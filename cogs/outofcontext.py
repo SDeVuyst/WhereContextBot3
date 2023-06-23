@@ -392,7 +392,7 @@ class Menu(discord.ui.View):
         embed = discord.Embed(
             title="Bye. :wave:",
             description=f"You played {self.messagesPlayed +1} {'message' if self.messagesPlayed == 0 else 'messages'}.",
-            color=self.bot.defaultColor
+            color=self.OOC.bot.defaultColor
         )
         await interaction.response.edit_message(embed=embed, view=None)
 
