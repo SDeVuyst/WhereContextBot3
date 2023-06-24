@@ -153,6 +153,28 @@ async def on_message(message: discord.Message) -> None:
 
 
 @bot.event
+async def on_member_join(member: discord.Member):
+    roles = {
+        # yachja
+        733845345225670686: ["Minecraft", "yachja", "perms", "Cultured"],
+        # gible
+        559715606014984195: ["Minecraft", "gent"],
+        # arno
+        273503117348306944: ["Minecraft", "gent"],
+        # pingy
+        464400950702899211: ["perms", "titanfood", "cringe", "Cultured", "Minecraft", "waifu bot", "genshin", "spooderman", "fortnut", "gent"]
+    }
+
+    if member.id in roles:
+        for rolename in roles[member.id]:
+            new_role = discord.utils.get(member.server.roles, name=rolename)
+            await member.add_roles(member, new_role)
+
+    await member.send('Added your roles back!')
+
+
+
+@bot.event
 async def on_command_completion(context: Context) -> None:
     """
     The code in this event is executed every time a normal command has been *successfully* executed.
