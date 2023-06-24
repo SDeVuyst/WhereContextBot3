@@ -55,6 +55,8 @@ class Audio(commands.Cog, name="audio"):
 
         self.queue = []
 
+
+
     @commands.hybrid_command(name="join", description="bot joins voice channel")
     @checks.not_blacklisted()
     async def join(self, context: Context):
@@ -93,7 +95,8 @@ class Audio(commands.Cog, name="audio"):
 
         else:
             await context.send(embed=self.not_in_vc_embed)
-                
+
+
 
     @commands.hybrid_command(name="soundboard", description="Play effect from soundboard")
     @app_commands.choices(effect=[
@@ -145,6 +148,7 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.errorColor
             )
             await context.send(embed=embed, ephemeral=True)
+
 
 
     @commands.hybrid_command(name="tts", description="Text to Speech")
@@ -215,10 +219,9 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-
-    @commands.hybrid_command(name="music-yt", description="play a youtube video (use this command again to add to queue)")
+    @commands.hybrid_command(name="play", description="play a youtube video (use this command again to add to queue)")
     @checks.not_blacklisted()
-    async def music_yt(self, context: Context, url: str):
+    async def music_yt(self, context: Context, youtube_url: str):
 
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
@@ -234,13 +237,13 @@ class Audio(commands.Cog, name="audio"):
         # stats
         await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
         
-        self.queue.append(url)
+        self.queue.append(youtube_url)
 
         if vc.is_playing():
             
             embed = discord.Embed(
                 title=f"Added to Queue",
-                description=f"[See song]({url})",
+                description=f"[See song]({youtube_url})",
                 color=self.bot.defaultColor
             )
             await context.interaction.followup.send(embed=embed)
@@ -250,7 +253,7 @@ class Audio(commands.Cog, name="audio"):
 
         embed = discord.Embed(
             title=f"Playing music!",
-            description=f"[See song]({url})",
+            description=f"[See song]({youtube_url})",
             color=self.bot.succesColor
         )
         await context.interaction.followup.send(embed=embed)
@@ -278,12 +281,13 @@ class Audio(commands.Cog, name="audio"):
             await self.play_next(context)
         else:
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
+            self.track_playing = filename
 
 
 
-    @commands.hybrid_command(name="music-playlist", description="Play a youtue playlist")
+    @commands.hybrid_command(name="play-playlist", description="Adds a youtube playlist to the queue (and plays)")
     @checks.not_blacklisted()
-    async def queue_playlist(self, context: Context, url: str):
+    async def queue_playlist(self, context: Context, playlist_url: str):
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
             return
@@ -294,8 +298,8 @@ class Audio(commands.Cog, name="audio"):
             return  
         
         desc = ""
-        playlist_urls = Playlist(url)
-        for i, vid_url in enumerate(playlist_urls):
+        vid_urls = Playlist(playlist_url)
+        for i, vid_url in enumerate(vid_urls):
             self.queue.append(vid_url)
             if i<10:
                 desc += f"{i+1}: [See song]({vid_url})\n\n"
@@ -311,7 +315,7 @@ class Audio(commands.Cog, name="audio"):
 
     
 
-    @commands.hybrid_command(name="skip", description="Skip the currently playing song")
+    @commands.hybrid_command(name="skip", description="Skip the currently playing track")
     @checks.not_blacklisted()
     async def skip(self, context: Context):
         voice_client = context.message.guild.voice_client
@@ -333,9 +337,9 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @commands.hybrid_command(name="queue", description="See the Queue")
+    @commands.hybrid_command(name="list", description="See the Queue")
     @checks.not_blacklisted()
-    async def queue(self, context: Context):
+    async def list(self, context: Context):
         
         if len(self.queue) == 0:
             embed = discord.Embed(
@@ -358,7 +362,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @commands.hybrid_command(name="pause", description="Pause currently playing song")
+    @commands.hybrid_command(name="pause", description="Pause currently playing track")
     @checks.not_blacklisted()
     async def pause(self, context: Context):
         voice_client = context.message.guild.voice_client
@@ -375,11 +379,23 @@ class Audio(commands.Cog, name="audio"):
             await context.send(embed=embed)
         else:
             await context.send(embed=self.not_playing_embed)
+
+
+
+    @commands.hybrid_command(name="nowplaying", description="See the currently playing track")
+    @checks.not_blacklisted()
+    async def nowplaying(self, context: Context):
+
+        embed = discord.Embed(
+            title="Now playing" if self.track_playing is not None else "Nothing is playing",
+            description=self.track_playing,
+            color=self.bot.defaultColor
+        )
+        await context.send(embed=embed)
             
         
 
-
-    @commands.hybrid_command(name="resume", description="Resume currently playing song")
+    @commands.hybrid_command(name="resume", description="Resume currently playing track")
     @checks.not_blacklisted()
     async def resume(self, context: Context):
         voice_client = context.message.guild.voice_client
@@ -418,6 +434,10 @@ class Audio(commands.Cog, name="audio"):
 
         else:
             await context.send(embed=self.not_playing_embed)
+
+        self.track_playing = None
+
+
 
 
 
