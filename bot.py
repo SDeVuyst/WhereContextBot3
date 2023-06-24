@@ -172,7 +172,7 @@ async def on_member_join(member):
         roles_to_add = roles.get(member.id)
         roles = []
         for rolename in roles_to_add:
-            new_role = discord.utils.get(member.server.roles, name=rolename)
+            new_role = discord.utils.get(member.guild.roles, name=rolename)
             roles.append(new_role)
 
         bot.logger.info(roles)
