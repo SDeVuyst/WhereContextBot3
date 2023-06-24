@@ -200,7 +200,7 @@ class Audio(commands.Cog, name="audio"):
             
             embed = discord.Embed(
                 title=f"Added to Queue",
-                description=f"[{yt.title}]({youtube_url})",
+                description=f"[{yt.title}]({youtube_url}) by {yt.author}",
                 color=self.bot.defaultColor
             )
             await context.interaction.followup.send(embed=embed)
@@ -210,7 +210,7 @@ class Audio(commands.Cog, name="audio"):
 
         embed = discord.Embed(
             title=f"Playing music!",
-            description=f"[{yt.title}]({youtube_url})",
+            description=f"[{yt.title}]({youtube_url}) by {yt.author}",
             color=self.bot.succesColor
         )
         await context.interaction.followup.send(embed=embed)
@@ -237,7 +237,7 @@ class Audio(commands.Cog, name="audio"):
                 yt = YouTube(vid_url)
 
                 if i<10:
-                    desc += f"{i+1}: [{yt.title}]({vid_url})\n\n"
+                    desc += f"{i+1}: [{yt.title}]({vid_url}) by {yt.author}\n\n"
 
         except Exception:
             embed = discord.Embed(
@@ -275,7 +275,7 @@ class Audio(commands.Cog, name="audio"):
             for i, url in enumerate(self.queue):
                 if i<10:
                     yt = YouTube(url)
-                    desc += f"{i+1}: [{yt.title}]({url})\n\n"
+                    desc += f"{i+1}: [{yt.title}]({url}) by {yt.author}\n\n"
 
             embed = discord.Embed(
                 title=f"Queue",
@@ -451,7 +451,7 @@ class Audio(commands.Cog, name="audio"):
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
 
             yt = YouTube(url)
-            self.track_playing = yt.title
+            self.track_playing = f"{yt.title} by {yt.author}"
             self.track_playing_url = url
 
             # stats
