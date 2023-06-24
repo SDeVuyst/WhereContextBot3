@@ -291,9 +291,16 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     async def nowplaying(self, context: Context):
 
+        try:
+            title="Now playing" if self.track_playing is not None else "Nothing is playing"
+            desc = f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None
+        except:
+            title="Nothing is playing"
+            desc = None
+
         embed = discord.Embed(
-            title="Now playing" if self.track_playing is not None else "Nothing is playing",
-            description=f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None,
+            title=title,
+            description=desc,
             color=self.bot.defaultColor
         )
         await context.send(embed=embed)
