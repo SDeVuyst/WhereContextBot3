@@ -297,21 +297,21 @@ class Audio(commands.Cog, name="audio"):
             await context.send(embed=self.bot_not_in_vc_embed)
             return  
         
-        desc = ""
-        vid_urls = Playlist(playlist_url)
         try:
+            desc = ""
+            vid_urls = Playlist(playlist_url)
             for i, vid_url in enumerate(vid_urls):
                 self.queue.append(vid_url)
                 if i<10:
                     desc += f"{i+1}: [See song]({vid_url})\n\n"
-        except KeyError:
+                    
+        except Exception:
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
                 description=f"ben je zeker dat dit een geldige url is?\n{playlist_url}",
                 color=self.bot.errorColor
             )
-            await context.interaction.followup.send(embed=embed)
-            await self.play_next(context)
+            await context.send(embed=embed)
             return
 
         # stats
