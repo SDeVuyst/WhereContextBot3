@@ -162,8 +162,8 @@ async def on_member_join(member):
         559715606014984195: ["gent", "Minecraft"],
         # arno
         273503117348306944: ["gent", "Minecraft"],
-        # pingy                 gent                perms
-        464400950702899211: [1024341053786038332, 756224050237538325]
+        # pingy                     perms
+        464400950702899211: [756224050237538325]
     }
 
     bot.logger.info(f"{member.id} joined the server!")
@@ -171,9 +171,12 @@ async def on_member_join(member):
     if member.id in roles:
         roles_to_add = roles.get(member.id)
         for role_id in roles_to_add:
-            new_role = discord.utils.get(member.guild.roles, id=role_id)
-            bot.logger.info(f"adding {role_id}")
-            await member.add_roles(member, new_role)
+            try:
+                new_role = discord.utils.get(member.guild.roles, id=role_id)
+                bot.logger.info(f"adding {role_id}")
+                await member.add_roles(member, new_role)
+            except:
+                bot.logger.warning(f"role {role_id} not found")
 
         
 
