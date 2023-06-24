@@ -15,7 +15,7 @@ from datetime import datetime
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands import Context
+from discord.ext.commands import Context, has_permissions
 
 from helpers import checks, db_manager
 
@@ -63,7 +63,7 @@ class General(commands.Cog, name="general"):
         name="lien",
         description="LIEN LOCKDOWN (admin only)",
     )
-    @checks.is_owner()
+    @has_permissions(ban_members=True)
     async def lien(self, context: Context) -> None:
         # kick grom
         try:
