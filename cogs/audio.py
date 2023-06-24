@@ -25,7 +25,7 @@ class Audio(commands.Cog, name="audio"):
 
         self.not_playing_embed = discord.Embed(
             title=f"The bot is not playing anything at the moment.",
-            description="Use /music-yt to play a song",
+            description="Use /play to play a song",
             color=self.bot.defaultColor
         )
 
@@ -54,47 +54,6 @@ class Audio(commands.Cog, name="audio"):
         self.ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
         self.queue = []
-
-
-
-    @commands.hybrid_command(name="join", description="bot joins voice channel")
-    @checks.not_blacklisted()
-    async def join(self, context: Context):
-        try:
-            if not context.message.author.voice:
-                embed = self.not_in_vc_embed
-            else:
-                channel = context.author.voice.channel
-                await channel.connect()
-                embed = discord.Embed(
-                    title=f"Joined channel {channel.name}!",
-                    color=self.bot.succesColor
-                )
-        except discord.ClientException:
-            embed = discord.Embed(
-                title=f"Already in voice channel",
-                color=self.bot.errorColor
-            )
-            
-        await context.send(embed=embed)
-    
-        
-
-    @commands.hybrid_command(name="leave", description="bot leaves voice channel")
-    @checks.not_blacklisted()
-    async def leave(self, context: Context):
-
-        vc = context.message.guild.voice_client
-        if vc.is_connected():
-            await vc.disconnect()
-            embed = discord.Embed(
-                title=f"left channel!",
-                color=self.bot.succesColor
-            )
-            await context.send(embed=embed)
-
-        else:
-            await context.send(embed=self.not_in_vc_embed)
 
 
 
@@ -221,7 +180,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="play", description="play a youtube video (use this command again to add to queue)")
     @checks.not_blacklisted()
-    async def music_yt(self, context: Context, youtube_url: str):
+    async def play(self, context: Context, youtube_url: str):
 
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
@@ -258,40 +217,9 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    async def play_next(self, context: Context):
-        vc = context.message.guild.voice_client
-
-        while vc.is_playing():
-            await asyncio.sleep(2)
-
-        if len(self.queue) == 0: return
-
-        url = self.queue.pop(0)
-
-        filename = await ytdl_helper.YTDLSource.from_url(url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
-        if filename is None:
-            embed = discord.Embed(
-                title=f"Er is iets misgegaan",
-                description=f"ben je zeker dat dit een geldige url is?\n{url}",
-                color=self.bot.errorColor
-            )
-            await context.interaction.followup.send(embed=embed)
-            await self.play_next(context)
-        else:
-            vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
-
-            yt = YouTube(url)
-            self.track_playing = yt.title
-            self.track_playing_url = url
-
-            # stats
-            await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
-
-
-
     @commands.hybrid_command(name="play-playlist", description="Adds a youtube playlist to the queue (and plays)")
     @checks.not_blacklisted()
-    async def queue_playlist(self, context: Context, playlist_url: str):
+    async def play_playlist(self, context: Context, playlist_url: str):
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
             return
@@ -331,28 +259,6 @@ class Audio(commands.Cog, name="audio"):
         if not vc.is_playing():
             await self.play_next(context)
 
-    
-
-    @commands.hybrid_command(name="skip", description="Skip the currently playing track")
-    @checks.not_blacklisted()
-    async def skip(self, context: Context):
-        voice_client = context.message.guild.voice_client
-        if voice_client is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
-            return  
-        
-        if voice_client.is_playing():
-            voice_client.stop()
-            
-            embed = discord.Embed(
-                title=f"Skipped!",
-                color=self.bot.succesColor
-            )
-            await context.send(embed=embed)
-
-        else:
-            await context.send(embed=self.not_playing_embed)
-
 
 
     @commands.hybrid_command(name="list", description="See the Queue")
@@ -381,6 +287,19 @@ class Audio(commands.Cog, name="audio"):
 
 
 
+    @commands.hybrid_command(name="nowplaying", description="See the currently playing track")
+    @checks.not_blacklisted()
+    async def nowplaying(self, context: Context):
+
+        embed = discord.Embed(
+            title="Now playing" if self.track_playing is not None else "Nothing is playing",
+            description=f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None,
+            color=self.bot.defaultColor
+        )
+        await context.send(embed=embed)
+      
+
+
     @commands.hybrid_command(name="pause", description="Pause currently playing track")
     @checks.not_blacklisted()
     async def pause(self, context: Context):
@@ -398,20 +317,7 @@ class Audio(commands.Cog, name="audio"):
             await context.send(embed=embed)
         else:
             await context.send(embed=self.not_playing_embed)
-
-
-
-    @commands.hybrid_command(name="nowplaying", description="See the currently playing track")
-    @checks.not_blacklisted()
-    async def nowplaying(self, context: Context):
-
-        embed = discord.Embed(
-            title="Now playing" if self.track_playing is not None else "Nothing is playing",
-            description=f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None,
-            color=self.bot.defaultColor
-        )
-        await context.send(embed=embed)
-            
+      
         
 
     @commands.hybrid_command(name="resume", description="Resume currently playing track")
@@ -429,6 +335,28 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.succesColor
             )
             await context.send(embed=embed)
+        else:
+            await context.send(embed=self.not_playing_embed)
+
+
+
+    @commands.hybrid_command(name="skip", description="Skip the currently playing track")
+    @checks.not_blacklisted()
+    async def skip(self, context: Context):
+        voice_client = context.message.guild.voice_client
+        if voice_client is None:
+            await context.send(embed=self.bot_not_in_vc_embed)
+            return  
+        
+        if voice_client.is_playing():
+            voice_client.stop()
+            
+            embed = discord.Embed(
+                title=f"Skipped!",
+                color=self.bot.succesColor
+            )
+            await context.send(embed=embed)
+
         else:
             await context.send(embed=self.not_playing_embed)
 
@@ -457,6 +385,77 @@ class Audio(commands.Cog, name="audio"):
         self.track_playing = None
         self.track_playing_url = None
 
+
+
+    @commands.hybrid_command(name="join", description="bot joins voice channel")
+    @checks.not_blacklisted()
+    async def join(self, context: Context):
+        try:
+            if not context.message.author.voice:
+                embed = self.not_in_vc_embed
+            else:
+                channel = context.author.voice.channel
+                await channel.connect()
+                embed = discord.Embed(
+                    title=f"Joined channel {channel.name}!",
+                    color=self.bot.succesColor
+                )
+        except discord.ClientException:
+            embed = discord.Embed(
+                title=f"Already in voice channel",
+                color=self.bot.errorColor
+            )
+            
+        await context.send(embed=embed)
+    
+        
+
+    @commands.hybrid_command(name="leave", description="bot leaves voice channel")
+    @checks.not_blacklisted()
+    async def leave(self, context: Context):
+
+        vc = context.message.guild.voice_client
+        if vc.is_connected():
+            await vc.disconnect()
+            embed = discord.Embed(
+                title=f"left channel!",
+                color=self.bot.succesColor
+            )
+            await context.send(embed=embed)
+
+        else:
+            await context.send(embed=self.not_in_vc_embed)
+
+
+
+    async def play_next(self, context: Context):
+        vc = context.message.guild.voice_client
+
+        while vc.is_playing():
+            await asyncio.sleep(2)
+
+        if len(self.queue) == 0: return
+
+        url = self.queue.pop(0)
+
+        filename = await ytdl_helper.YTDLSource.from_url(url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
+        if filename is None:
+            embed = discord.Embed(
+                title=f"Er is iets misgegaan",
+                description=f"ben je zeker dat dit een geldige url is?\n{url}",
+                color=self.bot.errorColor
+            )
+            await context.interaction.followup.send(embed=embed)
+            await self.play_next(context)
+        else:
+            vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
+
+            yt = YouTube(url)
+            self.track_playing = yt.title
+            self.track_playing_url = url
+
+            # stats
+            await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
 
 
 
