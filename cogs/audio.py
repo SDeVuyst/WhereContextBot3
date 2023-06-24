@@ -299,10 +299,20 @@ class Audio(commands.Cog, name="audio"):
         
         desc = ""
         vid_urls = Playlist(playlist_url)
-        for i, vid_url in enumerate(vid_urls):
-            self.queue.append(vid_url)
-            if i<10:
-                desc += f"{i+1}: [See song]({vid_url})\n\n"
+        try:
+            for i, vid_url in enumerate(vid_urls):
+                self.queue.append(vid_url)
+                if i<10:
+                    desc += f"{i+1}: [See song]({vid_url})\n\n"
+        except KeyError:
+            embed = discord.Embed(
+                title=f"Er is iets misgegaan",
+                description=f"ben je zeker dat dit een geldige url is?\n{playlist_url}",
+                color=self.bot.errorColor
+            )
+            await context.interaction.followup.send(embed=embed)
+            await self.play_next(context)
+            return
 
         # stats
         await db_manager.increment_or_add_command_count(context.author.id, "music_yt", len(vid_urls))
