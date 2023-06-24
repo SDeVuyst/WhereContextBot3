@@ -285,6 +285,7 @@ class Audio(commands.Cog, name="audio"):
 
             yt = YouTube(url)
             self.track_playing = yt.title
+            self.track_playing_url = url
 
 
 
@@ -408,7 +409,7 @@ class Audio(commands.Cog, name="audio"):
 
         embed = discord.Embed(
             title="Now playing" if self.track_playing is not None else "Nothing is playing",
-            description=self.track_playing,
+            description=f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None,
             color=self.bot.defaultColor
         )
         await context.send(embed=embed)
@@ -456,6 +457,7 @@ class Audio(commands.Cog, name="audio"):
             await context.send(embed=self.not_playing_embed)
 
         self.track_playing = None
+        self.track_playing_url = None
 
 
 
