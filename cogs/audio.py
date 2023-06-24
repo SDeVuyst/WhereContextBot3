@@ -149,12 +149,21 @@ class Audio(commands.Cog, name="audio"):
                 wav_f.flush()
                 subprocess.check_call(["ffmpeg", "-y", "-i", wav_f.name, opus_f.name])
 
+                self.bot.logger.info(wav_f)
+                self.bot.logger.info(opus_f)
+
                 source = discord.FFmpegOpusAudio(opus_f.name)
+
+                self.bot.logger.info(source)
+                
                 if vc.is_playing():
                     vc.pause()
 
                 vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
-
+                
+                while vc.is_playing():
+                    await asyncio.sleep(0.5)
+                    
                 if vc.is_paused():
                     vc.resume()
             
