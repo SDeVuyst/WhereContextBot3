@@ -156,19 +156,26 @@ async def on_message(message: discord.Message) -> None:
 async def on_member_join(member: discord.Member):
     roles = {
         # yachja
-        733845345225670686: ["Minecraft", "yachja", "perms", "Cultured"],
+        733845345225670686: ["Minecraft", "Cultured", "perms", "yachja"],
         # gible
-        559715606014984195: ["Minecraft", "gent"],
+        559715606014984195: ["gent", "Minecraft"],
         # arno
-        273503117348306944: ["Minecraft", "gent"],
+        273503117348306944: ["gent", "Minecraft"],
         # pingy
-        464400950702899211: ["perms", "titanfood", "cringe", "Cultured", "Minecraft", "waifu bot", "genshin", "spooderman", "fortnut", "gent"]
+        464400950702899211: ["gent", "perms"]
     }
 
+    print(f"{member.id} joined the server!")
+
     if member.id in roles:
+        roles = []
         for rolename in roles[member.id]:
             new_role = discord.utils.get(member.server.roles, name=rolename)
-            await member.add_roles(member, new_role)
+            roles.append(new_role)
+
+        print(roles)
+
+        await member.add_roles(member, *roles)
 
     await member.send('Added your roles back!')
 
