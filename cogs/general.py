@@ -145,7 +145,7 @@ class General(commands.Cog, name="general"):
 
     @commands.hybrid_command(
         name="countdown",
-        description="Countdown till spiderverse 3",
+        description=f"Countdown till {os.environ.get('countdown_title')}",
     )
     @checks.not_blacklisted()
     async def countdown(self, context: Context) -> None:
@@ -154,7 +154,7 @@ class General(commands.Cog, name="general"):
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
-            desc = "SPIDERVERSE 3 IS NU UIT!"
+            desc = f"{os.environ.get('countdown_title')} IS NU UIT!"
             kleur = self.bot.succesColor
         else:
             hours, remainder = divmod(diff.seconds, 3600)
@@ -164,7 +164,7 @@ class General(commands.Cog, name="general"):
             
 
         embed = discord.Embed(
-            title="Time till spiderverse 3",
+            title=f"Time till {os.environ.get('countdown_title')}",
             description=desc,
             color=kleur
         )
