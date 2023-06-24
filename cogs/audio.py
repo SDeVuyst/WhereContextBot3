@@ -233,9 +233,6 @@ class Audio(commands.Cog, name="audio"):
             return  
         
         await context.defer()
-
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
         
         self.queue.append(youtube_url)
         yt = YouTube(youtube_url)
@@ -287,6 +284,9 @@ class Audio(commands.Cog, name="audio"):
             self.track_playing = yt.title
             self.track_playing_url = url
 
+            # stats
+            await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
+
 
 
     @commands.hybrid_command(name="play-playlist", description="Adds a youtube playlist to the queue (and plays)")
@@ -320,8 +320,6 @@ class Audio(commands.Cog, name="audio"):
             await context.send(embed=embed)
             return
 
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "music_yt", len(vid_urls))
 
         embed = discord.Embed(
             title=f"Added to Queue",
