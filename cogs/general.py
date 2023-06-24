@@ -6,6 +6,7 @@ Description:
 Version: 5.5.0
 """
 
+import asyncio
 import os
 import platform
 import random
@@ -64,6 +65,7 @@ class General(commands.Cog, name="general"):
         description="LIEN LOCKDOWN (admin only)",
     )
     @has_permissions(ban_members=True)
+    @commands.cooldown(rate=1, per=40)
     async def lien(self, context: Context) -> None:
         # kick grom
         try:
@@ -80,6 +82,10 @@ class General(commands.Cog, name="general"):
             color=self.bot.errorColor
         )
         await context.send(embed=embed)
+        
+        await asyncio.sleep(30)
+        link = await context.channel.create_invite(max_uses=1, unique=True, reason="Lien")
+        await grom.send(link)
         
 
     @commands.hybrid_command(
