@@ -155,18 +155,25 @@ async def on_message(message: discord.Message) -> None:
 
 @bot.event
 async def on_member_join(member):
+    bot.logger.info(f"{member.id} joined the server!")
+
+    # add member role
+    new_role = discord.utils.get(member.guild.roles, id=753959093185675345)
+    bot.logger.info(f"adding {role_id}")
+    await member.add_roles(new_role)
+
     roles = {
-        # yachja
-        733845345225670686: ["Minecraft", "Cultured", "perms", "yachja"],
-        # gible
-        559715606014984195: ["gent", "Minecraft"],
-        # arno
-        273503117348306944: ["gent", "Minecraft"],
-        # pingy                     perms
-        464400950702899211: [756224050237538325]
+        # yachja                   perms               yachja
+        733845345225670686: [756224050237538325, 1119328394568548402],
+        # gible                    gent                minecraft
+        559715606014984195: [1024341053786038332, 739212609248690248],
+        # arno                     gent                minecraft         
+        273503117348306944: [1024341053786038332, 739212609248690248],
+        # pingy                    gent                minecraft           perms
+        464400950702899211: [1024341053786038332, 739212609248690248, 756224050237538325]
     }
 
-    bot.logger.info(f"{member.id} joined the server!")
+    
 
     if member.id in roles:
         roles_to_add = roles.get(member.id)
