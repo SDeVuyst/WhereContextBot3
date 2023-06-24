@@ -158,9 +158,9 @@ async def on_member_join(member):
     bot.logger.info(f"{member.id} joined the server!")
 
     # add member role
-    new_role = discord.utils.get(member.guild.roles, id=753959093185675345)
-    bot.logger.info(f"adding {role_id}")
-    await member.add_roles(new_role)
+    member_role = discord.utils.get(member.guild.roles, id=753959093185675345)
+    bot.logger.info(f"adding member role")
+    await member.add_roles(member_role)
 
     roles = {
         # yachja                   minecraft           cultured            perms               yachja
