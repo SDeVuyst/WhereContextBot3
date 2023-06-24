@@ -304,6 +304,9 @@ class Audio(commands.Cog, name="audio"):
             if i<10:
                 desc += f"{i+1}: [See song]({vid_url})\n\n"
 
+        # stats
+        await db_manager.increment_or_add_command_count(context.author.id, "music_yt", len(vid_urls))
+
         embed = discord.Embed(
             title=f"Added to Queue",
             description=desc,
@@ -311,7 +314,8 @@ class Audio(commands.Cog, name="audio"):
         )
         await context.send(embed=embed)
         
-        await self.play_next(context)
+        if not vc.is_playing():
+            await self.play_next(context)
 
     
 
