@@ -23,6 +23,7 @@ import exceptions
 
 
 intents = discord.Intents.default()
+intents.members = True
 
 bot = Bot(
     command_prefix='',
@@ -153,7 +154,7 @@ async def on_message(message: discord.Message) -> None:
 
 
 @bot.event
-async def on_member_join(member: discord.Member):
+async def on_member_join(member):
     roles = {
         # yachja
         733845345225670686: ["Minecraft", "Cultured", "perms", "yachja"],
@@ -165,7 +166,7 @@ async def on_member_join(member: discord.Member):
         464400950702899211: ["gent", "perms"]
     }
 
-    print(f"{member.id} joined the server!")
+    bot.logger.info(f"{member.id} joined the server!")
 
     if member.id in roles:
         roles = []
@@ -173,7 +174,7 @@ async def on_member_join(member: discord.Member):
             new_role = discord.utils.get(member.server.roles, name=rolename)
             roles.append(new_role)
 
-        print(roles)
+        bot.logger.info(roles)
 
         await member.add_roles(member, *roles)
 
