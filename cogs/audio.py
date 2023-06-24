@@ -432,7 +432,7 @@ class Audio(commands.Cog, name="audio"):
         vc = context.message.guild.voice_client
 
         while vc.is_playing():
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
 
         if len(self.queue) == 0: return
 
