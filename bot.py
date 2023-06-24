@@ -174,7 +174,7 @@ async def on_member_join(member):
             try:
                 new_role = discord.utils.get(member.guild.roles, id=role_id)
                 bot.logger.info(f"adding {role_id}")
-                await member.add_roles(member, new_role)
+                await member.add_roles(new_role)
             except:
                 bot.logger.warning(f"role {role_id} not found")
 
