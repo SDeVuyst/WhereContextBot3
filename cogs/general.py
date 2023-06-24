@@ -25,6 +25,8 @@ class General(commands.Cog, name="general"):
     def __init__(self, bot):
         self.bot = bot
 
+
+
     @commands.hybrid_command(
         name="help", description="List all commands the bot has loaded"
     )
@@ -60,12 +62,14 @@ class General(commands.Cog, name="general"):
         
         await context.send(embed=embed)
 
+
+
     @commands.hybrid_command(
         name="lien",
         description="LIEN LOCKDOWN (admin only)",
     )
     @has_permissions(ban_members=True)
-    @commands.cooldown(rate=1, per=40)
+    @commands.cooldown(rate=1, per=180)
     async def lien(self, context: Context) -> None:
         # kick grom
         try:
@@ -83,10 +87,11 @@ class General(commands.Cog, name="general"):
         )
         await context.send(embed=embed)
         
-        await asyncio.sleep(30)
-        link = await context.channel.create_invite(max_uses=1, unique=True, reason="Lien")
-        await grom.send(link)
+        # await asyncio.sleep(30)
+        # link = await context.channel.create_invite(max_uses=1, unique=True, reason="Lien")
+        # await grom.send(link)
         
+
 
     @commands.hybrid_command(
         name="ping",
@@ -110,6 +115,7 @@ class General(commands.Cog, name="general"):
         await context.send(embed=embed)
 
 
+
     @commands.hybrid_command(
         name="say",
         description="The bot will say anything you want",
@@ -127,6 +133,7 @@ class General(commands.Cog, name="general"):
         await db_manager.increment_or_add_command_count(context.author.id, "say", 1)
 
         await context.send(message)
+
 
 
     @commands.hybrid_command(
@@ -147,6 +154,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(title=message, color=self.bot.defaultColor)
         await context.send(embed=embed)
+
 
 
     @commands.hybrid_command(
@@ -179,6 +187,7 @@ class General(commands.Cog, name="general"):
         await db_manager.increment_or_add_command_count(context.author.id, "countdown", 1)
         
         await context.send(embed=embed)
+
 
 
     @commands.hybrid_command(
