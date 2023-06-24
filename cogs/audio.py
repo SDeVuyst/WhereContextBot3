@@ -9,7 +9,7 @@ import asyncio
 import tempfile
 from helpers import checks, db_manager, http, ytdl_helper
 import yt_dlp as youtube_dl
-from pytube import Playlist
+from pytube import Playlist, YouTube
 
 
 # Here we name the cog and create a new class for the cog.
@@ -238,12 +238,13 @@ class Audio(commands.Cog, name="audio"):
         await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
         
         self.queue.append(youtube_url)
+        yt = YouTube(youtube_url)
 
         if vc.is_playing():
             
             embed = discord.Embed(
                 title=f"Added to Queue",
-                description=f"[See song]({youtube_url})",
+                description=f"[{yt.title}]({youtube_url})",
                 color=self.bot.defaultColor
             )
             await context.interaction.followup.send(embed=embed)
@@ -253,7 +254,7 @@ class Audio(commands.Cog, name="audio"):
 
         embed = discord.Embed(
             title=f"Playing music!",
-            description=f"[See song]({youtube_url})",
+            description=f"[{yt.title}]({youtube_url})",
             color=self.bot.succesColor
         )
         await context.interaction.followup.send(embed=embed)
@@ -281,7 +282,9 @@ class Audio(commands.Cog, name="audio"):
             await self.play_next(context)
         else:
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
-            self.track_playing = filename
+
+            yt = YouTube(url)
+            self.track_playing = yt.title
 
 
 
@@ -302,9 +305,11 @@ class Audio(commands.Cog, name="audio"):
             vid_urls = Playlist(playlist_url)
             for i, vid_url in enumerate(vid_urls):
                 self.queue.append(vid_url)
+                yt = YouTube(vid_url)
+
                 if i<10:
-                    desc += f"{i+1}: [See song]({vid_url})\n\n"
-                    
+                    desc += f"{i+1}: [{yt.title}]({vid_url})\n\n"
+
         except Exception:
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
@@ -364,7 +369,8 @@ class Audio(commands.Cog, name="audio"):
             desc = ""
             for i, url in enumerate(self.queue):
                 if i<10:
-                    desc += f"{i+1}: [See song]({url})\n\n"
+                    yt = YouTube(url)
+                    desc += f"{i+1}: [{yt.title}]({url})\n\n"
 
             embed = discord.Embed(
                 title=f"Queue",
