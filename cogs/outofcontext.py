@@ -309,7 +309,7 @@ class OutOfContext(commands.Cog, name="context"):
 # behandelt alle knoppen
 class Menu(discord.ui.View):
     def __init__(self, OOC):
-        super().__init__(timeout=10)
+        super().__init__(timeout=300)
         self.OOC = OOC
         self.messages = []
         self.currentIndex = 0
@@ -404,6 +404,8 @@ class Menu(discord.ui.View):
         
 
     async def on_timeout(self) -> None:
+
+        if self.message is None: return
         # stuur confirmatie bericht
         embed = discord.Embed(
             title="Bye. :wave:",
