@@ -191,10 +191,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     async def play(self, context: Context, youtube_url: str):
 
+        # check dat user in vc zit
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
             return
         
+        # check dat bot in vc zit
         vc = context.message.guild.voice_client
         if vc is None:
             await context.send(embed=self.bot_not_in_vc_embed)
@@ -202,9 +204,12 @@ class Audio(commands.Cog, name="audio"):
         
         await context.defer()
         
-        self.queue.append(youtube_url)
         yt = YouTube(youtube_url)
-
+        
+        # voeg lied aan queue toe
+        self.queue.append(youtube_url)
+        
+        # stuur confirmatie dat lied is toegevoegd
         if vc.is_playing():
             
             embed = discord.Embed(
@@ -453,6 +458,20 @@ class Audio(commands.Cog, name="audio"):
         if len(self.queue) == 0: return
 
         url = self.queue.pop(0)
+        yt = YouTube(url)
+        # video mag max 15 min duren
+        try:
+            if yt.length > 900:
+                embed = discord.Embed(
+                    title=f"Video must be less than 15 minutes long.",
+                    color=self.bot.errorColor
+                ) 
+                await context.interaction.followup.send(embed=embed)
+                await self.play_next(context)
+                return
+        except Exception as e:
+            self.bot.logger.warning(e)
+            pass
 
         filename = await ytdl_helper.YTDLSource.from_url(url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
         if filename is None:
@@ -466,7 +485,6 @@ class Audio(commands.Cog, name="audio"):
         else:
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
 
-            yt = YouTube(url)
             self.track_playing = f"{yt.title} by {yt.author}"
             self.track_playing_url = url
 
