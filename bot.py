@@ -214,9 +214,9 @@ async def on_command_completion(context: Context) -> None:
 
 # check for inactivity in voice channel
 @bot.event()
-async def on_voice_state_update(self, member, before, after):
+async def on_voice_state_update(member, before, after):
     
-    if not member.id == self.bot.user.id:
+    if not member.id == bot.user.id:
         return
 
     elif before.channel is None:
