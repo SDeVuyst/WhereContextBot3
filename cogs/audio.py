@@ -13,28 +13,6 @@ import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube
 
 
-# check for inactivity in voice channel
-@commands.Cog.listener()
-async def on_voice_state_update(self, member, before, after):
-    
-    if not member.id == self.bot.user.id:
-        return
-
-    elif before.channel is None:
-        voice = after.channel.guild.voice_client
-        # time = 0
-        while True:
-            await asyncio.sleep(5)
-            if len(voice.channel.members) == 1:
-                await voice.disconnect()
-
-            # time = time + 1
-            # if voice.is_playing() and not voice.is_paused():
-            #     time = 0
-            # if time == 600:
-            #     await voice.disconnect()
-            if not voice.is_connected():
-                break
 
 
 # Here we name the cog and create a new class for the cog.
