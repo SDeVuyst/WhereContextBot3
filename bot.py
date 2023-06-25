@@ -287,6 +287,16 @@ async def on_command_error(context: Context, error) -> None:
             color=bot.errorColor,
         )
         await context.send(embed=embed)
+
+    elif isinstance(error, exceptions.WrongChannel):
+        embed = discord.Embed(
+            title="Wrong channel!",
+            # We need to capitalize because the command arguments have no capital letter in the code.
+            description=str(error).capitalize(),
+            color=bot.errorColor,
+        )
+        await context.send(embed=embed)
+
     else:
         # embed = discord.Embed(
         #     title="Error!",
