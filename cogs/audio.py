@@ -222,13 +222,6 @@ class Audio(commands.Cog, name="audio"):
 
         await self.play_next(context)
 
-        embed = discord.Embed(
-            title=f"Playing music!",
-            description=f"[{yt.title}]({youtube_url}) by {yt.author}",
-            color=self.bot.succesColor
-        )
-        await context.interaction.followup.send(embed=embed)
-
 
 
     @commands.hybrid_command(name="play-playlist", description="Adds a youtube playlist to the queue (and plays)")
@@ -487,6 +480,13 @@ class Audio(commands.Cog, name="audio"):
 
             self.track_playing = f"{yt.title} by {yt.author}"
             self.track_playing_url = url
+
+            embed = discord.Embed(
+                title=f"Playing music!",
+                description=f"[{yt.title}]({url}) by {yt.author}",
+                color=self.bot.succesColor
+            )
+            await context.interaction.followup.send(embed=embed)
 
             # stats
             await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
