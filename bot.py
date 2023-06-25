@@ -225,6 +225,7 @@ async def on_voice_state_update(self, member, before, after):
         while True:
             await asyncio.sleep(5)
             if len(voice.channel.members) == 1:
+                bot.logger.info("disconnecting bot due to inactivity")
                 await voice.disconnect()
 
             # time = time + 1
