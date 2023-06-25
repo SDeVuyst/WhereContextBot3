@@ -22,8 +22,6 @@ class OutOfContext(commands.Cog, name="context"):
         )
         self.bot.tree.add_command(self.ctx_menu_remove)
 
-        self.menu = Menu(self)
-
         self.currently_playing = False
 
  # COMMANDS
@@ -132,6 +130,8 @@ class OutOfContext(commands.Cog, name="context"):
             await context.send(embed=embed, delete_after=10)
             return
         
+        self.menu = Menu(self)
+        
         embed, sendView = await self.getRandomMessage(context.guild)
         await self.menu.reset()
         self.menu.author = context.author
@@ -140,7 +140,6 @@ class OutOfContext(commands.Cog, name="context"):
         await db_manager.increment_or_add_command_count(context.author.id, "play", 1)
         self.menu.message = await context.send(embed=embed, view= self.menu if sendView else None, ephemeral=not groep)
         self.currently_playing = True
-
 
 
 
@@ -412,6 +411,7 @@ class Menu(discord.ui.View):
             color=self.OOC.bot.defaultColor
         )
         await self.message.edit(embed=embed, view=None)
+        self
         await self.reset_game()
     
 
