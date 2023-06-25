@@ -413,7 +413,6 @@ class Menu(discord.ui.View):
             color=self.OOC.bot.defaultColor
         )
         await self.message.edit(embed=embed, view=None)
-        self
         await self.reset_game()
     
 
