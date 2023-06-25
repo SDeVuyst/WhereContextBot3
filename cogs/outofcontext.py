@@ -138,7 +138,7 @@ class OutOfContext(commands.Cog, name="context"):
 
         # voeg stats toe
         await db_manager.increment_or_add_command_count(context.author.id, "play", 1)
-        await context.send(embed=embed, view= self.menu if sendView else None, ephemeral=not groep)
+        self.menu.message = await context.send(embed=embed, view= self.menu if sendView else None, ephemeral=not groep)
         self.currently_playing = True
 
 
@@ -310,7 +310,7 @@ class OutOfContext(commands.Cog, name="context"):
 # behandelt alle knoppen
 class Menu(discord.ui.View):
     def __init__(self, OOC):
-        super().__init__(timeout=None)
+        super().__init__(timeout=10)
         self.OOC = OOC
         self.messages = []
         self.currentIndex = 0
@@ -381,12 +381,6 @@ class Menu(discord.ui.View):
 
     @discord.ui.button(label="Quit", style=discord.ButtonStyle.blurple)
     async def quit(self, interaction: discord.Interaction, button: discord.ui.Button):
-        
-
-        # stats
-        await db_manager.increment_or_add_command_count(self.author.id, "messages_played", self.messagesPlayed+1)
-        await db_manager.increment_or_add_command_count(self.author.id, "messages_deleted", self.messagesDeleted)
-
 
         # stuur confirmatie bericht
         embed = discord.Embed(
@@ -395,17 +389,7 @@ class Menu(discord.ui.View):
             color=self.OOC.bot.defaultColor
         )
         await interaction.response.edit_message(embed=embed, view=None)
-
-        
-        # reset alle gegevens
-        self.messages.clear()
-        self.currentIndex = 0
-        self.messagesPlayed = 0
-        self.messagesDeleted = 0
-        self.author = None
-        await self.reset()
-
-        self.OOC.currently_playing = False
+        await self.reset_game()
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -420,6 +404,32 @@ class Menu(discord.ui.View):
             return False
         
 
+    async def on_timeout(self) -> None:
+        # stuur confirmatie bericht
+        embed = discord.Embed(
+            title="Bye. :wave:",
+            description=f"You played {self.messagesPlayed +1} {'message' if self.messagesPlayed == 0 else 'messages'}.",
+            color=self.OOC.bot.defaultColor
+        )
+        await self.message.edit(embed=embed, view=None)
+        await self.reset_game()
+    
+
+    async def reset_game(self):
+        # stats
+        await db_manager.increment_or_add_command_count(self.author.id, "messages_played", self.messagesPlayed+1)
+        await db_manager.increment_or_add_command_count(self.author.id, "messages_deleted", self.messagesDeleted)       
+
+        # reset alle gegevens
+        self.messages.clear()
+        self.currentIndex = 0
+        self.messagesPlayed = 0
+        self.messagesDeleted = 0
+        self.author = None
+        self.message = None
+        await self.reset()
+
+        self.OOC.currently_playing = False
 
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
