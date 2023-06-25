@@ -212,9 +212,10 @@ async def on_command_completion(context: Context) -> None:
             f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs"
         )
 
+
 # check for inactivity in voice channel
-@bot.event()
-async def on_voice_state_update(member, before, after):
+@bot.event
+async def on_voice_state_update(member, before, after) -> None:
     
     if not member.id == bot.user.id:
         return
@@ -235,6 +236,7 @@ async def on_voice_state_update(member, before, after):
             #     await voice.disconnect()
             if not voice.is_connected():
                 break
+
 
 @bot.event
 async def on_command_error(context: Context, error) -> None:
