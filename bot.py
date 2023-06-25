@@ -281,7 +281,7 @@ async def on_command_error(context: Context, error) -> None:
         await context.send(embed=embed, ephemeral=True)
     elif isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(
-            title="Error!",
+            title="You are missing some required arguments!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
             color=bot.errorColor,
@@ -295,7 +295,7 @@ async def on_command_error(context: Context, error) -> None:
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await context.send(embed=embed)
+        await context.send(embed=embed, ephemeral=True)
 
     else:
         # embed = discord.Embed(

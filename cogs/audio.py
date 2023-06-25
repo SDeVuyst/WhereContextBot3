@@ -16,14 +16,6 @@ from pytube import Playlist, YouTube
 
 
 
-def in_correct_channel():
-    async def predicate(ctx: Context):
-        if ctx.channel.id not in [1114464141508345906, 727511733970665493]:
-            raise WrongChannel("Only able to play in #out-of-context-game or #music-bot)")
-        return True
-    return check(predicate)
-
-
 # Here we name the cog and create a new class for the cog.
 class Audio(commands.Cog, name="audio"):
     def __init__(self, bot):
@@ -84,7 +76,7 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="creeper", value="creeper.mp3"),
     ])
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def soundboard(self, context: Context, effect: discord.app_commands.Choice[str]):
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
@@ -136,7 +128,7 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="Hitler", value="hitler-rant"),
     ])
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     @commands.cooldown(rate=1, per=120)
     async def tts(self, context: Context, speech: str, voice: discord.app_commands.Choice[str]):
         
@@ -203,7 +195,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="play", description="play a youtube video (use this command again to add to queue)")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def play(self, context: Context, youtube_url: str):
 
         # check dat user in vc zit
@@ -241,7 +233,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="play-playlist", description="Adds a youtube playlist to the queue (and plays)")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def play_playlist(self, context: Context, playlist_url: str):
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
@@ -286,7 +278,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="list", description="See the Queue")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def list(self, context: Context):
         
         if len(self.queue) == 0:
@@ -313,7 +305,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="nowplaying", description="See the currently playing track")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def nowplaying(self, context: Context):
 
         try:
@@ -334,7 +326,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="pause", description="Pause currently playing track")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def pause(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -355,7 +347,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="resume", description="Resume currently playing track")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def resume(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -376,7 +368,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="skip", description="Skip the currently playing track")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def skip(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -399,7 +391,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="stop", description="Stop the listening session (this clears the queue!)")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def stop(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -425,7 +417,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="join", description="bot joins voice channel")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def join(self, context: Context):
         try:
             if not context.message.author.voice:
@@ -449,7 +441,7 @@ class Audio(commands.Cog, name="audio"):
 
     @commands.hybrid_command(name="leave", description="bot leaves voice channel")
     @checks.not_blacklisted()
-    @in_correct_channel()
+    @checks.in_audio_command_channel()
     async def leave(self, context: Context):
 
         vc = context.message.guild.voice_client
