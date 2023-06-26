@@ -241,15 +241,18 @@ class General(commands.Cog, name="general"):
         await db_manager.increment_or_add_command_count(context.author.id, "chat", 1)
 
         try:
-            response = openai.Completion.create(
+            response = openai.ChatCompletion.create(
                 engine="gpt-3.5-turbo-16k",
-                prompt=prompt,
-                max_tokens=1000,
+                messages=[
+                    {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but slightly sarcastic bot who is not afraid to trash-talk"},
+                    {"role": "user", "content": prompt}
+                ],
                 temperature=0.5,
+                max_tokens=350
             )
             embed = discord.Embed(
                 title=None,
-                description=response.choices[0].text,
+                description=response['choices'][0]['message']['content'],
                 color=self.bot.defaultColor
             )
 
