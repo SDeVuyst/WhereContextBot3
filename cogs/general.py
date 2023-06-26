@@ -245,7 +245,8 @@ class General(commands.Cog, name="general"):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but slightly sarcastic bot who is not afraid to trash-talk"},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt, "name":context.author.display_name},
+
                 ],
                 temperature=0.5,
                 max_tokens=350
