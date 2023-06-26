@@ -24,6 +24,7 @@ import exceptions
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 bot = Bot(
     command_prefix='',
