@@ -139,10 +139,11 @@ async def on_message(message: discord.Message) -> None:
         return
     
     # stuur dm naar solos on prive command
-    # solos user object
-    owner = int(list(os.environ.get("owners").split(","))[0])
-    user = await bot.fetch_user(owner)
+    
     if message.guild is None:
+        # solos user object
+        owner = int(list(os.environ.get("owners").split(","))[0])
+        user = await bot.fetch_user(owner)
         await user.send(content=f"{message.author.display_name} sent: {message.content}")
 
         for att in message.attachments:
