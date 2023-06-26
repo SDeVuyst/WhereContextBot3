@@ -211,7 +211,7 @@ class Audio(commands.Cog, name="audio"):
         await context.defer()
         
         # playlist
-        if youtube_url.find("&list=") != -1:
+        if youtube_url.find("list=") != -1:
             try:
                 desc = ""
                 vid_urls = Playlist(youtube_url)
