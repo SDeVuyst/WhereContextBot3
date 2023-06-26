@@ -225,16 +225,7 @@ class General(commands.Cog, name="general"):
     )
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=30)
-    async def chat(self, context: Context, prompt: str) -> None:
-        
-        if len(prompt) > 200:
-            context.command.reset_cooldown(context)
-            embed = discord.Embed(
-                title="promp mag max 200 karakters lang zijn",
-                color=self.bot.errorColor
-            )
-            await context.send(embed=embed)
-            return
+    async def chat(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
 
         await context.defer()
 
