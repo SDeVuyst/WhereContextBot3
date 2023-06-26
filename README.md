@@ -18,6 +18,7 @@ ELKE TITEL IS EEN COG DIE TELKENS HUN COMMANDS BESSCHRIJFT
 * /ping	check de latency van de bot
 * /say		laat de bot eender wat zeggen
 * /embed	laat de bot eender wat zeggen, maar in een embed
+* /chat	chat met de ai chatbox
 * /countdown  countdown tot een gegeven moment
 
 ## Namen
