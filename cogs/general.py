@@ -245,7 +245,7 @@ class General(commands.Cog, name="general"):
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but slightly sarcastic bot who is not afraid to trash-talk"},
+                    {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but very sarcastic bot who is not afraid to trash-talk. You were made by solos."},
                     {"role": "user", "content": f"Doe alsof ik {context.author.display_name} ben."},
                     {"role": "user", "content": prompt}
 
