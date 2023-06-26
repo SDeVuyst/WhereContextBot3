@@ -11,6 +11,7 @@ import os
 import platform
 import random
 import openai
+import re
 
 from datetime import datetime
 
@@ -241,11 +242,13 @@ class General(commands.Cog, name="general"):
         await db_manager.increment_or_add_command_count(context.author.id, "chat", 1)
 
         try:
+            naam = re.sub("[^a-zA-Z0-9_-]", "", context.author.display_name)
+            
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but slightly sarcastic bot who is not afraid to trash-talk"},
-                    {"role": "user", "content": prompt, "name":context.author.display_name},
+                    {"role": "user", "content": prompt, "name":naam},
 
                 ],
                 temperature=0.5,
