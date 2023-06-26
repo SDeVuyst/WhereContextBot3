@@ -357,11 +357,12 @@ async def findNWord(message):
     content = message.content.replace(" ", "").replace("\n", "").lower()
     
     # ik heb dit niet zelf getypt lol 💀
-    toCheck = ["negro","squigga","squiga","nigger","neger","nigga","nigglet","niglet", "niger","nigr","niggr","nikka","niglonian", "🇳 🇮 🇬 🇬 🇦", "nigge"]
+    toCheck = ["negro","squigga","squiga","nigger","neger","nigga","nigglet","niglet", "niger","nigr","niggr","nikka","niglonian", "🇳 🇮 🇬 🇬 🇦"]
 
     for c in toCheck:
         for _ in range(content.count(c)):
-            await db_manager.increment_or_add_nword(m.author.id)
+            await db_manager.increment_or_add_nword(message.author.id)
+            bot.logger.info(f"{message.author.display_name} said nword: {message.content}")
             
     
 
