@@ -234,6 +234,8 @@ class General(commands.Cog, name="general"):
             await context.send(embed=embed)
             return
 
+        await context.defer()
+
         # stats
         await db_manager.increment_or_add_command_count(context.author.id, "chat", 1)
 
@@ -259,8 +261,8 @@ class General(commands.Cog, name="general"):
             )
         
 
-        # stuur confirmatie
-        await context.send(embed=embed)
+        # stuur het antwoord
+        await context.interaction.followup.send(embed=embed)
 
 
 async def setup(bot):
