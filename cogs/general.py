@@ -10,6 +10,7 @@ import asyncio
 import os
 import platform
 import random
+import openai
 
 from datetime import datetime
 
@@ -19,6 +20,9 @@ from discord.ext import commands
 from discord.ext.commands import Context, has_permissions
 
 from helpers import checks, db_manager
+
+
+openai.api_key = os.environ.get("openaisecret")
 
 
 class General(commands.Cog, name="general"):
@@ -212,6 +216,51 @@ class General(commands.Cog, name="general"):
         # stuur confirmatie
         await context.send(content="done.", ephemeral=True)
 
+    @commands.hybrid_command(
+        name="chat",
+        description="Chat with the bot",
+    )
+    @checks.not_blacklisted()
+    @checks.is_owner()
+    # @commands.cooldown(rate=1, per=30)
+    async def chat(self, context: Context, prompt: str) -> None:
+        
+        if len(prompt) > 200:
+            context.command.reset_cooldown(context)
+            embed = discord.Embed(
+                title="promp mag max 200 karakters lang zijn",
+                color=self.bot.errorColor
+            )
+            await context.send(embed=embed)
+            return
+
+        # stats
+        await db_manager.increment_or_add_command_count(context.author.id, "chat", 1)
+
+        try:
+            response = openai.Completion.create(
+                engine="text-davinci-002",
+                prompt=prompt,
+                max_tokens=1000,
+                temperature=0.5,
+            )
+            embed = discord.Embed(
+                title=None,
+                description=response.choices[0].text,
+                color=self.bot.defaultColor
+            )
+
+        except Exception as e:
+            self.bot.logger.warning(e)
+            embed = discord.Embed(
+                title="Er ging iets mis",
+                description=e,
+                color=self.bot.errorColor
+            )
+        
+
+        # stuur confirmatie
+        await context.send(embed=embed)
 
 
 async def setup(bot):
