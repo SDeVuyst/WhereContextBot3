@@ -216,13 +216,14 @@ class General(commands.Cog, name="general"):
         # stuur confirmatie
         await context.send(content="done.", ephemeral=True)
 
+
+
     @commands.hybrid_command(
         name="chat",
         description="Chat with the bot",
     )
     @checks.not_blacklisted()
-    @checks.is_owner()
-    # @commands.cooldown(rate=1, per=30)
+    @commands.cooldown(rate=1, per=30)
     async def chat(self, context: Context, prompt: str) -> None:
         
         if len(prompt) > 200:
@@ -241,7 +242,7 @@ class General(commands.Cog, name="general"):
 
         try:
             response = openai.Completion.create(
-                engine="text-davinci-002",
+                engine="gpt-3.5-turbo-16k",
                 prompt=prompt,
                 max_tokens=1000,
                 temperature=0.5,
