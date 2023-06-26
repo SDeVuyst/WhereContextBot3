@@ -242,7 +242,7 @@ class General(commands.Cog, name="general"):
 
         try:
             response = openai.ChatCompletion.create(
-                engine="gpt-3.5-turbo-16k",
+                model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but slightly sarcastic bot who is not afraid to trash-talk"},
                     {"role": "user", "content": prompt}
