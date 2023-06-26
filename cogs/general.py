@@ -241,7 +241,7 @@ class General(commands.Cog, name="general"):
 
                 ],
                 temperature=0.5,
-                max_tokens=350
+                max_tokens=150
             )
             embed = discord.Embed(
                 title=None,
