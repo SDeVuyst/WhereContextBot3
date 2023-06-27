@@ -237,12 +237,11 @@ class General(commands.Cog, name="general"):
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but very sarcastic bot who is not afraid to trash-talk. You were made by solos."},
-                    {"role": "user", "content": f"Doe alsof ik {context.author.display_name} ben."},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": f"Mijn naam is  {context.author.display_name}. {prompt} (limiteer je antwoord tot 60 woorden)"},
 
                 ],
                 temperature=0.5,
-                max_tokens=350
+                max_tokens=150
             )
             embed = discord.Embed(
                 title=None,
