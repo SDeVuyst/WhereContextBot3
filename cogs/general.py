@@ -263,5 +263,47 @@ class General(commands.Cog, name="general"):
         await context.interaction.followup.send(embed=embed)
 
 
+
+    @commands.hybrid_command(
+        name="image",
+        description="Create an image",
+    )
+    @checks.not_blacklisted()
+    @commands.cooldown(rate=3, per=600) # 3 per 10 minutes
+    async def image(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
+
+        await context.defer()
+
+        # stats
+        await db_manager.increment_or_add_command_count(context.author.id, "image", 1)
+
+        try:
+            response = openai.Image.create(
+                prompt=prompt,
+                n=1,
+                size="512x512"
+            )
+            
+            image_url = response['data'][0]['url']
+            
+            embed = discord.Embed(
+                title=None,
+                color=self.bot.defaultColor
+            )
+            embed.set_image(url=image_url)
+
+        except Exception as e:
+            self.bot.logger.warning(e)
+            embed = discord.Embed(
+                title="Er ging iets mis",
+                description=e,
+                color=self.bot.errorColor
+            )
+        
+
+        # stuur het antwoord
+        await context.interaction.followup.send(embed=embed)
+
+
 async def setup(bot):
     await bot.add_cog(General(bot))
