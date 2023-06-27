@@ -158,6 +158,7 @@ async def on_message(message: discord.Message) -> None:
 
 @bot.event
 async def on_member_remove(member):
+    bot.logger.info(f"increased ban count of {member.id}")
     await db_manager.increment_or_add_ban_count(member.id, 1)
 
 
