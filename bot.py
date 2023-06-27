@@ -159,6 +159,8 @@ async def on_message(message: discord.Message) -> None:
 async def on_member_join(member):
     bot.logger.info(f"{member.id} joined the server!")
 
+    await db_manager.increment_or_add_ban_count(member.id, 1)
+    
     # add member role
     member_role = discord.utils.get(member.guild.roles, id=753959093185675345)
     bot.logger.info(f"adding member role")

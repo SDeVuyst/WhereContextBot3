@@ -430,3 +430,106 @@ async def get_leaderboard(command: str) -> list:
     except Exception as err:
         return [-1, err]
     
+
+
+async def is_in_ban_count(user_id: int) -> bool:
+    """
+    This function will check if a user already played a command.
+
+    """
+        
+    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM user_bans WHERE user_id=%s", (str(user_id),)
+                )
+                result = cursor.fetchall()
+                return len(result) > 0
+        # Als er iets misgaat, zeggen we dat command al bestaat
+        except:
+            return True
+        
+
+
+async def increment_or_add_ban_count(user_id: int, amount: int):
+
+    alreadyExists = await is_in_ban_count(user_id)
+
+    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE user_bans SET count = count + %s WHERE user_id=%s",
+                        (amount, str(user_id),)
+                    )   
+                else:
+                    cursor.execute(
+                        "INSERT INTO user_bans (user_id, count) VALUES (%s, %s)",
+                        (str(user_id), amount,)
+                    )
+
+                cursor.commit()
+                return True
+                
+        except:
+            return False
+        
+
+
+async def get_ban_count(user_id) -> list:
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT count FROM user_bans WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+
+async def set_ban_count(user_id, amount):
+    alreadyExists = await is_in_ban_count(user_id)
+
+    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE user_bans SET count = %s WHERE user_id=%s", 
+                        ((amount), str(user_id),)
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO user_bans (user_id, count) VALUES (%s, %s)",
+                        (str(user_id), amount,)
+                    )
+                    
+                con.commit()
+                return True
+
+        except:
+            return False
+        
+
+async def get_ban_leaderboard() -> list:
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, count FROM user_bans ORDER BY count DESC LIMIT 10"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]

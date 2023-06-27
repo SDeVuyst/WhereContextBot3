@@ -94,6 +94,7 @@ class Stats(commands.Cog, name="stats"):
         await context.send(embed=embed)
 
 
+
     @commands.hybrid_command(name="changecommandcount", description="Change the command count of a user (admin only)")
     @app_commands.describe(user="Which users count")
     @app_commands.choices(command=[
@@ -125,7 +126,7 @@ class Stats(commands.Cog, name="stats"):
         discord.app_commands.Choice(name="tts", value="tts"),
     ])
     @checks.is_owner()
-    async def changeNCount(self, context: Context, user: discord.User, command: discord.app_commands.Choice[str], amount: int):
+    async def change_command_count(self, context: Context, user: discord.User, command: discord.app_commands.Choice[str], amount: int):
         # krijg count uit db
         succes = await db_manager.set_command_count(command.value, user.id, amount)
 
@@ -139,6 +140,8 @@ class Stats(commands.Cog, name="stats"):
         )
         await context.send(embed=embed)
 
+
+
     @commands.hybrid_command(name="leaderboard", description="Leaderboard of a command")
     @app_commands.choices(command=[
         discord.app_commands.Choice(name="gible", value="gible"),
@@ -148,7 +151,7 @@ class Stats(commands.Cog, name="stats"):
         discord.app_commands.Choice(name="meng", value="meng"),
         discord.app_commands.Choice(name="broodman", value="broodman"),
         discord.app_commands.Choice(name="keleo", value="keleo"),
-        discord.app_commands.Choice(name="help", value="help"),
+        discord.app_commands.Choice(name="ban", value="bancount"),
         discord.app_commands.Choice(name="image", value="image"),
         discord.app_commands.Choice(name="say", value="say"),
         discord.app_commands.Choice(name="giblereact", value="giblereact"),
@@ -175,6 +178,8 @@ class Stats(commands.Cog, name="stats"):
         
         if command.value == "ncountCHECK":
             leaderb = await db_manager.get_nword_leaderboard()
+        elif command.value == "bancount":
+            leaderb = await db_manager.get_ban_leaderboard()
         else:
             # krijg count bericht uit db
             leaderb = await db_manager.get_leaderboard(command.value)
@@ -210,6 +215,64 @@ class Stats(commands.Cog, name="stats"):
         )
 
         await context.send(embed=embed)
+
+
+
+    @commands.hybrid_command(name="bancount", description="How many times has a user been banned?")
+    @app_commands.describe(user="Which users ban count")
+    @checks.not_blacklisted()
+    async def bancount(self, context: Context, user: discord.User):
+        
+        # krijg count uit db
+        count = await db_manager.get_ban_count(user.id)
+
+        # Geen berichten
+        if len(count) == 0 or int(count[0][0]) == 0:
+            embed = discord.Embed(
+                description=f"**<@{user.id}> has not been banned yet**",
+                color=self.bot.defaultColor
+            )
+            await context.send(embed=embed)
+            return
+        
+        # error
+        elif count[0] == -1:
+            embed = discord.Embed(
+                title=f"Something went wrong",
+                description=count[1],
+                color=self.bot.errorColor
+            )
+            await context.send(embed=embed)
+            return
+        
+
+        embed = discord.Embed(
+            description=f"**<@{user.id}> has been banned ```{count[0][0]}``` times.**",
+            color=self.bot.defaultColor
+        )
+
+        await context.send(embed=embed)
+
+
+
+    @commands.hybrid_command(name="changebancount", description="Change user ban count (owner only)")
+    @checks.is_owner()   
+    async def change_ban_count(self, context: Context, user: discord.User, amount: int):
+        # krijg count uit db
+        succes = await db_manager.set_ban_count(user.id, amount)
+
+
+        # verstuur embed
+        desc = f"ban count of <@{user.id}> is now {amount}" if succes else "Something went wrong"
+        embed = discord.Embed(
+            title="Succes!" if succes else "Oops!",
+            description=desc,
+            color=self.bot.succesColor if succes else self.bot.defaultColor
+        )
+        await context.send(embed=embed)
+
+
+
 
 
 
