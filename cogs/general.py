@@ -220,7 +220,7 @@ class General(commands.Cog, name="general"):
         description="Chat with the bot",
     )
     @checks.not_blacklisted()
-    @commands.cooldown(rate=1, per=30)
+    @commands.cooldown(rate=2, per=30)
     async def chat(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
 
         await context.defer()
@@ -264,7 +264,7 @@ class General(commands.Cog, name="general"):
         description="Create an image",
     )
     @checks.not_blacklisted()
-    @commands.cooldown(rate=3, per=600) # 3 per 10 minutes
+    @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
     async def image(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
 
         await context.defer()
