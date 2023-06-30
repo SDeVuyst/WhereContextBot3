@@ -309,7 +309,7 @@ class General(commands.Cog, name="general"):
     async def invite(self, context: Context) -> None:
         guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
         channel = await guild.fetch_channel(int(os.environ.get("channel")))
-        link = await channel.create_invite(xkcd=True, max_age = 0, max_uses = 1)
+        link = await channel.create_invite(max_age = 0, max_uses = 1)
 
         await context.send(link)
 
