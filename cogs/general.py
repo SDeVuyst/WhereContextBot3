@@ -92,10 +92,6 @@ class General(commands.Cog, name="general"):
         )
         await context.send(embed=embed)
         
-        # await asyncio.sleep(30)
-        # link = await context.channel.create_invite(max_uses=1, unique=True, reason="Lien")
-        # await grom.send(link)
-        
 
 
     @commands.hybrid_command(
@@ -302,6 +298,21 @@ class General(commands.Cog, name="general"):
 
         # stuur het antwoord
         await context.interaction.followup.send(embed=embed)
+
+
+
+    @commands.hybrid_command(
+        name="invite",
+        description="Create an invite",
+    )
+    @checks.not_blacklisted()
+    async def invite(self, context: Context) -> None:
+        guild = await self.bot.get_guild(int(os.environ.get("guild_id")))
+        channel = await guild.get_channel(int(os.environ.get("channel")))
+        link = await channel.create_invite(xkcd=True, max_age = 0, max_uses = 1)
+
+        await context.send(link)
+
 
 
 async def setup(bot):
