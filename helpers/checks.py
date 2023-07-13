@@ -63,3 +63,14 @@ def in_correct_server() -> Callable[[T], T]:
         return True
     
     return commands.check(predicate)
+
+
+def not_in_dm() -> Callable[[T], T]:
+
+    async def predicate(ctx: commands.Context):
+
+        if isinstance(ctx.channel, discord.channel.DMChannel):
+            raise WrongChannel("You cannot use this command in dm, use /invite to get an invite")
+        return True
+    
+    return commands.check(predicate)

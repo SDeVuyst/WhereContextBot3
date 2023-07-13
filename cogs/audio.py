@@ -77,6 +77,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def soundboard(self, context: Context, effect: discord.app_commands.Choice[str]):
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
@@ -130,6 +131,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     @commands.cooldown(rate=1, per=120)
     async def tts(self, context: Context, speech: str, voice: discord.app_commands.Choice[str]):
         
@@ -198,6 +200,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def play(self, context: Context, youtube_url: str):
 
         # check dat user in vc zit
@@ -271,6 +274,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def list(self, context: Context):
         
         if len(self.queue) == 0:
@@ -299,6 +303,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def nowplaying(self, context: Context):
 
         try:
@@ -321,6 +326,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def pause(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -343,6 +349,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def resume(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -365,6 +372,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def skip(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -389,6 +397,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def stop(self, context: Context):
         voice_client = context.message.guild.voice_client
         if voice_client is None:
@@ -416,6 +425,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def join(self, context: Context):
         try:
             if not context.message.author.voice:
@@ -441,6 +451,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def leave(self, context: Context):
 
         vc = context.message.guild.voice_client

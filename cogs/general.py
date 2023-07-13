@@ -76,6 +76,7 @@ class General(commands.Cog, name="general"):
     @has_permissions(ban_members=True)
     @commands.cooldown(rate=1, per=180)
     @checks.in_correct_server()
+    @checks.not_in_dm()
     async def lien(self, context: Context) -> None:
         # kick grom
         try:
@@ -198,6 +199,7 @@ class General(commands.Cog, name="general"):
     )
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=20)
+    @checks.not_in_dm()
     async def dm(self, context: Context, user: discord.User, content: str) -> None:
 
         # stats
@@ -221,6 +223,7 @@ class General(commands.Cog, name="general"):
         description="Chat with the bot",
     )
     @checks.not_blacklisted()
+    @checks.not_in_dm()
     @commands.cooldown(rate=2, per=30)
     async def chat(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
 
@@ -265,6 +268,7 @@ class General(commands.Cog, name="general"):
         description="Create an image",
     )
     @checks.not_blacklisted()
+    @checks.not_in_dm()
     @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
     async def image(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
 
