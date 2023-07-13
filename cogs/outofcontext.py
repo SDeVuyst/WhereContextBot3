@@ -94,6 +94,7 @@ class OutOfContext(commands.Cog, name="context"):
         description="debug stats for /play-game (admin only)",
     )
     @checks.is_owner()
+    @checks.in_correct_server()
     async def context_debug(self, context: Context):
 
         embed = discord.Embed(
@@ -116,6 +117,7 @@ class OutOfContext(commands.Cog, name="context"):
     )
     @app_commands.describe(groep="Toon het spel ook aan andere personen")
     @checks.not_blacklisted()
+    @checks.in_correct_server()
     async def play(self, context: Context, groep: bool) -> None:
         """
         Play the out of context game

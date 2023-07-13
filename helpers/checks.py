@@ -6,7 +6,7 @@ Description:
 Version: 5.5.0
 """
 
-import json
+import discord
 import os
 from typing import Callable, TypeVar
 
@@ -49,6 +49,17 @@ def in_audio_command_channel() -> Callable[[T], T]:
     async def predicate(ctx: commands.Context):
         if ctx.channel.id not in [1114464141508345906, 727511733970665493]:
             raise WrongChannel("Only able to play in #out-of-context-game or #music-bot")
+        return True
+    
+    return commands.check(predicate)
+
+
+def in_correct_server() -> Callable[[T], T]:
+
+    async def predicate(ctx: commands.Context):
+
+        if ctx.guild.id not in [int(os.environ.get("guild_id")),] and not isinstance(ctx.channel, discord.channel.DMChannel):
+            raise WrongChannel("You are only able to use this command in the main server, use /invite to get an invite")
         return True
     
     return commands.check(predicate)

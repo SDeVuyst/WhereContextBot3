@@ -75,6 +75,7 @@ class General(commands.Cog, name="general"):
     )
     @has_permissions(ban_members=True)
     @commands.cooldown(rate=1, per=180)
+    @checks.in_correct_server()
     async def lien(self, context: Context) -> None:
         # kick grom
         try:
