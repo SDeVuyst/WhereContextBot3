@@ -22,10 +22,7 @@ from helpers import db_manager
 import exceptions
 
 
-intents = discord.Intents.default()
-intents.members = True
-intents.message_content = True
-intents.dm_messages = True
+intents = discord.Intents.all()
 
 bot = Bot(
     command_prefix='',
