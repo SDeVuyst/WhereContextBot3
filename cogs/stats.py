@@ -37,9 +37,11 @@ class Stats(commands.Cog, name="stats"):
     @commands.cooldown(rate=1, per=10)
     async def stats_individual(self, context: Context, user: discord.User) -> None:
         view = View()
-        view.add_item(CogSelect(self.bot))
+        cog_select = CogSelect(self.bot)
+        view.add_item(cog_select)
 
-        await context.send("Kies een onderverdeling", view=view)
+        m = await context.send(view=view)
+        cog_select.m = m
 
         
 
@@ -265,14 +267,27 @@ class CogSelect(Select):
             placeholder="Kies een onderverdeling", 
             options=[SelectOption(label=item, value=item) for item in list(bot.loaded)],
         )
-        bot = bot
+        self.bot = bot
 
     async def callback(self, interaction):
+        self.m.edit(view=CommandSelect(self.bot))
+
+
+class CommandSelect(Select):
+    def __init__(self, bot) -> None:
         commands = []
-        for y in self.bot.commands:
+        for y in bot.commands:
             if y.cog and y.cog.qualified_name == self.values[0]:
                 commands.append(y.name)
-        return await interaction.response(f"You chose {self.values[0]}, available commands are ({commands})")
+        super().__init__(
+            placeholder="Kies een command", 
+            options=[SelectOption(label=item, value=item) for item in list(bot.loaded)],
+        )
+        self.bot = bot
+
+    async def callback(self, interaction):
+        return await interaction.response(f"You chose {self.values[0]}")
+
 
 
 async def setup(bot):
