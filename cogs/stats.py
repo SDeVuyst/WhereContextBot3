@@ -33,11 +33,11 @@ class Stats(commands.Cog, name="stats"):
         description="How many times did a user use a command",
     )
     @app_commands.describe(user="Welke persoon")
-    @checks.not_blacklisted()
+    @checks.is_owner()
     @commands.cooldown(rate=1, per=10)
     async def stats_individual(self, context: Context, user: discord.User) -> None:
         view = View()
-        view.add_item(CogSelect())
+        view.add_item(CogSelect(self.bot))
 
         await context.send("Kies een onderverdeling", view=view)
 
