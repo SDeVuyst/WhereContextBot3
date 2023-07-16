@@ -24,7 +24,7 @@ from discord.utils import MISSING
 from helpers import checks, db_manager
 
 
-loaded = None
+loaded_cogs = None
 
 
 class Stats(commands.Cog, name="stats"):
@@ -265,14 +265,14 @@ class CommandView(discord.ui.View):
     def __init__(self, bot) -> None:
         super().__init__()
         self.bot = bot
-        global loaded
-        loaded = list(self.bot.loaded)
+        global loaded_cogs
+        loaded_cogs = list(self.bot.loaded)
 
     chosen_command = None
 
     @discord.ui.select(
         placeholder="Kies een onderverdeling",
-        options=[SelectOption(label=item, value=item) for item in loaded]     
+        options=[SelectOption(label=item, value=item) for item in loaded_cogs]     
     )
     async def select_cog(self, interaction:discord.Interaction, select_item : discord.ui.Select):
         self.children[0].disabled= True
