@@ -271,16 +271,16 @@ class CogSelect(Select):
 
     async def callback(self, interaction):
         view = View()
-        command_select = CommandSelect(self.bot)
+        command_select = CommandSelect(self.bot, self.values[0])
         view.add_item(command_select)
         await self.m.edit(view=view)
 
 
 class CommandSelect(Select):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot, selected_cog) -> None:
         commands = []
         for y in bot.commands:
-            if y.cog and y.cog.qualified_name == self.values[0]:
+            if y.cog and y.cog.qualified_name == selected_cog:
                 commands.append(y.name)
 
         super().__init__(
