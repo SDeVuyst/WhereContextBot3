@@ -39,9 +39,7 @@ class Stats(commands.Cog, name="stats"):
         view = View()
         cog_select = CogSelect(self.bot)
         view.add_item(cog_select)
-
-        m = await context.send(view=view)
-        cog_select.m = m
+        await context.send(view=view)
 
         
 
@@ -273,14 +271,13 @@ class CogSelect(Select):
         view = View()
         command_select = CommandSelect(self.bot, self.values[0])
         view.add_item(command_select)
-        await self.m.edit(view=view)
+        await interaction.message.edit(view=view)
 
 
 class CommandSelect(Select):
     def __init__(self, bot, selected_cog) -> None:
         commands = []
         for y in bot.commands:
-            print(y.cog.qualified_name)
             if y.cog and y.cog.qualified_name.lower() == selected_cog:
                 commands.append(y.name)
 
@@ -291,7 +288,7 @@ class CommandSelect(Select):
         )
 
     async def callback(self, interaction):
-        return await interaction.response(f"You chose {self.values[0]}")
+        return await interaction.message.edit(content=f"You chose {self.values[0]}")
 
 
 
