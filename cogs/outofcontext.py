@@ -85,8 +85,6 @@ class OutOfContext(commands.Cog, name="context"):
         """
         embed = await self.remove(message.id, interaction.guild)
         await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
-        # stats
-        await db_manager.increment_or_add_command_count(interaction.user.id, "messages_deleted", 1)
 
 
     @commands.hybrid_command(
@@ -140,8 +138,6 @@ class OutOfContext(commands.Cog, name="context"):
         await self.menu.reset()
         self.menu.author = context.author
 
-        # voeg stats toe
-        await db_manager.increment_or_add_command_count(context.author.id, "play", 1)
         self.menu.message = await context.send(embed=embed, view= self.menu if sendView else None, ephemeral=not groep)
         self.currently_playing = True
 

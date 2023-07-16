@@ -12,6 +12,7 @@ import platform
 import random
 import openai
 import re
+import dateparser
 
 from datetime import datetime
 
@@ -29,7 +30,6 @@ openai.api_key = os.environ.get("openaisecret")
 class General(commands.Cog, name="general"):
     def __init__(self, bot):
         self.bot = bot
-
 
 
     @commands.hybrid_command(
@@ -62,9 +62,7 @@ class General(commands.Cog, name="general"):
                     name=i.capitalize(), value=f"```{help_text}```", inline=False
                 )
 
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "help", 1)
-        
+
         await context.send(embed=embed)
 
 
@@ -112,8 +110,6 @@ class General(commands.Cog, name="general"):
             description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
             color=self.bot.succesColor if (self.bot.latency * 1000) < 150 else self.bot.defaultColor
         )
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "ping", 1)
 
         await context.send(embed=embed)
 
@@ -132,8 +128,6 @@ class General(commands.Cog, name="general"):
         :param context: The hybrid command context.
         :param message: The message that should be repeated by the bot.
         """
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "say", 1)
 
         await context.send(message)
 
@@ -152,8 +146,6 @@ class General(commands.Cog, name="general"):
         :param context: The hybrid command context.
         :param message: The message that should be repeated by the bot.
         """
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "embed", 1)
 
         embed = discord.Embed(title=message, color=self.bot.defaultColor)
         await context.send(embed=embed)
@@ -186,9 +178,7 @@ class General(commands.Cog, name="general"):
             color=kleur
         )
 
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "countdown", 1)
-        
+ 
         await context.send(embed=embed)
 
 
@@ -201,10 +191,7 @@ class General(commands.Cog, name="general"):
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
     async def dm(self, context: Context, user: discord.User, content: str) -> None:
-
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "dm", 1)
-        
+   
         # stuur dm naar gebruiker
         await user.send(content=content)
 
@@ -228,9 +215,6 @@ class General(commands.Cog, name="general"):
     async def chat(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
 
         await context.defer()
-
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "chat", 1)
 
         try:
             response = openai.ChatCompletion.create(
@@ -274,9 +258,6 @@ class General(commands.Cog, name="general"):
 
         await context.defer()
 
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "image", 1)
-
         try:
             response = openai.Image.create(
                 prompt=prompt,
@@ -317,6 +298,35 @@ class General(commands.Cog, name="general"):
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
         await context.send(link)
+
+
+
+    @commands.hybrid_command(
+        name="remindme",
+        description="Remind me of an event",
+    )
+    @checks.not_blacklisted()
+    async def remindme(self, context: Context, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
+
+        t = dateparser.parse(wanneer)
+
+        if t is None:
+            embed = discord.Embed(
+                title="Geen geldig tijdstip",
+                description=f"{wanneer} is geen geldig tijdstip",
+                color=self.bot.errorColor
+            )
+        else:
+            
+            # TODO voeg toe aan db
+
+            embed = discord.Embed(
+                title="Reminder set!",
+                description=f"I will remind you at {t} for {waarover}",
+                color=self.bot.succesColor
+            )
+
+        await context.send(embed=embed)
 
 
 

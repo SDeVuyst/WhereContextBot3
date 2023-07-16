@@ -45,8 +45,6 @@ class Counter(commands.Cog, name="counter"):
             color=self.bot.defaultColor
         )
 
-        # stats
-        await db_manager.increment_or_add_command_count(context.author.id, "nCount", 1)
 
         await context.send(embed=embed)
     

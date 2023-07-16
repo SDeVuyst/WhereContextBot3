@@ -221,6 +221,10 @@ async def on_command_completion(context: Context) -> None:
             f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs"
         )
 
+    # add stats to db
+    await db_manager.increment_or_add_command_count(context.author.id, executed_command, 1)
+
+
 
 # check for inactivity in voice channel
 @bot.event

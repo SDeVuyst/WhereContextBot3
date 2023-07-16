@@ -103,8 +103,6 @@ class Audio(commands.Cog, name="audio"):
             )
             await context.send(embed=embed, ephemeral=True)
 
-            # stats
-            await db_manager.increment_or_add_command_count(context.author.id, "soundboard", 1)
 
         except Exception as e:
             embed = discord.Embed(
@@ -182,9 +180,6 @@ class Audio(commands.Cog, name="audio"):
             )
             await context.interaction.followup.send(embed=embed)
 
-            # stats
-            await db_manager.increment_or_add_command_count(context.author.id, "tts", 1)
-
 
         except Exception as e:
             embed = discord.Embed(
@@ -216,57 +211,58 @@ class Audio(commands.Cog, name="audio"):
         
         await context.defer()
         
-        # playlist
-        if youtube_url.find("list=") != -1:
-            try:
-                desc = ""
-                vid_urls = Playlist(youtube_url)
-                for i, vid_url in enumerate(vid_urls):
-                    self.queue.append(vid_url)
-                    yt = YouTube(vid_url)
+        try:
 
-                    if i<10:
-                        desc += f"{i+1}: [{yt.title}]({vid_url}) by {yt.author}\n\n"
+            # playlist
+            if youtube_url.find("list=") != -1:
+                
+                    desc = ""
+                    vid_urls = Playlist(youtube_url)
+                    for i, vid_url in enumerate(vid_urls):
+                        self.queue.append(vid_url)
+                        yt = YouTube(vid_url)
 
-            except Exception:
-                embed = discord.Embed(
-                    title=f"Er is iets misgegaan",
-                    description=f"ben je zeker dat dit een geldige url is?\n{youtube_url}",
-                    color=self.bot.errorColor
-                )
-                await context.send(embed=embed)
-                return
+                        if i<10:
+                            desc += f"{i+1}: [{yt.title}]({vid_url}) by {yt.author}\n\n"
 
+                    embed = discord.Embed(
+                        title=f"Added to Queue",
+                        description=desc,
+                        color=self.bot.defaultColor
+                    )
+                    await context.send(embed=embed)
+                    
+                    if not vc.is_playing():
+                        await self.play_next(context)
 
+            # enkele video
+            else:
+                yt = YouTube(youtube_url)
+                
+                # voeg lied aan queue toe
+                self.queue.append(youtube_url)
+                
+                # stuur confirmatie dat lied is toegevoegd
+                if vc.is_playing():
+                    
+                    embed = discord.Embed(
+                        title=f"Added to Queue",
+                        description=f"[{yt.title}]({youtube_url}) by {yt.author}",
+                        color=self.bot.defaultColor
+                    )
+                    await context.interaction.followup.send(embed=embed)
+                    return
+
+                await self.play_next(context)
+            
+        except Exception:
             embed = discord.Embed(
-                title=f"Added to Queue",
-                description=desc,
-                color=self.bot.defaultColor
+                title=f"Er is iets misgegaan",
+                description=f"ben je zeker dat dit een geldige url is?\n{youtube_url}",
+                color=self.bot.errorColor
             )
             await context.send(embed=embed)
-            
-            if not vc.is_playing():
-                await self.play_next(context)
-
-        # enkele video
-        else:
-            yt = YouTube(youtube_url)
-            
-            # voeg lied aan queue toe
-            self.queue.append(youtube_url)
-            
-            # stuur confirmatie dat lied is toegevoegd
-            if vc.is_playing():
-                
-                embed = discord.Embed(
-                    title=f"Added to Queue",
-                    description=f"[{yt.title}]({youtube_url}) by {yt.author}",
-                    color=self.bot.defaultColor
-                )
-                await context.interaction.followup.send(embed=embed)
-                return
-
-            await self.play_next(context)
+            return
 
 
 
@@ -513,9 +509,6 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.succesColor
             )
             await context.interaction.followup.send(embed=embed)
-
-            # stats
-            await db_manager.increment_or_add_command_count(context.author.id, "music_yt", 1)
 
 
 
