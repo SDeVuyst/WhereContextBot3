@@ -280,7 +280,8 @@ class CommandSelect(Select):
     def __init__(self, bot, selected_cog) -> None:
         commands = []
         for y in bot.commands:
-            if y.cog and y.cog.qualified_name == selected_cog:
+            print(y.cog.qualified_name)
+            if y.cog and y.cog.qualified_name.lower() == selected_cog:
                 commands.append(y.name)
 
         super().__init__(
