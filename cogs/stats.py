@@ -264,6 +264,7 @@ class Stats(commands.Cog, name="stats"):
 class CogSelect(Select):
     def __init__(self, bot) -> None:
         super().__init__(
+            custom_id="cogselector",
             placeholder="Kies een onderverdeling", 
             options=[SelectOption(label=item, value=item) for item in list(bot.loaded)],
         )
@@ -279,11 +280,12 @@ class CommandSelect(Select):
         for y in bot.commands:
             if y.cog and y.cog.qualified_name == self.values[0]:
                 commands.append(y.name)
+
         super().__init__(
+            custom_id="commandselector",
             placeholder="Kies een command", 
-            options=[SelectOption(label=item, value=item) for item in list(bot.loaded)],
+            options=[SelectOption(label=item, value=item) for item in commands],
         )
-        self.bot = bot
 
     async def callback(self, interaction):
         return await interaction.response(f"You chose {self.values[0]}")
