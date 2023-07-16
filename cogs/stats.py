@@ -260,7 +260,6 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-
 class CogSelect(Select):
     def __init__(self, bot) -> None:
         super().__init__(
@@ -271,7 +270,10 @@ class CogSelect(Select):
         self.bot = bot
 
     async def callback(self, interaction):
-        self.m.edit(view=CommandSelect(self.bot))
+        view = View()
+        command_select = CommandSelect(self.bot)
+        view.add_item(command_select)
+        await self.m.edit(view=view)
 
 
 class CommandSelect(Select):
