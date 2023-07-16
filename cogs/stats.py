@@ -9,12 +9,17 @@ Version: 5.5.0
 import os
 import platform
 import random
+from typing import Any, List, Optional
 
 
 import discord
 from discord import app_commands
+from discord.components import SelectOption
 from discord.ext import commands
 from discord.ext.commands import Context
+from discord.interactions import Interaction
+from discord.ui import Select, View
+from discord.utils import MISSING
 
 from helpers import checks, db_manager
 
@@ -28,70 +33,50 @@ class Stats(commands.Cog, name="stats"):
         description="How many times did a user use a command",
     )
     @app_commands.describe(user="Welke persoon")
-    @app_commands.choices(command=[
-        discord.app_commands.Choice(name="gible", value="gible"),
-        discord.app_commands.Choice(name="nootje", value="nootje"),
-        discord.app_commands.Choice(name="pingy", value="pingy"),
-        discord.app_commands.Choice(name="ba", value="ba"),
-        discord.app_commands.Choice(name="meng", value="meng"),
-        discord.app_commands.Choice(name="broodman", value="broodman"),
-        discord.app_commands.Choice(name="keleo", value="keleo"),
-        discord.app_commands.Choice(name="help", value="help"),
-        discord.app_commands.Choice(name="image", value="image"),
-        discord.app_commands.Choice(name="say", value="say"),
-        discord.app_commands.Choice(name="giblereact", value="giblereact"),
-        discord.app_commands.Choice(name="wholesquadlaughing", value="wholesquadlaughing"),
-        discord.app_commands.Choice(name="notfunny", value="notfunny"),
-        discord.app_commands.Choice(name="uthought", value="uthought"),
-        discord.app_commands.Choice(name="embed", value="embed"),
-        discord.app_commands.Choice(name="countdown", value="countdown"),
-        discord.app_commands.Choice(name="muur", value="muur"),
-        discord.app_commands.Choice(name="chat", value="chat"),
-        discord.app_commands.Choice(name="ncount", value="ncountCHECK"),
-        discord.app_commands.Choice(name="play game", value="play"),
-        discord.app_commands.Choice(name="messages played", value="messages_played"),
-        discord.app_commands.Choice(name="messages deleted", value="messages_deleted"),
-        discord.app_commands.Choice(name="soundboard", value="soundboard"),
-        discord.app_commands.Choice(name="play", value="music_yt"),
-        discord.app_commands.Choice(name="tts", value="tts"),
-        # discord.app_commands.Choice(name="dm", value="dm"),
-    ])
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
-    async def stats_individual(self, context: Context, user: discord.User, command: discord.app_commands.Choice[str]) -> None:
-        count = await db_manager.get_command_count(user.id, command.value)
-        # Geen berichten
-        if len(count) == 0 or int(count[0][0]) == 0:
-            embed = discord.Embed(
-                description=f"**<@{user.id}> didn't use {command.value} yet.**",
-                color=self.bot.defaultColor
-            )
-            await context.send(embed=embed)
-            return
-        
-        # error
-        elif count[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=count[1],
-                color=self.bot.errorColor
-            )
-            await context.send(embed=embed)
-            return
-        
-        if command.value == "messages_played":
-            desc = f"**<@{user.id}> played```{count[0][0]}``` messages.**"
-        elif command.value == "messages_deleted":
-            desc = f"**<@{user.id}> deleted```{count[0][0]}``` messages.**"
-        else:
-            desc = f"**<@{user.id}> used {command.value} ```{count[0][0]}``` times.**"
+    async def stats_individual(self, context: Context, user: discord.User) -> None:
+        view = View()
+        view.add_item(CogSelect())
 
-        embed = discord.Embed(
-            description=desc,
-            color=self.bot.defaultColor
-        )
+        await context.send("Kies een onderverdeling", view=view)
 
-        await context.send(embed=embed)
+        
+
+    # async def stats_individual_callback():
+    #     count = await db_manager.get_command_count(user.id, command.value)
+    #     # Geen berichten
+    #     if len(count) == 0 or int(count[0][0]) == 0:
+    #         embed = discord.Embed(
+    #             description=f"**<@{user.id}> didn't use {command.value} yet.**",
+    #             color=self.bot.defaultColor
+    #         )
+    #         await context.send(embed=embed)
+    #         return
+        
+    #     # error
+    #     elif count[0] == -1:
+    #         embed = discord.Embed(
+    #             title=f"Something went wrong",
+    #             description=count[1],
+    #             color=self.bot.errorColor
+    #         )
+    #         await context.send(embed=embed)
+    #         return
+        
+    #     if command.value == "messages_played":
+    #         desc = f"**<@{user.id}> played```{count[0][0]}``` messages.**"
+    #     elif command.value == "messages_deleted":
+    #         desc = f"**<@{user.id}> deleted```{count[0][0]}``` messages.**"
+    #     else:
+    #         desc = f"**<@{user.id}> used {command.value} ```{count[0][0]}``` times.**"
+
+    #     embed = discord.Embed(
+    #         description=desc,
+    #         color=self.bot.defaultColor
+    #     )
+
+    #     await context.send(embed=embed)
 
 
 
@@ -274,6 +259,20 @@ class Stats(commands.Cog, name="stats"):
 
 
 
+class CogSelect(Select):
+    def __init__(self, bot) -> None:
+        super().__init__(
+            placeholder="Kies een onderverdeling", 
+            options=[SelectOption(label=item, value=item) for item in list(bot.loaded)],
+        )
+        bot = bot
+
+    async def callback(self, interaction):
+        commands = []
+        for y in self.bot.commands:
+            if y.cog and y.cog.qualified_name == self.values[0]:
+                commands.append(y.name)
+        return await interaction.response(f"You chose {self.values[0]}, available commands are ({commands})")
 
 
 async def setup(bot):
