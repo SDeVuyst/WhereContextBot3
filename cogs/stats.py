@@ -23,6 +23,10 @@ from discord.utils import MISSING
 
 from helpers import checks, db_manager
 
+
+loaded = None
+
+
 class Stats(commands.Cog, name="stats"):
     def __init__(self, bot):
         self.bot = bot
@@ -36,11 +40,10 @@ class Stats(commands.Cog, name="stats"):
     @checks.is_owner()
     @commands.cooldown(rate=1, per=10)
     async def stats_individual(self, context: Context, user: discord.User) -> None:
-        view = View()
-        cog_select = CogSelect(self.bot)
-        view.add_item(cog_select)
+        view = CommandView()
         await context.send(view=view)
-
+        await view.wait()
+        await context.send(f"{view.chosen_command}")
         
 
     # async def stats_individual_callback():
@@ -258,38 +261,48 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-class CogSelect(Select):
+class CommandView(discord.ui.View):
     def __init__(self, bot) -> None:
-        super().__init__(
-            custom_id="cogselector",
-            placeholder="Kies een onderverdeling", 
-            options=[SelectOption(label=item, value=item) for item in list(bot.loaded)],
-        )
+        super().__init__()
         self.bot = bot
+        global loaded
+        loaded = list(self.bot.loaded)
 
-    async def callback(self, interaction):
-        view = View()
-        command_select = CommandSelect(self.bot, self.values[0])
-        view.add_item(command_select)
-        await interaction.message.edit(view=view)
+    chosen_command = None
+
+    @discord.ui.select(
+        placeholder="Kies een onderverdeling",
+        options=[SelectOption(label=item, value=item) for item in loaded]     
+    )
+    async def select_cog(self, interaction:discord.Interaction, select_item : discord.ui.Select):
+        self.children[0].disabled= True
+        command_select = CommandSelect(self.bot, select_item.values[0])
+        self.add_item(command_select)
+        await interaction.message.edit(view=self)
+        await interaction.response.defer()
+
+    async def respond_to_answer2(self, interaction : discord.Interaction, choices):
+        self.chosen_command = choices 
+        self.children[1].disabled= True
+        await interaction.message.edit(view=self)
+        await interaction.response.defer()
+        self.stop()
 
 
-class CommandSelect(Select):
-    def __init__(self, bot, selected_cog) -> None:
+class CommandSelect(discord.ui.Select):
+    def __init__(self, bot, selected_cog):
         commands = []
         for y in bot.commands:
             if y.cog and y.cog.qualified_name.lower() == selected_cog:
                 commands.append(y.name)
 
         super().__init__(
-            custom_id="commandselector",
             placeholder="Kies een command", 
-            options=[SelectOption(label=item, value=item) for item in commands],
+            options=[SelectOption(label=item, value=item) for item in commands]
         )
 
-    async def callback(self, interaction):
-        return await interaction.message.edit(content=f"You chose {self.values[0]}")
-
+    async def callback(self, interaction:discord.Interaction):
+        await self.view.respond_to_answer2(interaction, self.values)
 
 
 async def setup(bot):
