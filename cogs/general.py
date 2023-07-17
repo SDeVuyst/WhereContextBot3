@@ -92,7 +92,7 @@ class General(commands.Cog, name="general"):
         name="stack", description="stacktest"
     )
     async def stacked(self, ctx):
-        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed)
+        menu = ViewMenu(ctx.interaction, menu_type=ViewMenu.TypeEmbed)
 
         menu.add_page(discord.Embed(title="Hey Wumpos, can you say hi to the person reading this? 😃"))
         menu.add_page(discord.Embed(title="Hi, I'm Wumpos!"))
