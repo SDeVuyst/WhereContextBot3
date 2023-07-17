@@ -3,12 +3,11 @@ import subprocess
 from discord.ext import commands
 import os
 from discord import app_commands
-from discord.ext.commands import Context, check
+from discord.ext.commands import Context
 import discord
 import asyncio
 import tempfile
-from exceptions import WrongChannel
-from helpers import checks, db_manager, http, ytdl_helper
+from helpers import checks, http, ytdl_helper
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube
 

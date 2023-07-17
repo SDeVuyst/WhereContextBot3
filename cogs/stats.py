@@ -6,12 +6,6 @@ Description:
 Version: 5.5.0
 """
 
-import os
-import platform
-import random
-from typing import Any, List, Optional
-
-
 import discord
 from discord import app_commands
 from discord.components import SelectOption

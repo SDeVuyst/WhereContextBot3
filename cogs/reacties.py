@@ -5,7 +5,7 @@ import os
 from discord import app_commands
 from discord.ext.commands import Context
 import discord
-from helpers import checks, db_manager
+from helpers import checks
 
 
 # Here we name the cog and create a new class for the cog.

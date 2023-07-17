@@ -7,10 +7,8 @@ Version: 5.5.0
 """
 
 import discord
-import os
 from discord import app_commands
 from discord.ext import commands
-from discord import errors
 from discord.ext.commands import Context
 
 from helpers import checks, db_manager

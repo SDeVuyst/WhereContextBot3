@@ -6,12 +6,8 @@ Description:
 Version: 5.5.0
 """
 
-import asyncio
 import os
-import platform
-import random
 import openai
-import re
 import dateparser
 
 from datetime import datetime
@@ -21,7 +17,7 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context, has_permissions
 
-from helpers import checks, db_manager
+from helpers import checks
 
 
 openai.api_key = os.environ.get("openaisecret")

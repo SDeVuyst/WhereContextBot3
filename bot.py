@@ -7,12 +7,10 @@ Version: 5.5.0
 """
 
 import asyncio
-import json
 import logging
 import os
 import platform
 import random
-import sys
 import psycopg2
 
 import discord
