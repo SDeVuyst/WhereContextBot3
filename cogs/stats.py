@@ -59,6 +59,7 @@ class Stats(commands.Cog, name="stats"):
             desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
 
         embed = discord.Embed(
+            title="📊 Individual Statistic",
             description=desc,
             color=self.bot.defaultColor
         )
@@ -145,7 +146,7 @@ class Stats(commands.Cog, name="stats"):
             desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
 
         embed = discord.Embed(
-            title=f"Leaderboard for {command}",
+            title=f"🏆 Leaderboard for {command}",
             description=desc,
             color=self.bot.defaultColor
         )
@@ -181,7 +182,7 @@ class Stats(commands.Cog, name="stats"):
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
             embed = discord.Embed(
-                description=f"**<@{user.id}> has not been banned yet**",
+                description=f"❌ **<@{user.id}> has not been banned yet**",
                 color=self.bot.defaultColor
             )
             await context.send(embed=embed)
@@ -199,7 +200,7 @@ class Stats(commands.Cog, name="stats"):
         
 
         embed = discord.Embed(
-            description=f"**<@{user.id}> has been banned ```{count[0][0]}``` times.**",
+            description=f"🔨 **<@{user.id}> has been banned ```{count[0][0]}``` times.**",
             color=self.bot.defaultColor
         )
 
@@ -237,7 +238,7 @@ class Stats(commands.Cog, name="stats"):
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
             embed = discord.Embed(
-                description=f"**NWord Count of <@{user.id}>:** ```0```",
+                description=f"😌 **NWord Count of <@{user.id}>:** ```0```",
                 color=self.bot.succesColor
             )
             await context.send(embed=embed)
@@ -254,7 +255,7 @@ class Stats(commands.Cog, name="stats"):
             return
 
         embed = discord.Embed(
-            description=f"**NWord Count of <@{user.id}>:** ```{count[0][0]}```",
+            description=f"📸 **NWord Count of <@{user.id}>:** ```{count[0][0]}```",
             color=self.bot.defaultColor
         )
 
