@@ -68,7 +68,7 @@ class Stats(commands.Cog, name="stats"):
         description="How many times did a user use a command",
     )
     @app_commands.describe(user="Welke persoon")
-    @checks.is_owner()
+    @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
     async def stats_individual(self, context: Context, user: discord.User) -> None:
         view = CommandView(self.bot)
@@ -81,42 +81,17 @@ class Stats(commands.Cog, name="stats"):
 
     @commands.hybrid_command(name="changecommandcount", description="Change the command count of a user (admin only)")
     @app_commands.describe(user="Which users count")
-    @app_commands.choices(command=[
-        discord.app_commands.Choice(name="gible", value="gible"),
-        discord.app_commands.Choice(name="nootje", value="nootje"),
-        discord.app_commands.Choice(name="pingy", value="pingy"),
-        discord.app_commands.Choice(name="ba", value="ba"),
-        discord.app_commands.Choice(name="meng", value="meng"),
-        discord.app_commands.Choice(name="broodman", value="broodman"),
-        discord.app_commands.Choice(name="keleo", value="keleo"),
-        discord.app_commands.Choice(name="help", value="help"),
-        discord.app_commands.Choice(name="image", value="image"),
-        discord.app_commands.Choice(name="say", value="say"),
-        discord.app_commands.Choice(name="giblereact", value="giblereact"),
-        discord.app_commands.Choice(name="wholesquadlaughing", value="wholesquadlaughing"),
-        discord.app_commands.Choice(name="notfunny", value="notfunny"),
-        discord.app_commands.Choice(name="uthought", value="uthought"),
-        discord.app_commands.Choice(name="embed", value="embed"),
-        discord.app_commands.Choice(name="countdown", value="countdown"),
-        discord.app_commands.Choice(name="muur", value="muur"),
-        discord.app_commands.Choice(name="chat", value="chat"),
-        discord.app_commands.Choice(name="ncount", value="ncountCHECK"),
-        discord.app_commands.Choice(name="play game", value="play"),
-        discord.app_commands.Choice(name="messages played", value="messages_played"),
-        discord.app_commands.Choice(name="messages deleted", value="messages_deleted"),
-        discord.app_commands.Choice(name="soundboard", value="soundboard"),
-        # discord.app_commands.Choice(name="dm", value="dm"),
-        discord.app_commands.Choice(name="play", value="music_yt"),
-        discord.app_commands.Choice(name="tts", value="tts"),
-    ])
     @checks.is_owner()
-    async def change_command_count(self, context: Context, user: discord.User, command: discord.app_commands.Choice[str], amount: int):
+    async def change_command_count(self, context: Context, user: discord.User, amount: int):
+        view = CommandView(self.bot)
+        await context.send(view=view)
+        await view.wait()
+        
         # krijg count uit db
-        succes = await db_manager.set_command_count(command.value, user.id, amount)
-
+        succes = await db_manager.set_command_count(view.chosen_command, user.id, amount)
 
         # verstuur embed
-        desc = f"{command.value} count of <@{user.id}> is now {amount}" if succes else "Something went wrong"
+        desc = f"{view.chosen_command} count of <@{user.id}> is now {amount}" if succes else "Something went wrong"
         embed = discord.Embed(
             title="Succes!" if succes else "Oops!",
             description=desc,
@@ -126,47 +101,14 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @commands.hybrid_command(name="leaderboard", description="Leaderboard of a command")
-    @app_commands.choices(command=[
-        discord.app_commands.Choice(name="gible", value="gible"),
-        discord.app_commands.Choice(name="nootje", value="nootje"),
-        discord.app_commands.Choice(name="pingy", value="pingy"),
-        discord.app_commands.Choice(name="ba", value="ba"),
-        discord.app_commands.Choice(name="meng", value="meng"),
-        discord.app_commands.Choice(name="broodman", value="broodman"),
-        discord.app_commands.Choice(name="keleo", value="keleo"),
-        discord.app_commands.Choice(name="ban", value="bancount"),
-        discord.app_commands.Choice(name="image", value="image"),
-        discord.app_commands.Choice(name="say", value="say"),
-        discord.app_commands.Choice(name="giblereact", value="giblereact"),
-        discord.app_commands.Choice(name="wholesquadlaughing", value="wholesquadlaughing"),
-        discord.app_commands.Choice(name="notfunny", value="notfunny"),
-        discord.app_commands.Choice(name="uthought", value="uthought"),
-        discord.app_commands.Choice(name="embed", value="embed"),
-        discord.app_commands.Choice(name="countdown", value="countdown"),
-        discord.app_commands.Choice(name="muur", value="muur"),
-        discord.app_commands.Choice(name="chat", value="chat"),
-        discord.app_commands.Choice(name="ncount", value="ncountCHECK"),
-        discord.app_commands.Choice(name="play game", value="play"),
-        discord.app_commands.Choice(name="messages played", value="messages_played"),
-        discord.app_commands.Choice(name="messages deleted", value="messages_deleted"),
-        discord.app_commands.Choice(name="soundboard", value="soundboard"),
-        discord.app_commands.Choice(name="play", value="music_yt"),
-        discord.app_commands.Choice(name="tts", value="tts"),
-
-        # discord.app_commands.Choice(name="dm", value="dm"),
-    ])
-    @checks.not_blacklisted()
-    @commands.cooldown(rate=1, per=10)
-    async def leaderboard(self, context: Context, command: discord.app_commands.Choice[str]):
-        
-        if command.value == "ncountCHECK":
+    async def get_leaderboard_embed(self, command):
+        if command == "ncountCHECK":
             leaderb = await db_manager.get_nword_leaderboard()
-        elif command.value == "bancount":
+        elif command == "bancount":
             leaderb = await db_manager.get_ban_leaderboard()
         else:
             # krijg count bericht uit db
-            leaderb = await db_manager.get_leaderboard(command.value)
+            leaderb = await db_manager.get_leaderboard(command)
 
         # Geen berichten
         if len(leaderb) == 0:
@@ -174,8 +116,7 @@ class Stats(commands.Cog, name="stats"):
                 description=f"**This command has not been used yet.**",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed)
-            return
+            return embed
         
         # error
         elif leaderb[0] == -1:
@@ -184,8 +125,7 @@ class Stats(commands.Cog, name="stats"):
                 description=leaderb[1],
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed)
-            return
+            return embed
         
         desc = ""
         for i, stat in enumerate(leaderb):
@@ -193,13 +133,25 @@ class Stats(commands.Cog, name="stats"):
             desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
 
         embed = discord.Embed(
-            title=f"Leaderboard for {command.name}",
+            title=f"Leaderboard for {command}",
             description=desc,
             color=self.bot.defaultColor
         )
 
-        await context.send(embed=embed)
+        return embed
 
+
+
+    @commands.hybrid_command(name="leaderboard", description="Leaderboard of a command")
+    @checks.not_blacklisted()
+    @commands.cooldown(rate=1, per=10)
+    async def leaderboard(self, context: Context):
+        view = CommandView(self.bot)
+        await context.send(view=view)
+        await view.wait()
+        embed = await self.get_leaderboard_embed(view.chosen_command)
+        await context.send(embed=embed)
+        
 
 
     @commands.hybrid_command(name="bancount", description="How many times has a user been banned?")
@@ -257,6 +209,62 @@ class Stats(commands.Cog, name="stats"):
 
 
 
+    @commands.hybrid_command(name="ncount", description="AYO??")
+    @app_commands.describe(user="Which users' n-word count")
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    @commands.cooldown(rate=1, per=10)
+    async def nCount(self, context: Context, user: discord.User):
+        # krijg count bericht uit db
+        count = await db_manager.get_nword_count(user.id)
+
+        # Geen berichten
+        if len(count) == 0 or int(count[0][0]) == 0:
+            embed = discord.Embed(
+                description=f"**NWord Count of <@{user.id}>:** ```0```",
+                color=self.bot.succesColor
+            )
+            await context.send(embed=embed)
+            return
+        
+        # error
+        elif count[0] == -1:
+            embed = discord.Embed(
+                title=f"Something went wrong",
+                description=count[1],
+                color=self.bot.errorColor
+            )
+            await context.send(embed=embed)
+            return
+
+        embed = discord.Embed(
+            description=f"**NWord Count of <@{user.id}>:** ```{count[0][0]}```",
+            color=self.bot.defaultColor
+        )
+
+
+        await context.send(embed=embed)
+    
+
+    @commands.hybrid_command(name="changencount", description="Change the count of a user (admin only)")
+    @app_commands.describe(user="Which users' n-word count")
+    @app_commands.describe(amount="Amount to set the count to")
+    @checks.is_owner()
+    async def changeNCount(self, context: Context, user: discord.User, amount: int):
+        # krijg count uit db
+        succes = await db_manager.set_nword_count(user.id, amount)
+
+        # verstuur embed
+        desc = f"NWord Count of <@{user.id}> is now {amount}" if succes else "Something went wrong"
+        embed = discord.Embed(
+            title="Succes!" if succes else "Oops!",
+            description=desc,
+            color=self.bot.succesColor if succes else self.bot.defaultColor
+        )
+        await context.send(embed=embed)
+
+
+
 class CommandView(View):
     def __init__(self, bot) -> None:
         super().__init__()
@@ -266,13 +274,12 @@ class CommandView(View):
 
     @discord.ui.select(
         placeholder="Kies een onderverdeling",
-        options=[
+        options = [
             SelectOption(label="Audio", emoji="🎙️", value="audio"),
-            SelectOption(label="Counter", emoji="📒", value="counter"),
             SelectOption(label="General", emoji="🤖", value="general"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
-            SelectOption(label="Reacties", emoji="🃏", value="reacties"),
-            SelectOption(label="Stats", emoji="📊", value="stats"),
+            SelectOption(label="Reacties", emoji="✍", value="reacties"),
+            SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Owner", emoji="👨‍🔧", value="owner")
         ]     
     )
