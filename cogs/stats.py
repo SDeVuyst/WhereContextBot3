@@ -329,7 +329,7 @@ class CommandSelect(Select):
             commands.append(("Messages Deleted", "messages_deleted"))
         
         elif selected_cog == "stats":
-            commands.append(("N-Words said", "ncountCHECK"))
+            commands.insert(0, ("N-Words said", "ncountCHECK"))
 
 
         super().__init__(

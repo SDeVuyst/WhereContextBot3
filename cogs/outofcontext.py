@@ -7,7 +7,7 @@ from helpers import checks, db_manager
 
 
 # Here we name the cog and create a new class for the cog.
-class OutOfContext(commands.Cog, name="context"):
+class OutOfContext(commands.Cog, name="outofcontext"):
     def __init__(self, bot):
         self.bot = bot
         self.ctx_menu_add = app_commands.ContextMenu(
