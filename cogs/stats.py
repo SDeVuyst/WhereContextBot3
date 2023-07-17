@@ -267,13 +267,13 @@ class CommandView(View):
     @discord.ui.select(
         placeholder="Kies een onderverdeling",
         options=[
-            SelectOption(label="Audio", emoji=":microphone2:", value="audio"),
-            SelectOption(label="Counter", emoji=":ledger:", value="counter"),
-            SelectOption(label="General", emoji=":robot:", value="general"),
-            SelectOption(label="Out Of Context", emoji=":camera_with_flash:", value="outofcontext"),
-            SelectOption(label="Reacties", emoji=":black_joker:", value="reacties"),
-            SelectOption(label="Stats", emoji=":bar_chart:", value="stats"),
-            SelectOption(label="Owner", emoji=":man_mechanic:", value="owner")
+            SelectOption(label="Audio", emoji="🎙️", value="audio"),
+            SelectOption(label="Counter", emoji="📒", value="counter"),
+            SelectOption(label="General", emoji="🤖", value="general"),
+            SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
+            SelectOption(label="Reacties", emoji="🃏", value="reacties"),
+            SelectOption(label="Stats", emoji="📊", value="stats"),
+            SelectOption(label="Owner", emoji="👨‍🔧", value="owner")
         ]     
     )
     async def select_cog(self, interaction: Interaction, select_item : Select):
