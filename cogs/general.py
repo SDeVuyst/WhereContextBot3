@@ -39,7 +39,7 @@ class General(commands.Cog, name="general"):
 
         menu = ViewMenu(context, menu_type=ViewMenu.TypeEmbed)
 
-        for i in self.bot.cogs:
+        for i in self.bot.cogs.sort():
             embed = discord.Embed(
                 title="**Help** :man_mechanic:", 
                 description=f"Ask <@{int(admin[0])}> for help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\n", 
@@ -65,10 +65,13 @@ class General(commands.Cog, name="general"):
 
             menu.add_page(embed)
 
-        menu.add_go_to_select(ViewSelect.GoTo(title="Ga naar onderverdeling...", page_numbers=...))
+        menu.add_go_to_select(ViewSelect.GoTo(
+            title="Ga naar onderverdeling...", 
+            page_numbers={1 : "🎙️ Audio", 2 : "🤖 General", 3: "📊 Statistics", 4: "📸 Out Of Context", 5: "✍ Reacties", 6: "👨‍🔧 Owner"}
+        ))
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
-        await menu.start()
+        return await menu.start()
 
 
     @commands.hybrid_command(
