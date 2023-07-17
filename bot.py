@@ -163,7 +163,11 @@ async def on_member_remove(member):
 async def on_member_join(member):
     bot.logger.info(f"{member.id} joined the server!")
 
+    await autoroles(member)
+    await autonick(member)
     
+
+async def autoroles(member):
     # add member role
     member_role = discord.utils.get(member.guild.roles, id=753959093185675345)
     bot.logger.info(f"adding member role")
@@ -198,6 +202,24 @@ async def on_member_join(member):
 
     await member.send('Added your roles back!')
 
+
+async def autonick(member):
+    nicks = {
+        # yachja
+        # 733845345225670686: "",
+        # gible      
+        559715606014984195: "smikkelkontje",     
+        # arno        
+        # 273503117348306944: "",
+        # pingy                 
+        # 464400950702899211: "",
+        # # solos             
+        462932133170774036: "kanye east",
+    }
+
+    if member.id in nicks:
+        await member.edit(nick=nicks.get(member.id))
+        await member.send(f'Set your nickname to "{nicks.get(member.id)}"')
 
 
 @bot.event
