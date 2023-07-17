@@ -47,9 +47,9 @@ class Stats(commands.Cog, name="stats"):
             )
             return embed
         
-        if command.value == "messages_played":
+        if command == "messages_played":
             desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
-        elif command.value == "messages_deleted":
+        elif command == "messages_deleted":
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
         else:
             desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
