@@ -290,7 +290,7 @@ class CommandView(View):
             SelectOption(label="General", emoji="🤖", value="general"),
             SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
-            SelectOption(label="Reacties", emoji="✍", value="reacties"),
+            SelectOption(label="Reacties", emoji="💭", value="reacties"),
             SelectOption(label="Owner", emoji="👨‍🔧", value="owner")
         ]     
     )
