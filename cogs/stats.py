@@ -37,7 +37,7 @@ class Stats(commands.Cog, name="stats"):
     @checks.is_owner()
     @commands.cooldown(rate=1, per=10)
     async def stats_individual(self, context: Context, user: discord.User) -> None:
-        view = CommandView()
+        view = CommandView(self.bot)
         await context.send(view=view)
         await view.wait()
         await context.send(f"{view.chosen_command}")
