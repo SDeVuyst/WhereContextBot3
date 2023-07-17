@@ -38,36 +38,50 @@ class General(commands.Cog, name="general"):
         admin = list(os.environ.get("owners").split(","))
 
         menu = ViewMenu(context, menu_type=ViewMenu.TypeEmbed)
+        cog_to_title = {
+            "audio": "🎙️ Audio",
+            "general": "🤖 General",
+            "stats": "📊 Statistics",
+            "outofcontext": "📸 Out Of Context",
+            "reacties": "✍ Reacties",
+            "owner": "👨‍🔧 Owner"
+        }
 
-        for i in self.bot.cogs.sort():
-            embed = discord.Embed(
-                title="**Help** :man_mechanic:", 
-                description=f"Ask <@{int(admin[0])}> for help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\n", 
-                color=self.bot.defaultColor
-            )
-            cog = self.bot.get_cog(i.lower())
+        page_numbers = {}
+        
+        for i, c in enumerate(self.bot.cogs):
+            
+            cog = self.bot.get_cog(c.lower())
             commands = cog.get_commands()
+
+            page_numbers[i] = cog_to_title.get(c.lower())
 
             data = []
             for command in commands:
                 description = command.description.partition("\n")[0]
                 data.append(f"{command.name} - {description}")
 
-            if i == "context":
+            if i == "outofcontext":
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
                 data.append("Rechtermuisklik -> Apps -> Remove Context - Remove message")
+
+            embed = discord.Embed(
+                title=f"**Help - {cog_to_title.get(c.lower())}**", 
+                description=f"Ask <@{int(admin[0])}> for help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\n", 
+                color=self.bot.defaultColor
+            )
 
             help_text = "\n".join(data)
             if len(help_text) > 0:
                 embed.add_field(
-                    name=i.capitalize(), value=f"```{help_text}```", inline=False
+                    name="✅ Available commands", value=help_text, inline=False
                 )
 
             menu.add_page(embed)
 
         menu.add_go_to_select(ViewSelect.GoTo(
             title="Ga naar onderverdeling...", 
-            page_numbers={1 : "🎙️ Audio", 2 : "🤖 General", 3: "📊 Statistics", 4: "📸 Out Of Context", 5: "✍ Reacties", 6: "👨‍🔧 Owner"}
+            page_numbers=page_numbers
         ))
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
