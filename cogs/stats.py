@@ -329,7 +329,7 @@ class CommandSelect(Select):
             commands.append(("Messages Deleted", "messages_deleted"))
         
         elif selected_cog == "stats":
-            commands.append(("NCount", "ncountCHECK"))
+            commands.append(("N-Words said", "ncountCHECK"))
             commands.append(("Ban","bancount"))
 
 
