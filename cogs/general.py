@@ -17,6 +17,8 @@ from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context, has_permissions
 
+from reactionmenu import ViewMenu, ViewSelect, ViewButton
+
 from helpers import checks
 
 
@@ -34,12 +36,22 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     async def help(self, context: Context) -> None:
         admin = list(os.environ.get("owners").split(","))
-        embed = discord.Embed(
-            title="**Help** :man_mechanic:", 
-            description=f"Ask <@{int(admin[0])}> for help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\nList of available commands:", 
-            color=self.bot.defaultColor
-        )
+
+        menu = ViewMenu(context, menu_type=ViewMenu.TypeEmbed)
+        
+        menu.add_go_to_select(ViewSelect.GoTo(title="Ga naar onderverdeling...", page_numbers=...))
+
+        menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton.next())
+
+        
+
         for i in self.bot.cogs:
+            embed = discord.Embed(
+                title="**Help** :man_mechanic:", 
+                description=f"Ask <@{int(admin[0])}> for help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\n", 
+                color=self.bot.defaultColor
+            )
             cog = self.bot.get_cog(i.lower())
             commands = cog.get_commands()
 
@@ -58,9 +70,9 @@ class General(commands.Cog, name="general"):
                     name=i.capitalize(), value=f"```{help_text}```", inline=False
                 )
 
+            menu.add_page(embed)
 
-        await context.send(embed=embed)
-
+        await menu.start()
 
 
     @commands.hybrid_command(
@@ -323,6 +335,7 @@ class General(commands.Cog, name="general"):
             )
 
         await context.send(embed=embed)
+
 
 
 
