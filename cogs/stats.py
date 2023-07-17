@@ -28,6 +28,38 @@ class Stats(commands.Cog, name="stats"):
     def __init__(self, bot):
         self.bot = bot
         
+    async def get_stat_individual_embed(self, userid, command):
+        count = await db_manager.get_command_count(userid, command.value)
+        # Geen berichten
+        if len(count) == 0 or int(count[0][0]) == 0:
+            embed = discord.Embed(
+                description=f"**<@{userid}> didn't use {command.value} yet.**",
+                color=self.bot.defaultColor
+            )
+            return embed
+        
+        # error
+        elif count[0] == -1:
+            embed = discord.Embed(
+                title=f"Something went wrong",
+                description=count[1],
+                color=self.bot.errorColor
+            )
+            await embed
+        
+        if command.value == "messages_played":
+            desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
+        elif command.value == "messages_deleted":
+            desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
+        else:
+            desc = f"**<@{userid}> used {command.value} ```{count[0][0]}``` times.**"
+
+        embed = discord.Embed(
+            description=desc,
+            color=self.bot.defaultColor
+        )
+
+        return embed
 
     @commands.hybrid_command(
         name="individuele_stats",
@@ -40,44 +72,9 @@ class Stats(commands.Cog, name="stats"):
         view = CommandView(self.bot)
         await context.send(view=view)
         await view.wait()
-        await context.send(f"{view.chosen_command}")
+        embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
+        await context.send(embed=embed)
         
-
-    # async def stats_individual_callback():
-    #     count = await db_manager.get_command_count(user.id, command.value)
-    #     # Geen berichten
-    #     if len(count) == 0 or int(count[0][0]) == 0:
-    #         embed = discord.Embed(
-    #             description=f"**<@{user.id}> didn't use {command.value} yet.**",
-    #             color=self.bot.defaultColor
-    #         )
-    #         await context.send(embed=embed)
-    #         return
-        
-    #     # error
-    #     elif count[0] == -1:
-    #         embed = discord.Embed(
-    #             title=f"Something went wrong",
-    #             description=count[1],
-    #             color=self.bot.errorColor
-    #         )
-    #         await context.send(embed=embed)
-    #         return
-        
-    #     if command.value == "messages_played":
-    #         desc = f"**<@{user.id}> played```{count[0][0]}``` messages.**"
-    #     elif command.value == "messages_deleted":
-    #         desc = f"**<@{user.id}> deleted```{count[0][0]}``` messages.**"
-    #     else:
-    #         desc = f"**<@{user.id}> used {command.value} ```{count[0][0]}``` times.**"
-
-    #     embed = discord.Embed(
-    #         description=desc,
-    #         color=self.bot.defaultColor
-    #     )
-
-    #     await context.send(embed=embed)
-
 
 
     @commands.hybrid_command(name="changecommandcount", description="Change the command count of a user (admin only)")
@@ -271,15 +268,17 @@ class CommandView(View):
         options=[SelectOption(label=item, value=item) for item in ["audio", "counter", "general", "outofcontext"]]     
     )
     async def select_cog(self, interaction: Interaction, select_item : Select):
-        self.children[0].disabled= True
+        self.children[0].disabled = True
+        self.children[0].placeholder = select_item.values[0]
         command_select = CommandSelect(self.bot, select_item.values[0])
         self.add_item(command_select)
         await interaction.message.edit(view=self)
         await interaction.response.defer()
 
     async def respond_to_answer2(self, interaction : Interaction, choices):
-        self.chosen_command = choices 
+        self.chosen_command = choices[0]
         self.children[1].disabled= True
+        self.children[1].placeholder = choices[0]
         await interaction.message.edit(view=self)
         await interaction.response.defer()
         self.stop()
