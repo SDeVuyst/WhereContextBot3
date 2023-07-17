@@ -54,7 +54,7 @@ class General(commands.Cog, name="general"):
             cog = self.bot.get_cog(c.lower())
             commands = cog.get_commands()
 
-            page_numbers[i+1] = cog_to_title.get(c.lower())[0]
+            page_numbers[i+1] = cog_to_title.get(c.lower()).split(" ")[0]
 
             data = []
             for command in commands:
@@ -67,7 +67,7 @@ class General(commands.Cog, name="general"):
 
             embed = discord.Embed(
                 title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"Ask <@{int(admin[0])}> for help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\n", 
+                description=f"Ask <@{int(admin[0])}> for more help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\n", 
                 color=self.bot.defaultColor
             )
 
@@ -326,7 +326,7 @@ class General(commands.Cog, name="general"):
         name="remindme",
         description="Remind me of an event",
     )
-    @checks.not_blacklisted()
+    @checks.is_owner()
     async def remindme(self, context: Context, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
 
         t = dateparser.parse(wanneer)
