@@ -85,7 +85,7 @@ class General(commands.Cog, name="general"):
         ))
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
-        await context.send()
+        await context.send("** **")
         return await menu.start()
 
 
