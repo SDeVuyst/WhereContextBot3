@@ -88,6 +88,20 @@ class General(commands.Cog, name="general"):
         await context.send("** **")
         return await menu.start()
 
+    @commands.hybrid_command(
+        name="stack", description="stacktest"
+    )
+    async def stacked(self, ctx):
+        menu = ViewMenu(ctx, menu_type=ViewMenu.TypeEmbed)
+
+        menu.add_page(discord.Embed(title="Hey Wumpos, can you say hi to the person reading this? 😃"))
+        menu.add_page(discord.Embed(title="Hi, I'm Wumpos!"))
+        
+        menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton.next())
+        
+        await menu.start()
+
 
     @commands.hybrid_command(
         name="lien",
