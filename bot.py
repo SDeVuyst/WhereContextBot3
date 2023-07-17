@@ -101,7 +101,7 @@ def init_db():
             ) as file:
                 cursor.execute(file.read())
 
-    bot.logger.info(f"initializing db'")
+    bot.logger.info(f"initializing db")
 
 
 @bot.event
