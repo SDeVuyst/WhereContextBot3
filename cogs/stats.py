@@ -29,11 +29,11 @@ class Stats(commands.Cog, name="stats"):
         self.bot = bot
         
     async def get_stat_individual_embed(self, userid, command):
-        count = await db_manager.get_command_count(userid, command.value)
+        count = await db_manager.get_command_count(userid, command)
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
             embed = discord.Embed(
-                description=f"**<@{userid}> didn't use {command.value} yet.**",
+                description=f"**<@{userid}> didn't use {command} yet.**",
                 color=self.bot.defaultColor
             )
             return embed
@@ -45,14 +45,14 @@ class Stats(commands.Cog, name="stats"):
                 description=count[1],
                 color=self.bot.errorColor
             )
-            await embed
+            return embed
         
         if command.value == "messages_played":
             desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
         elif command.value == "messages_deleted":
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
         else:
-            desc = f"**<@{userid}> used {command.value} ```{count[0][0]}``` times.**"
+            desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
 
         embed = discord.Embed(
             description=desc,
@@ -60,6 +60,8 @@ class Stats(commands.Cog, name="stats"):
         )
 
         return embed
+
+
 
     @commands.hybrid_command(
         name="individuele_stats",
