@@ -19,12 +19,9 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from discord.interactions import Interaction
 from discord.ui import Select, View
-from discord.utils import MISSING
 
 from helpers import checks, db_manager
 
-
-loaded_cogs = None
 
 
 class Stats(commands.Cog, name="stats"):
@@ -261,27 +258,26 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-class CommandView(discord.ui.View):
+class CommandView(View):
     def __init__(self, bot) -> None:
         super().__init__()
         self.bot = bot
-        global loaded_cogs
-        loaded_cogs = list(self.bot.loaded)
+        # CommandView.loaded_cogs = list(self.bot.loaded)
 
     chosen_command = None
 
     @discord.ui.select(
         placeholder="Kies een onderverdeling",
-        options=[SelectOption(label=item, value=item) for item in loaded_cogs]     
+        options=[SelectOption(label=item, value=item) for item in ["audio", "counter", "general", "outofcontext"]]     
     )
-    async def select_cog(self, interaction:discord.Interaction, select_item : discord.ui.Select):
+    async def select_cog(self, interaction: Interaction, select_item : Select):
         self.children[0].disabled= True
         command_select = CommandSelect(self.bot, select_item.values[0])
         self.add_item(command_select)
         await interaction.message.edit(view=self)
         await interaction.response.defer()
 
-    async def respond_to_answer2(self, interaction : discord.Interaction, choices):
+    async def respond_to_answer2(self, interaction : Interaction, choices):
         self.chosen_command = choices 
         self.children[1].disabled= True
         await interaction.message.edit(view=self)
@@ -289,9 +285,10 @@ class CommandView(discord.ui.View):
         self.stop()
 
 
-class CommandSelect(discord.ui.Select):
+class CommandSelect(Select):
     def __init__(self, bot, selected_cog):
         commands = []
+        # todo voeg stats toe die geen commands zijn eg messages played
         for y in bot.commands:
             if y.cog and y.cog.qualified_name.lower() == selected_cog:
                 commands.append(y.name)
@@ -301,7 +298,7 @@ class CommandSelect(discord.ui.Select):
             options=[SelectOption(label=item, value=item) for item in commands]
         )
 
-    async def callback(self, interaction:discord.Interaction):
+    async def callback(self, interaction:Interaction):
         await self.view.respond_to_answer2(interaction, self.values)
 
 
