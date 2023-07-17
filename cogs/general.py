@@ -54,7 +54,7 @@ class General(commands.Cog, name="general"):
             cog = self.bot.get_cog(c.lower())
             commands = cog.get_commands()
 
-            page_numbers[i] = cog_to_title.get(c.lower())[0]
+            page_numbers[i+1] = cog_to_title.get(c.lower())[0]
 
             data = []
             for command in commands:
