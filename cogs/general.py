@@ -38,13 +38,6 @@ class General(commands.Cog, name="general"):
         admin = list(os.environ.get("owners").split(","))
 
         menu = ViewMenu(context, menu_type=ViewMenu.TypeEmbed)
-        
-        menu.add_go_to_select(ViewSelect.GoTo(title="Ga naar onderverdeling...", page_numbers=...))
-
-        menu.add_button(ViewButton.back())
-        menu.add_button(ViewButton.next())
-
-        
 
         for i in self.bot.cogs:
             embed = discord.Embed(
@@ -72,6 +65,9 @@ class General(commands.Cog, name="general"):
 
             menu.add_page(embed)
 
+        menu.add_go_to_select(ViewSelect.GoTo(title="Ga naar onderverdeling...", page_numbers=...))
+        menu.add_button(ViewButton.back())
+        menu.add_button(ViewButton.next())
         await menu.start()
 
 
