@@ -37,7 +37,7 @@ class General(commands.Cog, name="general"):
     async def help(self, context: Context) -> None:
         admin = list(os.environ.get("owners").split(","))
 
-        menu = ViewMenu(context, menu_type=ViewMenu.TypeEmbed)
+        menu = ViewMenu(context.interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
             "audio": "🎙️ Audio",
             "general": "🤖 General",
@@ -85,22 +85,7 @@ class General(commands.Cog, name="general"):
         ))
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
-        await context.send("** **")
         return await menu.start()
-
-    @commands.hybrid_command(
-        name="stack", description="stacktest"
-    )
-    async def stacked(self, ctx):
-        menu = ViewMenu(ctx.interaction, menu_type=ViewMenu.TypeEmbed)
-
-        menu.add_page(discord.Embed(title="Hey Wumpos, can you say hi to the person reading this? 😃"))
-        menu.add_page(discord.Embed(title="Hi, I'm Wumpos!"))
-        
-        menu.add_button(ViewButton.back())
-        menu.add_button(ViewButton.next())
-        
-        await menu.start()
 
 
     @commands.hybrid_command(
