@@ -261,13 +261,20 @@ class CommandView(View):
     def __init__(self, bot) -> None:
         super().__init__()
         self.bot = bot
-        # CommandView.loaded_cogs = list(self.bot.loaded)
 
     chosen_command = None
 
     @discord.ui.select(
         placeholder="Kies een onderverdeling",
-        options=[SelectOption(label=item, value=item) for item in ["audio", "counter", "general", "outofcontext"]]     
+        options=[
+            SelectOption(label="Audio", emoji=":microphone2:", value="audio"),
+            SelectOption(label="Counter", emoji=":ledger:", value="counter"),
+            SelectOption(label="General", emoji=":robot:", value="general"),
+            SelectOption(label="Out Of Context", emoji=":camera_with_flash:", value="outofcontext"),
+            SelectOption(label="Reacties", emoji=":black_joker:", value="reacties"),
+            SelectOption(label="Stats", emoji=":bar_chart:", value="stats"),
+            SelectOption(label="Owner", emoji=":man_mechanic:", value="owner")
+        ]     
     )
     async def select_cog(self, interaction: Interaction, select_item : Select):
         self.children[0].disabled = True
@@ -289,14 +296,23 @@ class CommandView(View):
 class CommandSelect(Select):
     def __init__(self, bot, selected_cog):
         commands = []
-        # todo voeg stats toe die geen commands zijn eg messages played
         for y in bot.commands:
             if y.cog and y.cog.qualified_name.lower() == selected_cog:
-                commands.append(y.name)
+                commands.append((y.name, y.name))
+
+        # stats die zelf geen command zijn
+        if selected_cog == "outofcontext":
+            commands.append(("Messages Played", "messages_played"))
+            commands.append(("Messages Deleted", "messages_deleted"))
+        
+        elif selected_cog == "stats":
+            commands.append(("NCount", "ncountCHECK"))
+            commands.append(("Ban","bancount"))
+
 
         super().__init__(
             placeholder="Kies een command", 
-            options=[SelectOption(label=item, value=item) for item in commands]
+            options=[SelectOption(label=label, value=value) for label, value in commands]
         )
 
     async def callback(self, interaction:Interaction):
