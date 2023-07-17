@@ -27,6 +27,10 @@ from helpers import checks, db_manager
 class Stats(commands.Cog, name="stats"):
     def __init__(self, bot):
         self.bot = bot
+        self.timeout_embed = discord.Embed(
+            title=f"Timeout",
+            color=self.bot.errorColor
+        )
         
     async def get_stat_individual_embed(self, userid, command):
         count = await db_manager.get_command_count(userid, command)
@@ -74,7 +78,11 @@ class Stats(commands.Cog, name="stats"):
         view = CommandView(self.bot)
         await context.send(view=view)
         await view.wait()
-        embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
+        if view.chosen_command is None:
+            embed = self.timeout_embed 
+        else:
+            embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
+        
         await context.send(embed=embed)
         
 
@@ -86,17 +94,21 @@ class Stats(commands.Cog, name="stats"):
         view = CommandView(self.bot)
         await context.send(view=view)
         await view.wait()
-        
-        # krijg count uit db
-        succes = await db_manager.set_command_count(view.chosen_command, user.id, amount)
 
-        # verstuur embed
-        desc = f"{view.chosen_command} count of <@{user.id}> is now {amount}" if succes else "Something went wrong"
-        embed = discord.Embed(
-            title="Succes!" if succes else "Oops!",
-            description=desc,
-            color=self.bot.succesColor if succes else self.bot.defaultColor
-        )
+        if view.chosen_command is None:
+            embed = self.timeout_embed 
+        else:
+            # krijg count uit db
+            succes = await db_manager.set_command_count(view.chosen_command, user.id, amount)
+
+            # verstuur embed
+            desc = f"{view.chosen_command} count of <@{user.id}> is now {amount}" if succes else "Something went wrong"
+            embed = discord.Embed(
+                title="Succes!" if succes else "Oops!",
+                description=desc,
+                color=self.bot.succesColor if succes else self.bot.defaultColor
+            )
+        
         await context.send(embed=embed)
 
 
@@ -149,7 +161,11 @@ class Stats(commands.Cog, name="stats"):
         view = CommandView(self.bot)
         await context.send(view=view)
         await view.wait()
-        embed = await self.get_leaderboard_embed(view.chosen_command)
+        if view.chosen_command is None:
+            embed = self.timeout_embed 
+        else:
+            embed = await self.get_leaderboard_embed(view.chosen_command)
+
         await context.send(embed=embed)
         
 
@@ -277,9 +293,9 @@ class CommandView(View):
         options = [
             SelectOption(label="Audio", emoji="🎙️", value="audio"),
             SelectOption(label="General", emoji="🤖", value="general"),
+            SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
             SelectOption(label="Reacties", emoji="✍", value="reacties"),
-            SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Owner", emoji="👨‍🔧", value="owner")
         ]     
     )
