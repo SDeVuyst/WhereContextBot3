@@ -330,7 +330,6 @@ class CommandSelect(Select):
         
         elif selected_cog == "stats":
             commands.append(("N-Words said", "ncountCHECK"))
-            commands.append(("Ban","bancount"))
 
 
         super().__init__(
