@@ -61,7 +61,7 @@ class General(commands.Cog, name="general"):
                 description = command.description.partition("\n")[0]
                 data.append(f"{command.name} - {description}")
 
-            if i == "outofcontext":
+            if c == "outofcontext":
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
                 data.append("Rechtermuisklik -> Apps -> Remove Context - Remove message")
 
