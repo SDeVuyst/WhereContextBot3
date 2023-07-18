@@ -143,12 +143,12 @@ async def check_remindme():
         for reminder in reminders:
             id, user_id, subject, time = tuple(reminder)
 
-            bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S')}")
-            bot.logger.info(f"now: {datetime.now()}")
+            bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=ZoneInfo('Europe/Warsaw'))}")
+            bot.logger.info(f"now: {datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw'))}")
 
             
 
-            if datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=ZoneInfo('Europe/Warsaw')) < datetime.now():
+            if datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=ZoneInfo('Europe/Warsaw')) < datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw')):
 
                 bot.logger.info(f"{id}, {user_id}, {subject}, {time} triggered")
 
