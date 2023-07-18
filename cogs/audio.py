@@ -196,10 +196,10 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     @app_commands.choices(in_front=[
-        discord.app_commands.Choice(name="yes", value=True),
-        discord.app_commands.Choice(name="no", value=False),
+        discord.app_commands.Choice(name="yes", value=1),
+        discord.app_commands.Choice(name="no", value=0),
     ])
-    async def play(self, context: Context, youtube_url: str, in_front: discord.app_commands.Choice[bool]):
+    async def play(self, context: Context, youtube_url: str, in_front: discord.app_commands.Choice[int]):
 
         # check dat user in vc zit
         if not context.message.author.voice:
@@ -222,7 +222,7 @@ class Audio(commands.Cog, name="audio"):
                     desc = ""
                     vid_urls = Playlist(youtube_url)
                     for i, vid_url in enumerate(vid_urls):
-                        if in_front.value:
+                        if in_front.value == 1:
                             self.queue.insert(0, vid_url)
                         else:
                             self.queue.append(vid_url)
@@ -246,7 +246,7 @@ class Audio(commands.Cog, name="audio"):
                 yt = YouTube(youtube_url)
                 
                 # voeg lied aan queue toe
-                if in_front.value:
+                if in_front.value == 1:
                     self.queue.insert(0, youtube_url)
                 else:
                     self.queue.append(youtube_url)
