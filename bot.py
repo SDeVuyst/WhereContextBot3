@@ -19,6 +19,7 @@ from discord.ext.commands import Bot, Context
 from helpers import db_manager
 import exceptions
 
+from datetime import datetime
 
 intents = discord.Intents.all()
 
@@ -114,7 +115,7 @@ async def on_ready() -> None:
     bot.logger.info("-------------------")
     status_task.start()
     check_remindme.start()
-    
+
 
 @tasks.loop(minutes=1.0)
 async def status_task() -> None:
@@ -128,8 +129,36 @@ async def status_task() -> None:
 
 @tasks.loop(seconds=10)
 async def check_remindme():
-    bot.logger.info(f"Checking for remindmes")
+    reminders = db_manager.get_reminders()
 
+    # Geen berichten
+    if len(reminders) == 0: return
+    # error
+    elif reminders[0] == -1:
+        bot.logger.warning(f"Could not fetch reminders: {reminders[1]}")
+
+    else:
+
+        for reminder in reminders:
+            id, user_id, subject, time = tuple(reminder)
+            
+            if datetime.strptime(time, '%d/%m/%y %H:%M:%S') < datetime.now():
+                # stuur reminder
+                embed = discord.Embed(
+                    title="⏰ Reminder!",
+                    description=subject,
+                    color=bot.defaultColor
+                )
+
+                user = await bot.fetch_user(int(user_id))
+                await user.send(embed=embed)
+
+                # verwijder reminder uit db
+                succes = db_manager.delete_reminder(id)
+                if succes:
+                    bot.logger.info(f"Sent out a reminder ({subject})")
+                else:
+                    bot.logger.warning("could not delete reminder")
 
 
 @bot.event
