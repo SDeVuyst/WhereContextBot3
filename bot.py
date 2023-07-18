@@ -143,14 +143,7 @@ async def check_remindme():
         for reminder in reminders:
             id, user_id, subject, time = tuple(reminder)
 
-            bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S')}")
-            bot.logger.info(f"now: {datetime.now()}")
-
-            
-
             if datetime.strptime(time, '%d/%m/%y %H:%M:%S') - timedelta(hours=2) < datetime.now():
-
-                bot.logger.info(f"{id}, {user_id}, {subject}, {time} triggered")
 
                 # stuur reminder
                 embed = discord.Embed(
@@ -163,7 +156,7 @@ async def check_remindme():
                 await user.send(embed=embed)
 
                 # verwijder reminder uit db
-                succes = db_manager.delete_reminder(id)
+                succes = await db_manager.delete_reminder(id)
                 if succes:
                     bot.logger.info(f"Sent out a reminder ({subject})")
                 else:
