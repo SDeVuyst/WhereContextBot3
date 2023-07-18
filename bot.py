@@ -129,7 +129,7 @@ async def status_task() -> None:
 
 @tasks.loop(seconds=10)
 async def check_remindme():
-    reminders = db_manager.get_reminders()
+    reminders = await db_manager.get_reminders()
 
     # Geen berichten
     if len(reminders) == 0: return
