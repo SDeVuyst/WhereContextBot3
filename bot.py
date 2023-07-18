@@ -141,9 +141,14 @@ async def check_remindme():
 
         for reminder in reminders:
             id, user_id, subject, time = tuple(reminder)
+
             bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S')}")
-            if datetime.strptime(time, '%d/%m/%y %H:%M:%S') < datetime.now():
+            bot.logger.info(f"now: {datetime.now()}")
+
+            if datetime.strptime(f"{time} CEST", '%d/%m/%y %H:%M:%S %z') < datetime.now():
+
                 bot.logger.info(f"{id}, {user_id}, {subject}, {time} triggered")
+                
                 # stuur reminder
                 embed = discord.Embed(
                     title="⏰ Reminder!",
