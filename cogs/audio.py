@@ -78,24 +78,32 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def soundboard(self, context: Context, effect: discord.app_commands.Choice[str]):
+
+        # check als userin vc zit
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
             return
         try:
+
+            # autojoin vc als bot nog niet in vc zit
             vc = context.message.guild.voice_client
             if not vc.is_connected():
                 await context.invoke(self.bot.get_command('join'))
 
+            # pauzeer reeds spelende audio
             if vc.is_playing():
                 vc.pause()
 
+            # speel soundboard af
             vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
                 after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop)
             )
             
+            # resume de vorige spelende audio
             if vc.is_paused():
                 vc.resume()
             
+            # confirmatie 
             embed = discord.Embed(
                 title=f"played {effect.name}!",
                 color=self.bot.succesColor
@@ -132,11 +140,13 @@ class Audio(commands.Cog, name="audio"):
     @commands.cooldown(rate=1, per=120)
     async def tts(self, context: Context, speech: str, voice: discord.app_commands.Choice[str]):
         
+        # check als user in vc zit
         if not context.message.author.voice:
             await context.send(embed=self.not_in_vc_embed)
             context.command.reset_cooldown(context)
             return
         
+        # check als bot in vc zit
         vc = context.message.guild.voice_client
         if vc is None:
             await context.send(embed=self.bot_not_in_vc_embed)
@@ -147,6 +157,7 @@ class Audio(commands.Cog, name="audio"):
         await context.defer()
 
         try:
+            # creeer audio file 
             audio_data = await http.query_uberduck(speech, voice.value)
             with tempfile.NamedTemporaryFile(
                 suffix=".wav"
@@ -158,6 +169,7 @@ class Audio(commands.Cog, name="audio"):
                 self.bot.logger.info(wav_f)
                 self.bot.logger.info(opus_f)
 
+                # speel audio af
                 source = discord.FFmpegOpusAudio(opus_f.name)
 
                 self.bot.logger.info(source)
@@ -173,6 +185,7 @@ class Audio(commands.Cog, name="audio"):
                 if vc.is_paused():
                     vc.resume()
             
+            # confirmatie
             embed = discord.Embed(
                 title=f"Said ```{speech}``` in a {voice.name} voice!",
                 color=self.bot.succesColor
@@ -218,7 +231,9 @@ class Audio(commands.Cog, name="audio"):
 
             # playlist
             if youtube_url.find("list=") != -1:
-                
+
+                    # krijg afzonderlijke urls van videos in playlist 
+                    # voeg de urls toe aan queue
                     desc = ""
                     vid_urls = Playlist(youtube_url)
                     for i, vid_url in enumerate(vid_urls):
@@ -282,11 +297,14 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_in_dm()
     async def list(self, context: Context):
         
+        # lege queue
         if len(self.queue) == 0:
             embed = discord.Embed(
                 title=f"Queue is empty!",
                 color=self.bot.defaultColor
             )
+
+        # toon lijst van videos in queue
         else:
             desc = ""
             for i, url in enumerate(self.queue):
@@ -333,11 +351,14 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def pause(self, context: Context):
+
+        # check als bot in vc zit
         voice_client = context.message.guild.voice_client
         if voice_client is None:
             await context.send(embed=self.bot_not_in_vc_embed)
             return  
         
+        # pauzeer
         if voice_client.is_playing():
             voice_client.pause()
             embed = discord.Embed(
@@ -356,11 +377,14 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def resume(self, context: Context):
+
+        # check als bot in vc zit
         voice_client = context.message.guild.voice_client
         if voice_client is None:
             await context.send(embed=self.bot_not_in_vc_embed)
             return  
         
+        # resume
         if voice_client.is_paused():
             voice_client.resume()
             embed = discord.Embed(
@@ -379,11 +403,14 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def skip(self, context: Context):
+
+        # check als bot in vc zit
         voice_client = context.message.guild.voice_client
         if voice_client is None:
             await context.send(embed=self.bot_not_in_vc_embed)
             return  
         
+        # skip
         if voice_client.is_playing():
             voice_client.stop()
             
@@ -404,12 +431,16 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def stop(self, context: Context):
+
+        # check dat bot in vc zit
         voice_client = context.message.guild.voice_client
         if voice_client is None:
             await context.send(embed=self.bot_not_in_vc_embed)
             return  
         
+        
         if voice_client.is_playing():
+            # maak queue leeg
             self.queue = []
             voice_client.stop()
             embed = discord.Embed(
@@ -433,9 +464,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_in_dm()
     async def join(self, context: Context):
         try:
+            # user zit niet in vc
             if not context.message.author.voice:
                 embed = self.not_in_vc_embed
             else:
+                # join channel
                 channel = context.author.voice.channel
                 await channel.connect()
                 embed = discord.Embed(
@@ -476,11 +509,13 @@ class Audio(commands.Cog, name="audio"):
     async def play_next(self, context: Context):
         vc = context.message.guild.voice_client
 
+        # doe niks zolang player aan het spelen is
         while vc.is_playing():
             await asyncio.sleep(1)
 
         if len(self.queue) == 0: return
 
+        # krijg volgende url
         url = self.queue.pop(0)
         yt = YouTube(url)
         # video mag max 15 min duren
@@ -496,7 +531,8 @@ class Audio(commands.Cog, name="audio"):
         except Exception as e:
             self.bot.logger.warning(e)
             pass
-
+        
+        # maak temp file aan via url
         filename = await ytdl_helper.YTDLSource.from_url(url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
         if filename is None:
             embed = discord.Embed(
@@ -507,11 +543,13 @@ class Audio(commands.Cog, name="audio"):
             await context.interaction.followup.send(embed=embed)
             await self.play_next(context)
         else:
+            # speel de temp file af
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
 
             self.track_playing = f"{yt.title} by {yt.author}"
             self.track_playing_url = url
 
+            # confirmatie
             embed = discord.Embed(
                 title=f"Playing music!",
                 description=f"[{yt.title}]({url}) by {yt.author}",

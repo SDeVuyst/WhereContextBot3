@@ -130,6 +130,8 @@ async def status_task() -> None:
 
 @tasks.loop(seconds=10)
 async def check_remindme():
+
+    # krijg reminders uit db
     reminders = await db_manager.get_reminders()
 
     # Geen berichten
@@ -139,10 +141,11 @@ async def check_remindme():
         bot.logger.warning(f"Could not fetch reminders: {reminders[1]}")
 
     else:
-
+        # check elke reminder
         for reminder in reminders:
             id, user_id, subject, time = tuple(reminder)
 
+            # reminder is in verleden, dus stuur bericht
             if datetime.strptime(time, '%d/%m/%y %H:%M:%S') - timedelta(hours=2) < datetime.now():
 
                 # stuur reminder
@@ -228,6 +231,8 @@ async def autoroles(member):
     
 
     if member.id in roles:
+
+        # voeg autoroles toe
         roles_to_add = roles.get(member.id)
         for role_id in roles_to_add:
             try:
