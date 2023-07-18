@@ -19,7 +19,7 @@ from discord.ext.commands import Bot, Context
 from helpers import db_manager
 import exceptions
 
-from datetime import datetime
+from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 intents = discord.Intents.all()
@@ -143,12 +143,12 @@ async def check_remindme():
         for reminder in reminders:
             id, user_id, subject, time = tuple(reminder)
 
-            bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S')}")
+            bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=timezone.utc)}")
             bot.logger.info(f"now: {datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw'))}")
 
             
 
-            if datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=datetime.timezone.utc) < datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw')):
+            if datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=timezone.utc) < datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw')):
 
                 bot.logger.info(f"{id}, {user_id}, {subject}, {time} triggered")
 
