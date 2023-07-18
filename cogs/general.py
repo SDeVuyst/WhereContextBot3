@@ -355,9 +355,9 @@ class General(commands.Cog, name="general"):
             succes = await db_manager.set_reminder(context.author.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
 
             
-            desc = f"I will remind you at {t.strftime('%d/%m/%y %H:%M:%S')} for {waarover}" if succes else "Something went wrong"
+            desc = f"I will remind you at ```{t.strftime('%d/%m/%y %H:%M:%S')}``` for ```{waarover}```" if succes else "Something went wrong!"
             embed = discord.Embed(
-                title="✅ Reminder set!" if succes else "Oops!",
+                title="⏳ Reminder set!" if succes else "Oops!",
                 description=desc,
                 color=self.bot.succesColor if succes else self.bot.errorColor
             )
