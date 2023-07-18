@@ -20,6 +20,7 @@ from helpers import db_manager
 import exceptions
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 intents = discord.Intents.all()
 
@@ -145,10 +146,12 @@ async def check_remindme():
             bot.logger.info(f"{id}, {user_id}, {subject}, {time}: {datetime.strptime(time, '%d/%m/%y %H:%M:%S')}")
             bot.logger.info(f"now: {datetime.now()}")
 
-            if datetime.strptime(f"{time} CEST", '%d/%m/%y %H:%M:%S %z') < datetime.now():
+            
+
+            if datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=ZoneInfo('Europe/Warsaw')) < datetime.now():
 
                 bot.logger.info(f"{id}, {user_id}, {subject}, {time} triggered")
-                
+
                 # stuur reminder
                 embed = discord.Embed(
                     title="⏰ Reminder!",
