@@ -113,6 +113,8 @@ async def on_ready() -> None:
     bot.logger.info(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     bot.logger.info("-------------------")
     status_task.start()
+    check_remindme.start()
+    
 
 @tasks.loop(minutes=1.0)
 async def status_task() -> None:
@@ -122,6 +124,12 @@ async def status_task() -> None:
     amount = await db_manager.messages_in_ooc()
     statuses = ["Ora et Labora", f"{amount} berichten in outofcontext", "met ba zijn gevoelens", "with Astolfo", "Minecraft", "with gible z'n ma", "with grom z'n ma", "🚨 Scanning for n-words 🚨"]
     await bot.change_presence(activity=discord.Game(random.choice(statuses)))
+
+
+@tasks.loop(seconds=10)
+async def check_remindme():
+    bot.logger.info(f"Checking for remindmes")
+
 
 
 @bot.event

@@ -329,11 +329,17 @@ class General(commands.Cog, name="general"):
     @checks.is_owner()
     async def remindme(self, context: Context, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
 
-        t = dateparser.parse(wanneer)
+        t = dateparser.parse(wanneer, settings={
+            'DATE_ORDER': 'DMY',
+            'TIMEZONE': 'CEST',
+            'PREFER_DAY_OF_MONTH': 'first',
+            'PREFER_DATES_FROM': 'future',
+            'DEFAULT_LANGUAGES': ["en", "nl"]
+        })
 
         if t is None:
             embed = discord.Embed(
-                title="Geen geldig tijdstip",
+                title="❌ Geen geldig tijdstip",
                 description=f"{wanneer} is geen geldig tijdstip",
                 color=self.bot.errorColor
             )
@@ -342,8 +348,8 @@ class General(commands.Cog, name="general"):
             # TODO voeg toe aan db
 
             embed = discord.Embed(
-                title="Reminder set!",
-                description=f"I will remind you at {t} for {waarover}",
+                title="✅ Reminder set!",
+                description=f"I will remind you at {str(t)} for {waarover}",
                 color=self.bot.succesColor
             )
 
