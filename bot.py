@@ -148,7 +148,7 @@ async def check_remindme():
                 # stuur reminder
                 embed = discord.Embed(
                     title="⏰ Reminder!",
-                    description=subject,
+                    description=f"```{subject}```",
                     color=bot.defaultColor
                 )
 
