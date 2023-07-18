@@ -49,6 +49,8 @@ class Stats(commands.Cog, name="stats"):
             desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
         elif command == "messages_deleted":
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
+        elif command == "ncountCHECK":
+            desc = f"<@{userid}> said the n-word ```{count[0][0]}``` times.**"
         else:
             desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
 
@@ -138,6 +140,8 @@ class Stats(commands.Cog, name="stats"):
         for i, stat in enumerate(leaderb):
             user_id, count = tuple(stat)
             desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
+
+        command = "N-words said" if command == "ncountCHECK" else command
 
         embed = discord.Embed(
             title=f"🏆 Leaderboard for {command}",
