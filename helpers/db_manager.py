@@ -533,3 +533,22 @@ async def get_ban_leaderboard() -> list:
             
     except Exception as err:
         return [-1, err]
+    
+
+
+async def set_reminder(user_id, subject, time):
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                        "INSERT INTO reminders (user_id, subject, time) VALUES (%s, %s, %s)",
+                        (str(user_id), subject, time)
+                    )
+                    
+                con.commit()
+                return True
+            
+    except Exception as err:
+        print(err)
+        return False

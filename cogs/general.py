@@ -19,7 +19,7 @@ from discord.ext.commands import Context, has_permissions
 
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
-from helpers import checks
+from helpers import checks, db_manager
 
 
 openai.api_key = os.environ.get("openaisecret")
@@ -343,14 +343,23 @@ class General(commands.Cog, name="general"):
                 description=f"{wanneer} is geen geldig tijdstip",
                 color=self.bot.errorColor
             )
-        else:
-            
-            # TODO voeg toe aan db
-
+        elif t < datetime.now():
             embed = discord.Embed(
-                title="✅ Reminder set!",
-                description=f"I will remind you at {str(t)} for {waarover}",
-                color=self.bot.succesColor
+                title="❌ Geen geldig tijdstip",
+                description=f"{wanneer} is in het verleden",
+                color=self.bot.errorColor
+            )
+        else:
+
+            # zet reminder in db
+            succes = await db_manager.set_reminder(context.author.id, subject=waarover, time=t)
+
+            
+            desc = f"I will remind you at {t.strftime('%d/%m/%y %H:%M:%S')} for {waarover}" if succes else "Something went wrong"
+            embed = discord.Embed(
+                title="✅ Reminder set!" if succes else "Oops!",
+                description=desc,
+                color=self.bot.succesColor if succes else self.bot.errorColor
             )
 
         await context.send(embed=embed)

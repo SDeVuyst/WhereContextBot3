@@ -30,3 +30,10 @@ CREATE TABLE IF NOT EXISTS user_bans (
   user_id varchar(20) NOT NULL UNIQUE,
   count INTEGER DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS reminders (
+  id SERIAL PRIMARY KEY,
+  user_id varchar(20) NOT NULL,
+  subject varchar(100) NOT NULL,
+  time DATETIME NOT NULL
+);
