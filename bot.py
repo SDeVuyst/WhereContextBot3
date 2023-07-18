@@ -148,7 +148,7 @@ async def check_remindme():
 
             
 
-            if datetime.strptime(time, '%d/%m/%y %H:%M:%S') < datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw')):
+            if datetime.strptime(time, '%d/%m/%y %H:%M:%S').replace(tzinfo=datetime.timezone.utc) < datetime.now().replace(tzinfo=ZoneInfo('Europe/Warsaw')):
 
                 bot.logger.info(f"{id}, {user_id}, {subject}, {time} triggered")
 
