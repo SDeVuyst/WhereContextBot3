@@ -352,7 +352,7 @@ class General(commands.Cog, name="general"):
         else:
 
             # zet reminder in db
-            succes = await db_manager.set_reminder(context.author.id, subject=waarover, time=t)
+            succes = await db_manager.set_reminder(context.author.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
 
             
             desc = f"I will remind you at {t.strftime('%d/%m/%y %H:%M:%S')} for {waarover}" if succes else "Something went wrong"
