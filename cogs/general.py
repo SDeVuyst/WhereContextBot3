@@ -33,10 +33,13 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="help", description="List all commands the bot has loaded")
     @checks.not_blacklisted()
     async def help(self, interaction) -> None:
-        """
-        Sends info about all available commands.
+        """ Sends info about all available commands
 
-        :param interaction: The command interaction.
+        Args:
+            interaction (Interaction): Users Interaction
+
+        Returns:
+            None: Nothing
         """
 
         admin = list(os.environ.get("owners").split(","))
@@ -98,10 +101,10 @@ class General(commands.Cog, name="general"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def lien(self, interaction) -> None:
-        """
-        Lockdown.
+        """Kicks Jerome in case of emergency
 
-        :param interaction: The command interaction.
+        Args:
+            interaction (Interaction): Users Interaction
         """
 
         # kick grom
@@ -125,11 +128,12 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="ping", description="Check if the bot is alive")
     @checks.not_blacklisted()
     async def ping(self, interaction) -> None:
-        """
-        Check if the bot is alive.
+        """Check if the bot is alive
 
-        :param interaction: The command interaction.
+        Args:
+            interaction (Interaction): Users Interaction
         """
+
         embed = discord.Embed(
             title="🏓 Pong!",
             description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
@@ -144,11 +148,11 @@ class General(commands.Cog, name="general"):
     @app_commands.describe(message="The message that should be repeated by the bot")
     @checks.not_blacklisted()
     async def say(self, interaction, *, message: str) -> None:
-        """
-        The bot will say anything you want.
+        """Let the bot say anything you want
 
-        :param interaction: The command interaction.
-        :param message: The message that should be repeated by the bot.
+        Args:
+            interaction (Interaction): Users Interaction
+            message (str): What the bot has to say
         """
 
         await interaction.response.send_message(message)
@@ -159,11 +163,11 @@ class General(commands.Cog, name="general"):
     @app_commands.describe(message="The message that should be repeated by the bot")
     @checks.not_blacklisted()
     async def embed(self, interaction, *, message: str) -> None:
-        """
-        The bot will say anything you want, but using embeds.
+        """Let the bot say anything you want, but in an embed
 
-        :param interaction: The command interaction.
-        :param message: The message that should be repeated by the bot.
+        Args:
+            interaction (Interaction): Users Interaction
+            message (str): What the bot has to say
         """
 
         embed = discord.Embed(title=message, color=self.bot.defaultColor)
@@ -174,10 +178,10 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('countdown_title')}")
     @checks.not_blacklisted()
     async def countdown(self, interaction) -> None:
-        """
-        Countdown till a given moment in time.
+        """Countdown till agiven moment in time
 
-        :param interaction: The command interaction.
+        Args:
+            interaction (Interaction): Users Interaction
         """
 
         deadline = datetime.strptime(os.environ.get("countdown"), "%d/%m/%y %H:%M:%S")
@@ -210,14 +214,13 @@ class General(commands.Cog, name="general"):
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
     async def dm(self, interaction, user: discord.User, content: str) -> None:
-        """
-        Dm's a given user.
+        """Let the bot DM a user
 
-        :param interaction: The command interaction.
-        :param user: Which user.
-        :param content: What to send the user.
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user to dm
+            content (str): What to dm the user
         """
-
 
         # stuur dm naar gebruiker
         await user.send(content=content)
@@ -237,11 +240,11 @@ class General(commands.Cog, name="general"):
     @checks.not_in_dm()
     @commands.cooldown(rate=2, per=30)
     async def chat(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
-        """
-        Chat with chatgpt.
+        """Chat with the bot using AI
 
-        :param interaction: The command interaction.
-        :param prompt: Your question.
+        Args:
+            interaction (Interaction): Users Interaction
+            prompt (app_commands.Range[str, 1, 200]): The users question
         """
         await interaction.response.defer()
 
@@ -281,12 +284,13 @@ class General(commands.Cog, name="general"):
     @checks.not_in_dm()
     @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
     async def image(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
-        """
-        Creates an AI image
+        """Create an image using Ai
 
-        :param interaction: The command interaction.
-        :param prompt: Description of what to create.
+        Args:
+            interaction (Interaction): Users Interaction
+            prompt (app_commands.Range[str, 1, 200]): Information about what to create
         """
+
         await interaction.response.defer()
 
         try:
@@ -321,11 +325,12 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="invite", description="Create an invite")
     @checks.not_blacklisted()
     async def invite(self, interaction) -> None:
-        """
-        Sends an invite to the main server
+        """Send an invite to the main server
 
-        :param interaction: The command interaction.
+        Args:
+            interaction (Interaction): Users Interaction
         """
+
         guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
         channel = await guild.fetch_channel(int(os.environ.get("channel")))
         link = await channel.create_invite(max_age = 0, max_uses = 1)
@@ -337,13 +342,14 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="remindme", description="Remind me of an event")
     @checks.is_owner()
     async def remindme(self, interaction, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
-        """
-        Creates a reminder.
+        """Sets a reminder
 
-        :param interaction: The command interaction.
-        :param wanneer: When should the bot set the reminder.
-        :param waarover: What is the reminder about.
+        Args:
+            interaction (Interaction): Users Interaction
+            wanneer (str): When to send the reminder
+            waarover (app_commands.Range[str, 1, 100]): What the reminder is about
         """
+        
         t = dateparser.parse(wanneer, settings={
             'DATE_ORDER': 'DMY',
             'TIMEZONE': 'CEST',

@@ -23,7 +23,12 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def context_debug(self, interaction):
+        """Debug stats about the out of context game
 
+        Args:
+            interaction (Interaction): Users interaction
+        """
+    
         embed = discord.Embed(
             title="Debug",
             color=self.bot.defaultColor,
@@ -47,10 +52,11 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def play(self, interaction, groep: bool) -> None:
-        """
-        Play the out of context game
+        """Play the out of context game
 
-        :param context: The hybrid command context.
+        Args:
+            interaction (Interaction): Users interaction
+            groep (bool): If the game has to be ephemeral or not
         """
         if self.currently_playing:
             embed = discord.Embed(
@@ -74,6 +80,15 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 # HELPER FUNCTIONS
 
     async def getRandomMessage(self, guild):
+        """Gets a random message from the out of context game db
+
+        Args:
+            guild (Guild): Guild from the message
+
+        Returns:
+            Tuple with embed and bool if succesfull
+        """
+
         # krijg random bericht uit db
         messages = await db_manager.get_ooc_messages(1)
         if len(messages) > 0:
@@ -102,6 +117,16 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     
 
     async def getMessage(self, guild, id):
+        """Get specific message from the ooc db
+
+        Args:
+            guild (Guild): Guild from message
+            id (int): ID from the message
+
+        Returns:
+            Tuple with embed and bool if succesfull
+        """
+
         # krijg bekend bericht uit db
         messages = await db_manager.get_ooc_message(id)
 
@@ -128,6 +153,18 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         
 
     async def getEmbed(self, id, guild, added_by, times_played):
+        """ Generates an embed
+
+        Args:
+            id (int): Id from message
+            guild (Guild): Messages guild
+            added_by (str): id of user who added the message        
+            times_played (int): How many times the message has been played
+
+        Returns:
+            Embed
+        """
+
         # haal bericht op van discord
         m = await guild.get_channel(int(os.environ.get("channel"))).fetch_message(id)
         desc = f"[Go to message]({m.jump_url})" if len(m.content) == 0 else f"**{m.content}**\n[Go to message]({m.jump_url})"
@@ -201,6 +238,16 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
 
     async def remove(self, id, guild):
+        """Removes a message from the ooc game
+
+        Args:
+            id (int): Id of message that has to be removed
+            guild (Guild): Messages guild
+
+        Returns:
+            Embed
+        """
+
         # check als bericht bestaat
         if not await db_manager.is_in_ooc(id):
             embed = discord.Embed(
@@ -247,12 +294,20 @@ class Menu(discord.ui.View):
 
 
     async def reset(self):
+        """Resets the children
+        """
         for b in self.children:
             b.disabled = False
 
 
     @discord.ui.button(label="Previous", style=discord.ButtonStyle.green, disabled=True)
     async def previous(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Goes to the previous message
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+            button (discord.ui.Button): the button
+        """
         self.currentIndex -= 1
         self.currentIndex = self.currentIndex if self.currentIndex > 0 else 0
 
@@ -269,6 +324,12 @@ class Menu(discord.ui.View):
 
     @discord.ui.button(label="Next", style=discord.ButtonStyle.green)
     async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Goes to the next message
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+            button (discord.ui.Button): button
+        """
         self.currentIndex += 1
         # check als we bericht al hebben ingeladen of nieuw random bericht moeten opvragen
         if (self.currentIndex == len(self.messages)):
@@ -287,6 +348,13 @@ class Menu(discord.ui.View):
 
     @discord.ui.button(label="Remove", style=discord.ButtonStyle.red)
     async def remove(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Removes message from the game
+
+        Args:
+            interaction (discord.Interaction): Users interaction
+            button (discord.ui.Button): button
+        """
+
         # verwijder bericht
         embed = await self.OOC.remove(self.messages[self.currentIndex], interaction.guild)
 
@@ -308,6 +376,12 @@ class Menu(discord.ui.View):
 
     @discord.ui.button(label="Quit", style=discord.ButtonStyle.blurple)
     async def quit(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Exit the game
+
+        Args:
+            interaction (discord.Interaction): Users interaction
+            button (discord.ui.Button): button
+        """
 
         # stuur confirmatie bericht
         embed = discord.Embed(
@@ -320,6 +394,15 @@ class Menu(discord.ui.View):
 
 
     async def interaction_check(self, interaction: discord.Interaction):
+        """Check that the game player is the one who is clicking buttons
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+
+        Returns:
+            bool
+        """
+
         try:
             is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("owners").split(","))
             # stuur dm naar user als niet author is
@@ -332,6 +415,8 @@ class Menu(discord.ui.View):
         
 
     async def on_timeout(self) -> None:
+        """Exits the game on timeout
+        """
 
         if self.message is None: return
         # stuur confirmatie bericht
@@ -345,6 +430,8 @@ class Menu(discord.ui.View):
     
 
     async def reset_game(self):
+        """Resets the game
+        """
         # stats
         await db_manager.increment_or_add_command_count(self.author.id, "messages_played", self.messagesPlayed+1)
         await db_manager.increment_or_add_command_count(self.author.id, "messages_deleted", self.messagesDeleted)       

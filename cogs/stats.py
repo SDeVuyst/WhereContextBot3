@@ -27,6 +27,15 @@ class Stats(commands.Cog, name="stats"):
         )
         
     async def get_stat_individual_embed(self, userid, command):
+        """Get an embed for individual stats
+
+        Args:
+            userid (str): Id of user 
+            command (str): Which command
+
+        Returns:
+            Embed
+        """
         count = await db_manager.get_command_count(userid, command)
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
@@ -72,6 +81,12 @@ class Stats(commands.Cog, name="stats"):
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
     async def stats_individual(self,interaction, user: discord.User) -> None:
+        """Shows the individual stats for a user for a given command
+
+        Args:
+            interaction (Interaction): Users interaction
+            user (discord.User): Which user
+        """
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
         await view.wait()
@@ -88,6 +103,13 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.describe(user="Which users count")
     @checks.is_owner()
     async def change_command_count(self,interaction, user: discord.User, amount: int):
+        """Changes the count of a command for a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user
+            amount (int): What to set the count to
+        """
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
         await view.wait()
@@ -111,6 +133,14 @@ class Stats(commands.Cog, name="stats"):
 
 
     async def get_leaderboard_embed(self, command):
+        """Get embed for a leaderboard 
+
+        Args:
+            command (str): Which command
+
+        Returns:
+            Embed
+        """
         if command == "ncountCHECK":
             leaderb = await db_manager.get_nword_leaderboard()
         elif command == "bancount":
@@ -157,6 +187,11 @@ class Stats(commands.Cog, name="stats"):
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
     async def leaderboard(self,interaction):
+        """Shows the leaderboard for a command
+
+        Args:
+            interaction (Interaction): Users interaction
+        """
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
         await view.wait()
@@ -173,6 +208,12 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.describe(user="Which users ban count")
     @checks.not_blacklisted()
     async def bancount(self,interaction, user: discord.User):
+        """How many times a user has been banned
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which users ban count
+        """
         
         # krijg count uit db
         count = await db_manager.get_ban_count(user.id)
@@ -209,6 +250,13 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.command(name="changebancount", description="Change user ban count (owner only)")
     @checks.is_owner()   
     async def change_ban_count(self,interaction, user: discord.User, amount: int):
+        """Changes the ban count of a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user
+            amount (int): Set the count to 
+        """
         # krijg count uit db
         succes = await db_manager.set_ban_count(user.id, amount)
 
@@ -230,6 +278,13 @@ class Stats(commands.Cog, name="stats"):
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=10)
     async def nCount(self,interaction, user: discord.User):
+        """How many times a user has said the nword
+
+        Args:
+            interaction (Interaction): Users interaction
+            user (discord.User): Which user
+        """
+
         # krijg count bericht uit db
         count = await db_manager.get_nword_count(user.id)
 
@@ -266,6 +321,14 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.describe(amount="Amount to set the count to")
     @checks.is_owner()
     async def changeNCount(self,interaction, user: discord.User, amount: int):
+        """Change the ncount of a user
+
+        Args:
+            interaction (Interaction): Users interaction
+            user (discord.User): Which user
+            amount (int): Set to how much
+        """
+
         # krijg count uit db
         succes = await db_manager.set_nword_count(user.id, amount)
 
@@ -299,6 +362,12 @@ class CommandView(View):
         ]     
     )
     async def select_cog(self, interaction: Interaction, select_item : Select):
+        """Selection of first cog
+
+        Args:
+            interaction (Interaction): Users interaction
+            select_item (Select): Selected item
+        """
         self.children[0].disabled = True
         self.children[0].placeholder = select_item.values[0]
         command_select = CommandSelect(self.bot, select_item.values[0])
@@ -307,6 +376,12 @@ class CommandView(View):
         await interaction.response.defer()
 
     async def respond_to_answer2(self, interaction : Interaction, choices):
+        """What to do after second choice aka user has chosen a command
+
+        Args:
+            interaction (Interaction): Users interaction
+            choices (list): What has the user chosen
+        """
         self.chosen_command = choices[0]
         self.children[1].disabled= True
         self.children[1].placeholder = choices[0]

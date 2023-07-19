@@ -30,10 +30,11 @@ class Owner(commands.Cog, name="owner"):
     ])
     @checks.is_owner()
     async def sync(self, interaction, scope: discord.app_commands.Choice[str]) -> None:
-        """
-        Synchronizes the slash commands.
+        """Synchronizes the slash commands
 
-        :param context: The command context.
+        Args:
+            interaction (Interaction): Users interaction
+            scope (discord.app_commands.Choice[str]): The scope to sync, can be global or server
         """
         try:
 
@@ -78,6 +79,11 @@ class Owner(commands.Cog, name="owner"):
 
 
     def save_ids(self, cmds):
+        """Saves the ids of commands
+
+        Args:
+            cmds (Command)
+        """
         for cmd in cmds:
             if cmd.guild_id is None:  # it's a global slash command
                 self.bot.tree._global_commands[cmd.name].id = cmd.id
@@ -94,11 +100,11 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(cog="The name of the cog to load")
     @checks.is_owner()
     async def load_cog(self, interaction, cog: str) -> None:
-        """
-        The bot will load the given cog.
+        """Load a given cog
 
-        :param context: The hybrid command context.
-        :param cog: The name of the cog to load.
+        Args:
+            interaction (Interaction): users interaction
+            cog (str): The cog to load
         """
         try:
             await self.bot.load_extension(f"cogs.{cog}")
@@ -125,11 +131,11 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(cog="The name of the cog to unload")
     @checks.is_owner()
     async def unload_cog(self, interaction, cog: str) -> None:
-        """
-        The bot will unload the given cog.
+        """Unloads a cog
 
-        :param context: The hybrid command context.
-        :param cog: The name of the cog to unload.
+        Args:
+            interaction (Interaction): Users Interaction
+            cog (str): The cog to unload
         """
         try:
             await self.bot.unload_extension(f"cogs.{cog}")
@@ -155,11 +161,11 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(cog="The name of the cog to reload")
     @checks.is_owner()
     async def reload_cog(self, interaction, cog: str) -> None:
-        """
-        The bot will reload the given cog.
+        """Reloads a cog
 
-        :param context: The hybrid command context.
-        :param cog: The name of the cog to reload.
+        Args:
+            interaction (Interaction): Users interaction
+            cog (str): The cog to reload
         """
         try:
             await self.bot.reload_extension(f"cogs.{cog}")
@@ -184,10 +190,10 @@ class Owner(commands.Cog, name="owner"):
     )
     @checks.is_owner()
     async def cogs(self, interaction) -> None:
-        """
-        See which cogs are loaded and which are unloaded 
+        """Shows which cogs are loaded/unloaded
 
-        :param context: The hybrid command context.
+        Args:
+            interaction (Interaction): users interaction
         """
         
         embed = discord.Embed(
@@ -214,10 +220,10 @@ class Owner(commands.Cog, name="owner"):
     )
     @checks.is_owner()
     async def restart(self, interaction) -> None:
-        """
-        Shuts down the bot.
+        """Restarts the bot
 
-        :param context: The hybrid command context.
+        Args:
+            interaction (Interaction): Users Interaction
         """
         embed = discord.Embed(description="Restarting. brb :wave:", color=self.bot.defaultColor)
         await interaction.response.send_message(embed=embed)
@@ -233,10 +239,10 @@ class Owner(commands.Cog, name="owner"):
     )
     @checks.is_owner()
     async def blacklist_show(self, interaction) -> None:
-        """
-        Shows the list of all blacklisted users.
+        """Shows list of all blacklisted users
 
-        :param context: The hybrid command context.
+        Args:
+            interaction (Interaction): Users Interaction
         """
         blacklisted_users = await db_manager.get_blacklisted_users()
         
@@ -278,11 +284,11 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(user="The user that should be added to the blacklist")
     @checks.is_owner()
     async def blacklist_add(self, interaction, user: discord.User) -> None:
-        """
-        Lets you add a user from not being able to use the bot.
+        """Adds a user to the blacklist
 
-        :param context: The hybrid command context.
-        :param user: The user that should be added to the blacklist.
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user to add
         """
         user_id = user.id
         if await db_manager.is_blacklisted(user_id):
@@ -321,11 +327,11 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.describe(user="The user that should be removed from the blacklist.")
     @checks.is_owner()
     async def blacklist_remove(self, interaction, user: discord.User) -> None:
-        """
-        Lets you remove a user from not being able to use the bot.
+        """Removes a user from the blacklist
 
-        :param context: The hybrid command context.
-        :param user: The user that should be removed from the blacklist.
+        Args:
+            interaction (Interaction): Users interaction
+            user (discord.User): WHich user to remove
         """
         user_id = user.id
         if not await db_manager.is_blacklisted(user_id):

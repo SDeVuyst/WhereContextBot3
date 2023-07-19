@@ -78,7 +78,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def soundboard(self, interaction, effect: discord.app_commands.Choice[str]):
+        """ Play a soundboard effect in vc
 
+        Args:
+            interaction (Interaction): Users interaction
+            effect (discord.app_commands.Choice[str]): Which effect to play
+        """
         # check als userin vc zit
         if not interaction.message.author.voice:
             await interaction.response.send_message(embed=self.not_in_vc_embed)
@@ -111,7 +116,7 @@ class Audio(commands.Cog, name="audio"):
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
-
+        # error
         except Exception as e:
             embed = discord.Embed(
                 title=f"Something went wrong",
@@ -140,7 +145,13 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=120)
     async def tts(self, interaction, speech: str, voice: discord.app_commands.Choice[str]):
-        
+        """ Play a tts message in vc
+
+        Args:
+            interaction (Interaction): User Interaction
+            speech (str): What to say
+            voice (discord.app_commands.Choice[str]): Which voice
+        """
         # check als user in vc zit
         if not interaction.message.author.voice:
             await interaction.response.send_message(embed=self.not_in_vc_embed)
@@ -172,6 +183,7 @@ class Audio(commands.Cog, name="audio"):
                 source = discord.FFmpegOpusAudio(opus_f.name)
 
                 self.bot.logger.info(source)
+                
                 
                 if vc.is_playing():
                     vc.pause()
@@ -212,6 +224,14 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="no", value=0),
     ])
     async def play(self, interaction, youtube_url: str, in_front: discord.app_commands.Choice[int]):
+        """ Play audio from a video
+
+        Args:
+            interaction (Interaction): User Interaction
+            youtube_url (str): Youtube url
+            in_front (discord.app_commands.Choice[int]): If the audio has to be played now or put in queue
+        """
+
 
         # check dat user in vc zit
         if not interaction.message.author.voice:
@@ -295,7 +315,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def list(self, interaction):
-        
+        """List the videos in queue
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+
         # lege queue
         if len(self.queue) == 0:
             embed = discord.Embed(
@@ -327,6 +352,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def nowplaying(self, interaction):
+        """Which audio is now playing
+
+        Args:
+            interaction (Interaction): Users interaction
+        """
 
         try:
             title="Now playing" if self.track_playing is not None else "Nothing is playing"
@@ -350,6 +380,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def pause(self, interaction):
+        """ Pauses the playing audio
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
 
         # check als bot in vc zit
         voice_client = interaction.message.guild.voice_client
@@ -376,6 +411,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def resume(self, interaction):
+        """Resumes the paused audio
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
 
         # check als bot in vc zit
         voice_client = interaction.message.guild.voice_client
@@ -402,6 +442,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def skip(self, interaction):
+        """Skips the currently playing audio
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
 
         # check als bot in vc zit
         voice_client = interaction.message.guild.voice_client
@@ -430,6 +475,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def stop(self, interaction):
+        """ Stops the listening session & clears the queue
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
 
         # check dat bot in vc zit
         voice_client = interaction.message.guild.voice_client
@@ -462,6 +512,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def join(self, interaction):
+        """Joins a vc
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+
         try:
             # user zit niet in vc
             if not interaction.message.author.voice:
@@ -490,6 +546,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     async def leave(self, interaction):
+        """leaves a vc
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+
 
         vc = interaction.message.guild.voice_client
         if vc.is_connected():
@@ -506,6 +568,11 @@ class Audio(commands.Cog, name="audio"):
 
 
     async def play_next(self, interaction):
+        """Plays the next audio in queue
+
+        Args:
+            interaction (Interaction): Users interaction
+        """
         vc = interaction.message.guild.voice_client
 
         # doe niks zolang player aan het spelen is
