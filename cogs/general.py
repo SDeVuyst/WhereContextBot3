@@ -52,7 +52,7 @@ class General(commands.Cog, name="general"):
         for i, c in enumerate(self.bot.cogs):
             
             cog = self.bot.get_cog(c.lower())
-            commands = cog.get_commands()
+            commands = cog.get_app_commands()
 
             page_numbers[i+1] = cog_to_title.get(c.lower()).split(" ")[0]
 
@@ -60,7 +60,7 @@ class General(commands.Cog, name="general"):
             for command in commands:
                 description = command.description.partition("\n")[0]
                 # TODO fix command ids
-                data.append(f"</{command.name}:1115382088749817906> - {description}")
+                data.append(f"</{command.name}:{command.id}> - {description}")
 
             if c == "outofcontext":
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
