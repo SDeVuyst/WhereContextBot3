@@ -9,7 +9,7 @@ import asyncio
 import tempfile
 from helpers import checks, http, ytdl_helper
 import yt_dlp as youtube_dl
-from pytube import Playlist, YouTube
+from pytube import Playlist, YouTube, extract
 
 
 
@@ -370,6 +370,15 @@ class Audio(commands.Cog, name="audio"):
             description=desc,
             color=self.bot.defaultColor
         )
+
+        try:
+            vid_id = extract.video_id(self.track_playing_url)
+            embed.set_thumbnail(
+                url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
+            )
+        except:
+            pass
+
         await interaction.response.send_message(embed=embed)
       
 
@@ -621,6 +630,15 @@ class Audio(commands.Cog, name="audio"):
                 description=f"[{yt.title}]({url}) by {yt.author}",
                 color=self.bot.succesColor
             )
+
+            try:
+                vid_id = extract.video_id(self.track_playing_url)
+                embed.set_thumbnail(
+                    url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
+                )
+            except:
+                pass
+            
             await interaction.followup.send(embed=embed)
 
 
