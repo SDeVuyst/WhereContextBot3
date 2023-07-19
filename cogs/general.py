@@ -58,9 +58,9 @@ class General(commands.Cog, name="general"):
 
             data = []
             for command in commands:
-                self.bot.logger.info(command)
                 description = command.description.partition("\n")[0]
-                data.append(f"</{command.name}:COMMAND_ID>{command.name} - {description}")
+                # TODO fix command ids
+                data.append(f"</{command.name}:1115382088749817906> - {description}")
 
             if c == "outofcontext":
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
