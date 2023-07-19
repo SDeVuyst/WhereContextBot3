@@ -46,6 +46,7 @@ class Owner(commands.Cog, name="owner"):
                     color=self.bot.succesColor,
                 )
                 await interaction.response.send_message(embed=embed)
+                return
             
             elif scope.value == "server":
 
