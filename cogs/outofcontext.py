@@ -10,21 +10,11 @@ from helpers import checks, db_manager
 class OutOfContext(commands.Cog, name="outofcontext"):
     def __init__(self, bot):
         self.bot = bot
-        self.ctx_menu_add = app_commands.ContextMenu(
-            name='AddContext',
-            callback=self.context_add,
-        )
-        self.bot.tree.add_command(self.ctx_menu_add)
-
-        self.ctx_menu_remove = app_commands.ContextMenu(
-            name='RemoveContext',
-            callback=self.context_remove,
-        )
-        self.bot.tree.add_command(self.ctx_menu_remove)
 
         self.currently_playing = False
 
  # COMMANDS
+    @app_commands.context_menu(name="AddContext")
     @checks.not_blacklisted()
     async def context_add(self, interaction: discord.Interaction, message:discord.Message):
         """
@@ -76,7 +66,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         )
         await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
 
-
+    @app_commands.context_menu(name="RemoveContext")
     @checks.not_blacklisted()
     async def context_remove(self, interaction: discord.Interaction, message:discord.Message):
         """
