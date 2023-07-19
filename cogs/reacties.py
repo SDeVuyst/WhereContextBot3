@@ -111,7 +111,7 @@ class Reacties(commands.Cog, name="reacties"):
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
-    async def muur_1(self, interaction) -> None:
+    async def golden_rule(self, interaction) -> None:
         """Sends the 'golden rule' muur reaction
 
         Args:
@@ -130,7 +130,7 @@ class Reacties(commands.Cog, name="reacties"):
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
-    async def muur_2(self, interaction) -> None:
+    async def laten_doen(self, interaction) -> None:
         """Sends the 'laten doen' muur reaction
 
         Args:
@@ -149,7 +149,7 @@ class Reacties(commands.Cog, name="reacties"):
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
-    async def muur_3(self, interaction) -> None:
+    async def limieten(self, interaction) -> None:
         """Sends the 'limieten' muur reaction
 
         Args:
@@ -168,7 +168,7 @@ class Reacties(commands.Cog, name="reacties"):
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
-    async def muur_4(self, interaction) -> None:
+    async def danny(self, interaction) -> None:
         """Sends the 'danny' muur reaction
 
         Args:
@@ -187,7 +187,7 @@ class Reacties(commands.Cog, name="reacties"):
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
-    async def muur_5(self, interaction) -> None:
+    async def bozo(self, interaction) -> None:
         """Sends the 'L bozo' muur reaction
 
         Args:
