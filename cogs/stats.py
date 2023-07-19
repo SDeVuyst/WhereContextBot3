@@ -95,7 +95,7 @@ class Stats(commands.Cog, name="stats"):
         else:
             embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
         
 
 
@@ -128,7 +128,7 @@ class Stats(commands.Cog, name="stats"):
                 color=self.bot.succesColor if succes else self.bot.defaultColor
             )
         
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 
 
@@ -200,7 +200,7 @@ class Stats(commands.Cog, name="stats"):
         else:
             embed = await self.get_leaderboard_embed(view.chosen_command)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
         
 
 
@@ -393,7 +393,7 @@ class CommandView(View):
 class CommandSelect(Select):
     def __init__(self, bot, selected_cog):
         commands = []
-        for y in bot.commands:
+        for y in bot.tree.walk_commands():
             if y.cog and y.cog.qualified_name.lower() == selected_cog:
                 commands.append((y.name, y.name))
 
