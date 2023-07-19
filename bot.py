@@ -118,6 +118,8 @@ async def on_ready() -> None:
     status_task.start()
     check_remindme.start()
 
+    await bot.tree.sync()
+
 
 @tasks.loop(minutes=1.0)
 async def status_task() -> None:
