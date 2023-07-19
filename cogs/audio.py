@@ -274,6 +274,7 @@ class Audio(commands.Cog, name="audio"):
                     
                     if not vc.is_playing():
                         await self.play_next(interaction)
+                        return
 
             # enkele video
             else:
@@ -626,6 +627,7 @@ class Audio(commands.Cog, name="audio"):
             )
             await interaction.followup.send(embed=embed)
             await self.play_next(interaction)
+
         else:
             # speel de temp file af
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
@@ -637,7 +639,7 @@ class Audio(commands.Cog, name="audio"):
             total = 20
             current = 0
             # First two arguments are mandatory
-            bardata = progressBar.splitBar(total, current)
+            bardata = progressBar.splitBar(total, current, size=20)
 
             # confirmatie
             embed = discord.Embed(
@@ -660,20 +662,20 @@ class Audio(commands.Cog, name="audio"):
             self.playing_message = await interaction.followup.send(embed=embed)
 
             current_sec = 0
-            
+
             while vc.is_playing():
                 current_sec += 1
                 try:
                     # creeer een progress bar
-                    total = 20
-                    current = (current_sec / self.current_vid_length) * total
+                    total = yt.length
+                    current = current_sec
                     # First two arguments are mandatory
-                    bardata = progressBar.splitBar(total, current)
+                    bardata = progressBar.splitBar(total, current, size=20)
                     self.playing_embed.description = self.playing_embed.description.split('\n')[0] + {bardata[0]} - f"{self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
                     await self.playing_message.edit(embed=self.playing_embed)
 
                 except Exception as e:
-                    self.logger.warning(e)
+                    self.bot.logger.warning(e)
 
                 await asyncio.sleep(1)
 
