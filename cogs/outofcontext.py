@@ -13,78 +13,16 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         self.currently_playing = False
 
- # COMMANDS
-    @app_commands.context_menu(name="AddContext")
-    @checks.not_blacklisted()
-    async def context_add(self, interaction: discord.Interaction, message:discord.Message):
-        """
-        Lets you add a message to the OOC game.
-
-        """
-        submitted_id = interaction.user.id
-
-        # check als message uit OOC komt
-        if message.channel.id != int(os.environ.get('channel')):
-            embed = discord.Embed(
-                description="Bericht moet in #out-of-context staan!",
-                color=self.bot.errorColor,
-            )
-            embed.set_footer(text=f"{message.id}")
-            await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
-            return
-
-        # check als bericht al in db staat
-        if await db_manager.is_in_ooc(message.id):
-            embed = discord.Embed(
-                description=f"Message is already in the game.",
-                color=self.bot.errorColor,
-            )
-            embed.set_footer(text=f"{message.id}")
-            await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
-            return
-        
-        # voeg toe
-        total = await db_manager.add_message_to_ooc(message.id, submitted_id)
-
-        # error
-        if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.",
-                color=self.bot.errorColor,
-            )
-            embed.set_footer(text=f"{message.id}")
-            await interaction.response.send_message(embed=embed)
-            return
-        
-        # alles oke
-        embed = discord.Embed(
-            description=f"[Message]({message.jump_url}) has been added to the game",
-            color=self.bot.succesColor,
-        )
-        embed.set_footer(
-            text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
-        )
-        await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
-
-    @app_commands.context_menu(name="RemoveContext")
-    @checks.not_blacklisted()
-    async def context_remove(self, interaction: discord.Interaction, message:discord.Message):
-        """
-        Lets you remove a message to the OOC game.
-
-        """
-        embed = await self.remove(message.id, interaction.guild)
-        await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
-
-
-    @commands.hybrid_command(
+    # COMMANDS
+    
+    @app_commands.command(
         name="context_debug",
         description="debug stats for /play-game (admin only)",
     )
     @checks.is_owner()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def context_debug(self, context: Context):
+    async def context_debug(self, interaction):
 
         embed = discord.Embed(
             title="Debug",
@@ -97,10 +35,10 @@ class OutOfContext(commands.Cog, name="outofcontext"):
                 Currently playing: {self.currently_playing}"""
         )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="play-game",
         description="Play the out of context game",
     )
@@ -108,7 +46,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     @checks.not_blacklisted()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def play(self, context: Context, groep: bool) -> None:
+    async def play(self, interaction, groep: bool) -> None:
         """
         Play the out of context game
 
@@ -119,16 +57,16 @@ class OutOfContext(commands.Cog, name="outofcontext"):
                 description=f"Er is al iemand het spel aan het spelen.",
                 color=self.bot.errorColor,
             )
-            await context.send(embed=embed, delete_after=10)
+            await interaction.response.send_message(embed=embed, delete_after=10)
             return
         
         self.menu = Menu(self)
         
-        embed, sendView = await self.getRandomMessage(context.guild)
+        embed, sendView = await self.getRandomMessage(interaction.guild)
         await self.menu.reset()
-        self.menu.author = context.author
+        self.menu.author = interaction.user
 
-        self.menu.message = await context.send(embed=embed, view= self.menu if sendView else None, ephemeral=not groep)
+        self.menu.message = await interaction.response.send_message(embed=embed, view= self.menu if sendView else None, ephemeral=not groep)
         self.currently_playing = True
 
 

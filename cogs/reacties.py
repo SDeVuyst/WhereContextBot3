@@ -15,27 +15,27 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!")
     @checks.not_blacklisted()
-    async def giblereact(self, context: Context):
-        file, embed = await self.get_reactie_embed("giblereact.jpg", context.message.author.id, "Sexy giby")
-        await context.send(file=file, embed=embed)
+    async def giblereact(self, interaction):
+        file, embed = await self.get_reactie_embed("giblereact.jpg", interaction.user.id, "Sexy giby")
+        await interaction.response.send_message(file=file, embed=embed)
 
     @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing")
     @checks.not_blacklisted()
-    async def wholesquadlaughing(self, context: Context):
-        file, embed = await self.get_reactie_embed("wholesquadlaughing.jpg", context.message.author.id, "Squad is laughing")
-        await context.send(file=file, embed=embed)
+    async def wholesquadlaughing(self, interaction):
+        file, embed = await self.get_reactie_embed("wholesquadlaughing.jpg", interaction.user.id, "Squad is laughing")
+        await interaction.response.send_message(file=file, embed=embed)
 
     @app_commands.command(name="notfunny", description="bro that wasn't even funny")
     @checks.not_blacklisted()
-    async def notfunny(self, context: Context):
-        file, embed = await self.get_reactie_embed("notfunny.jpg", context.message.author.id, "Not funny")
-        await context.send(file=file, embed=embed)
+    async def notfunny(self, interaction):
+        file, embed = await self.get_reactie_embed("notfunny.jpg", interaction.user.id, "Not funny")
+        await interaction.response.send_message(file=file, embed=embed)
 
     @app_commands.command(name="uthought", description="sike u thought")
     @checks.not_blacklisted()
-    async def uthought(self, context: Context):
-        file, embed = await self.get_reactie_embed("uthought.jpg", context.message.author.id, "U thought")
-        await context.send(file=file, embed=embed)
+    async def uthought(self, interaction):
+        file, embed = await self.get_reactie_embed("uthought.jpg", interaction.user.id, "U thought")
+        await interaction.response.send_message(file=file, embed=embed)
  
 
     async def get_reactie_embed(self, name, userid, title):
@@ -63,13 +63,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="De OG quotes muur",
     )
     @checks.not_blacklisted()
-    async def muur(self, context: Context) -> None:
-        if context.invoked_subcommand is None:
-            embed = discord.Embed(
-                description="You need to specify a subcommand.",
-                color=self.bot.errorColor,
-            )
-            await context.send(embed=embed)
+    async def muur(self, interaction) -> None:
+        pass
 
 
     @muur.command(
@@ -78,8 +73,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="Keleos golden rule",
     )
     @checks.not_blacklisted()
-    async def muur_1(self, context: Context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_1(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "You only need 3 things in life, happiness and good weather", 
             "-Keleo (golden rule)"
         ))
@@ -91,8 +86,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="laten doen",
     )
     @checks.not_blacklisted()
-    async def muur_2(self, context: Context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_2(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "Jij laat je toch ook altijd doen hé", 
             "-jeroentje pompoentje"
         ))
@@ -103,8 +98,8 @@ class Reacties(commands.Cog, name="reacties"):
         description=":skull:",
     )
     @checks.not_blacklisted()
-    async def muur_3(self, context: Context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_3(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "ik ken mijn limieten", 
             "-Yours truly"
         ))
@@ -115,8 +110,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="the danny special",
     )
     @checks.not_blacklisted()
-    async def muur_4(self, context: Context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_4(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "ik vertrouw je voor geen haar!!", 
             "-danny vande fucking veire"
         ))
@@ -127,8 +122,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="L bozo",
     )
     @checks.not_blacklisted()
-    async def muur_5(self, context: Context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_5(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "L bozo", 
             "-bozarius III"
         ))
@@ -146,7 +141,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
-    async def gible(self, context: Context, choices: app_commands.Choice[int]):
+    async def gible(self, interaction, choices: app_commands.Choice[int]):
         messages = ["daar gaat je base gible", "wapz tnt over gible z'n base", "KAAANKEERRRBEK GIBLE", "dans"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
 
@@ -160,7 +155,7 @@ class Reacties(commands.Cog, name="reacties"):
                 title=m,
                 color=self.bot.defaultColor,
             )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
         name="nootje",
@@ -173,7 +168,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
-    async def nootje(self, context: Context, choices: app_commands.Choice[int]):
+    async def nootje(self, interaction, choices: app_commands.Choice[int]):
         messages = ["meest intelligente nootje opmerking:", "stop met je fk reels"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
 
@@ -181,7 +176,7 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -196,7 +191,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
-    async def pingy(self, context: Context, choices: app_commands.Choice[int]):
+    async def pingy(self, interaction, choices: app_commands.Choice[int]):
         messages = ["Lol", "Njom", "dolfein"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
 
@@ -204,7 +199,7 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -218,7 +213,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
-    async def ba(self, context: Context, choices: app_commands.Choice[int]):
+    async def ba(self, interaction, choices: app_commands.Choice[int]):
         messages = ["ba", "zo schattig :smiling_face_with_3_hearts:"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
 
@@ -226,7 +221,7 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -240,7 +235,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
-    async def meng(self, context: Context, choices: app_commands.Choice[int]):
+    async def meng(self, interaction, choices: app_commands.Choice[int]):
         messages = ["meng shut the fuck up", "nog 1 pun en ik SNAP"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
        
@@ -248,7 +243,7 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -261,7 +256,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
-    async def broodman(self, context: Context, choices: app_commands.Choice[int]):
+    async def broodman(self, interaction, choices: app_commands.Choice[int]):
         messages = [f"retarded ass mening nr. {random.randint(194892084, 294892084)}"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
        
@@ -269,7 +264,7 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -281,7 +276,7 @@ class Reacties(commands.Cog, name="reacties"):
         app_commands.Choice(name="rooftop madness", value=0),
     ])
     @checks.not_blacklisted()
-    async def keleo(self, context: Context, choices: app_commands.Choice[int]):
+    async def keleo(self, interaction, choices: app_commands.Choice[int]):
         messages = ["rooftop"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
 
@@ -295,7 +290,7 @@ class Reacties(commands.Cog, name="reacties"):
                 title=m,
                 color=self.bot.defaultColor,
             )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.

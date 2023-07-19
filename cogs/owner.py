@@ -28,7 +28,7 @@ class Owner(commands.Cog, name="owner"):
         discord.app_commands.Choice(name="Server", value="server"),
     ])
     @checks.is_owner()
-    async def sync(self, context: Context, scope: discord.app_commands.Choice[str]) -> None:
+    async def sync(self, interaction, scope: discord.app_commands.Choice[str]) -> None:
         """
         Synchronizes the slash commands.
 
@@ -37,31 +37,31 @@ class Owner(commands.Cog, name="owner"):
         try:
 
             if scope.value == "global":
-                cmds = await context.bot.tree.sync()
+                cmds = await self.bot.tree.sync()
                 self.save_ids(cmds)
 
                 embed = discord.Embed(
                     description="Slash commands have been globally synchronized.",
                     color=self.bot.succesColor,
                 )
-                await context.send(embed=embed)
+                await interaction.response.send_message(embed=embed)
             
             elif scope.value == "server":
 
                 # context.bot.tree.copy_global_to(guild=context.guild)
-                cmds = await context.bot.tree.sync(guild=context.guild)
+                cmds = await self.bot.tree.sync(guild=interaction.guild)
                 self.save_ids(cmds)
 
                 embed = discord.Embed(
                     description="Slash commands have been synchronized in this server.",
                     color=self.bot.succesColor,
                 )
-                await context.send(embed=embed)
+                await interaction.response.send_message(embed=embed)
                 return
             embed = discord.Embed(
                 description="The scope must be `global` or `server`.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
             
 
@@ -71,7 +71,7 @@ class Owner(commands.Cog, name="owner"):
                 description="HTTPException, most likely daily application command limits.",
                 color=self.bot.errorColor,
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
 
 
@@ -91,7 +91,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @app_commands.describe(cog="The name of the cog to load")
     @checks.is_owner()
-    async def load_cog(self, context: Context, cog: str) -> None:
+    async def load_cog(self, interaction, cog: str) -> None:
         """
         The bot will load the given cog.
 
@@ -106,13 +106,13 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"Could not load the `{cog}` cog.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         embed = discord.Embed(
             description=f"Successfully loaded the `{cog}` cog.", color=self.bot.succesColor
         )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
         name="unload",
@@ -120,7 +120,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @app_commands.describe(cog="The name of the cog to unload")
     @checks.is_owner()
-    async def unload_cog(self, context: Context, cog: str) -> None:
+    async def unload_cog(self, interaction, cog: str) -> None:
         """
         The bot will unload the given cog.
 
@@ -135,13 +135,13 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"Could not unload the `{cog}` cog.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         embed = discord.Embed(
             description=f"Successfully unloaded the `{cog}` cog.", color=self.bot.succesColor
         )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
         name="reload",
@@ -149,7 +149,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @app_commands.describe(cog="The name of the cog to reload")
     @checks.is_owner()
-    async def reload_cog(self, context: Context, cog: str) -> None:
+    async def reload_cog(self, interaction, cog: str) -> None:
         """
         The bot will reload the given cog.
 
@@ -163,14 +163,14 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"Could not reload the `{cog}` cog.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         embed = discord.Embed(
             description=f"Successfully reloaded the `{cog}` cog.", color=self.bot.succesColor
         )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -178,7 +178,7 @@ class Owner(commands.Cog, name="owner"):
         description="See loaded/unloaded cogs (admin only)",
     )
     @checks.is_owner()
-    async def cogs(self, context: Context) -> None:
+    async def cogs(self, interaction) -> None:
         """
         See which cogs are loaded and which are unloaded 
 
@@ -200,7 +200,7 @@ class Owner(commands.Cog, name="owner"):
                 name="Unloaded", value=f"```\n{unloaded_fields}```", inline=False
             )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(
@@ -208,14 +208,14 @@ class Owner(commands.Cog, name="owner"):
         description="Make the bot restart (admin only)",
     )
     @checks.is_owner()
-    async def restart(self, context: Context) -> None:
+    async def restart(self, interaction) -> None:
         """
         Shuts down the bot.
 
         :param context: The hybrid command context.
         """
         embed = discord.Embed(description="Restarting. brb :wave:", color=self.bot.defaultColor)
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
         # We shut down the bot, but heroku will automatically restart it.
         await self.bot.close()
@@ -227,19 +227,13 @@ class Owner(commands.Cog, name="owner"):
         description="Get the list of all blacklisted users (admin only)",
     )
     @checks.is_owner()
-    async def blacklist(self, context: Context) -> None:
+    async def blacklist(self, interaction) -> None:
         """
         Lets you add or remove a user from not being able to use the bot.
 
         :param context: The hybrid command context.
         """
-        if context.invoked_subcommand is None:
-            embed = discord.Embed(
-                description="You need to specify a subcommand.\n\n**Subcommands:**\n`add` - Add a user to the blacklist.\n`remove` - Remove a user from the blacklist.",
-                color=self.bot.errorColor,
-            )
-            await context.send(embed=embed)
-
+        pass
 
 
     @blacklist.command(
@@ -248,7 +242,7 @@ class Owner(commands.Cog, name="owner"):
         description="Shows the list of all blacklisted users (admin only)",
     )
     @checks.is_owner()
-    async def blacklist_show(self, context: Context) -> None:
+    async def blacklist_show(self, interaction) -> None:
         """
         Shows the list of all blacklisted users.
 
@@ -261,7 +255,7 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description="There are currently no blacklisted users.", color=self.bot.defaultColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # error
@@ -271,7 +265,7 @@ class Owner(commands.Cog, name="owner"):
                 description=blacklisted_users[1],
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
 
         # alles is ok
@@ -283,7 +277,7 @@ class Owner(commands.Cog, name="owner"):
             )
             users.append(f"• {user.mention} ({user}) - Blacklisted at {bluser[1].strftime('%d/%m/%Y - %H:%M:%S')}")
         embed.description = "\n".join(users)
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
@@ -294,7 +288,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @app_commands.describe(user="The user that should be added to the blacklist")
     @checks.is_owner()
-    async def blacklist_add(self, context: Context, user: discord.User) -> None:
+    async def blacklist_add(self, interaction, user: discord.User) -> None:
         """
         Lets you add a user from not being able to use the bot.
 
@@ -307,7 +301,7 @@ class Owner(commands.Cog, name="owner"):
                 description=f"**{user.name}** is already in the blacklist.",
                 color=self.bot.errorColor,
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         total = await db_manager.add_user_to_blacklist(user_id)
 
@@ -317,7 +311,7 @@ class Owner(commands.Cog, name="owner"):
                 description=f"Er is iets misgegaan.",
                 color=self.bot.errorColor,
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # alles oke
@@ -328,7 +322,7 @@ class Owner(commands.Cog, name="owner"):
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @blacklist.command(
         base="blacklist",
@@ -337,7 +331,7 @@ class Owner(commands.Cog, name="owner"):
     )
     @app_commands.describe(user="The user that should be removed from the blacklist.")
     @checks.is_owner()
-    async def blacklist_remove(self, context: Context, user: discord.User) -> None:
+    async def blacklist_remove(self, interaction, user: discord.User) -> None:
         """
         Lets you remove a user from not being able to use the bot.
 
@@ -349,7 +343,7 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"**{user.name}** is not in the blacklist.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         total = await db_manager.remove_user_from_blacklist(user_id)
 
@@ -358,7 +352,7 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"Er is iets misgegaan.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # alles ok
@@ -369,7 +363,7 @@ class Owner(commands.Cog, name="owner"):
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot):

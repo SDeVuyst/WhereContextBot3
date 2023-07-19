@@ -71,25 +71,25 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
-    async def stats_individual(self, context: Context, user: discord.User) -> None:
+    async def stats_individual(self,interaction, user: discord.User) -> None:
         view = CommandView(self.bot)
-        await context.send(view=view)
+        await interaction.response.send_message(view=view)
         await view.wait()
         if view.chosen_command is None:
             embed = self.timeout_embed 
         else:
             embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
         
 
 
     @app_commands.command(name="changecommandcount", description="Change the command count of a user (admin only)")
     @app_commands.describe(user="Which users count")
     @checks.is_owner()
-    async def change_command_count(self, context: Context, user: discord.User, amount: int):
+    async def change_command_count(self,interaction, user: discord.User, amount: int):
         view = CommandView(self.bot)
-        await context.send(view=view)
+        await interaction.response.send_message(view=view)
         await view.wait()
 
         if view.chosen_command is None:
@@ -106,7 +106,7 @@ class Stats(commands.Cog, name="stats"):
                 color=self.bot.succesColor if succes else self.bot.defaultColor
             )
         
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
@@ -156,23 +156,23 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.command(name="leaderboard", description="Leaderboard of a command")
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
-    async def leaderboard(self, context: Context):
+    async def leaderboard(self,interaction):
         view = CommandView(self.bot)
-        await context.send(view=view)
+        await interaction.response.send_message(view=view)
         await view.wait()
         if view.chosen_command is None:
             embed = self.timeout_embed 
         else:
             embed = await self.get_leaderboard_embed(view.chosen_command)
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
         
 
 
     @app_commands.command(name="bancount", description="How many times has a user been banned?")
     @app_commands.describe(user="Which users ban count")
     @checks.not_blacklisted()
-    async def bancount(self, context: Context, user: discord.User):
+    async def bancount(self,interaction, user: discord.User):
         
         # krijg count uit db
         count = await db_manager.get_ban_count(user.id)
@@ -183,7 +183,7 @@ class Stats(commands.Cog, name="stats"):
                 description=f"❌ **<@{user.id}> has not been banned yet**",
                 color=self.bot.defaultColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # error
@@ -193,7 +193,7 @@ class Stats(commands.Cog, name="stats"):
                 description=count[1],
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
 
@@ -202,13 +202,13 @@ class Stats(commands.Cog, name="stats"):
             color=self.bot.defaultColor
         )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
     @app_commands.command(name="changebancount", description="Change user ban count (owner only)")
     @checks.is_owner()   
-    async def change_ban_count(self, context: Context, user: discord.User, amount: int):
+    async def change_ban_count(self,interaction, user: discord.User, amount: int):
         # krijg count uit db
         succes = await db_manager.set_ban_count(user.id, amount)
 
@@ -220,7 +220,7 @@ class Stats(commands.Cog, name="stats"):
             description=desc,
             color=self.bot.succesColor if succes else self.bot.defaultColor
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
@@ -229,7 +229,7 @@ class Stats(commands.Cog, name="stats"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=10)
-    async def nCount(self, context: Context, user: discord.User):
+    async def nCount(self,interaction, user: discord.User):
         # krijg count bericht uit db
         count = await db_manager.get_nword_count(user.id)
 
@@ -239,7 +239,7 @@ class Stats(commands.Cog, name="stats"):
                 description=f"😌 **NWord Count of <@{user.id}>:** ```0```",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # error
@@ -249,7 +249,7 @@ class Stats(commands.Cog, name="stats"):
                 description=count[1],
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
 
         embed = discord.Embed(
@@ -258,14 +258,14 @@ class Stats(commands.Cog, name="stats"):
         )
 
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
     
 
     @app_commands.command(name="changencount", description="Change the count of a user (admin only)")
     @app_commands.describe(user="Which users' n-word count")
     @app_commands.describe(amount="Amount to set the count to")
     @checks.is_owner()
-    async def changeNCount(self, context: Context, user: discord.User, amount: int):
+    async def changeNCount(self,interaction, user: discord.User, amount: int):
         # krijg count uit db
         succes = await db_manager.set_nword_count(user.id, amount)
 
@@ -276,7 +276,7 @@ class Stats(commands.Cog, name="stats"):
             description=desc,
             color=self.bot.succesColor if succes else self.bot.defaultColor
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 

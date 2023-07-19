@@ -77,18 +77,19 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def soundboard(self, context: Context, effect: discord.app_commands.Choice[str]):
+    async def soundboard(self, interaction, effect: discord.app_commands.Choice[str]):
 
         # check als userin vc zit
-        if not context.message.author.voice:
-            await context.send(embed=self.not_in_vc_embed)
+        if not interaction.message.author.voice:
+            await interaction.response.send_message(embed=self.not_in_vc_embed)
             return
         try:
 
-            # autojoin vc als bot nog niet in vc zit
-            vc = context.message.guild.voice_client
-            if not vc.is_connected():
-                await context.invoke(self.bot.get_command('join'))
+            # check als bot in vc zit
+            vc = interaction.message.guild.voice_client
+            if vc is None:
+                await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
+                return
 
             # pauzeer reeds spelende audio
             if vc.is_playing():
@@ -96,7 +97,7 @@ class Audio(commands.Cog, name="audio"):
 
             # speel soundboard af
             vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
-                after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop)
+                after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
             )
             
             # resume de vorige spelende audio
@@ -108,7 +109,7 @@ class Audio(commands.Cog, name="audio"):
                 title=f"played {effect.name}!",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
         except Exception as e:
@@ -117,7 +118,7 @@ class Audio(commands.Cog, name="audio"):
                 description=e,
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed, ephemeral=True)
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 
@@ -138,23 +139,21 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=120)
-    async def tts(self, context: Context, speech: str, voice: discord.app_commands.Choice[str]):
+    async def tts(self, interaction, speech: str, voice: discord.app_commands.Choice[str]):
         
         # check als user in vc zit
-        if not context.message.author.voice:
-            await context.send(embed=self.not_in_vc_embed)
-            context.command.reset_cooldown(context)
+        if not interaction.message.author.voice:
+            await interaction.response.send_message(embed=self.not_in_vc_embed)
             return
         
         # check als bot in vc zit
-        vc = context.message.guild.voice_client
+        vc = interaction.message.guild.voice_client
         if vc is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
-            context.command.reset_cooldown(context)
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return      
             
 
-        await context.defer()
+        await interaction.response.defer()
 
         try:
             # creeer audio file 
@@ -177,7 +176,7 @@ class Audio(commands.Cog, name="audio"):
                 if vc.is_playing():
                     vc.pause()
 
-                vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
+                vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
                 
                 while vc.is_playing():
                     await asyncio.sleep(0.5)
@@ -190,7 +189,7 @@ class Audio(commands.Cog, name="audio"):
                 title=f"Said ```{speech}``` in a {voice.name} voice!",
                 color=self.bot.succesColor
             )
-            await context.interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed)
 
 
         except Exception as e:
@@ -199,7 +198,7 @@ class Audio(commands.Cog, name="audio"):
                 description=e,
                 color=self.bot.errorColor
             )
-            await context.interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed)
 
 
 
@@ -212,20 +211,20 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="yes", value=1),
         discord.app_commands.Choice(name="no", value=0),
     ])
-    async def play(self, context: Context, youtube_url: str, in_front: discord.app_commands.Choice[int]):
+    async def play(self, interaction, youtube_url: str, in_front: discord.app_commands.Choice[int]):
 
         # check dat user in vc zit
-        if not context.message.author.voice:
-            await context.send(embed=self.not_in_vc_embed)
+        if not interaction.message.author.voice:
+            await interaction.response.send_message(embed=self.not_in_vc_embed)
             return
         
         # check dat bot in vc zit
-        vc = context.message.guild.voice_client
+        vc = interaction.message.guild.voice_client
         if vc is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
         
-        await context.defer()
+        await interaction.response.defer()
         
         try:
 
@@ -251,10 +250,10 @@ class Audio(commands.Cog, name="audio"):
                         description=desc,
                         color=self.bot.defaultColor
                     )
-                    await context.send(embed=embed)
+                    await interaction.response.send_message(embed=embed)
                     
                     if not vc.is_playing():
-                        await self.play_next(context)
+                        await self.play_next(interaction)
 
             # enkele video
             else:
@@ -274,10 +273,10 @@ class Audio(commands.Cog, name="audio"):
                         description=f"[{yt.title}]({youtube_url}) by {yt.author}",
                         color=self.bot.defaultColor
                     )
-                    await context.interaction.followup.send(embed=embed)
+                    await interaction.followup.send(embed=embed)
                     return
 
-                await self.play_next(context)
+                await self.play_next(interaction)
             
         except Exception:
             embed = discord.Embed(
@@ -285,7 +284,7 @@ class Audio(commands.Cog, name="audio"):
                 description=f"ben je zeker dat dit een geldige url is?\n{youtube_url}",
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
 
 
@@ -295,7 +294,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def list(self, context: Context):
+    async def list(self, interaction):
         
         # lege queue
         if len(self.queue) == 0:
@@ -318,7 +317,7 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.defaultColor
             )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
@@ -327,7 +326,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def nowplaying(self, context: Context):
+    async def nowplaying(self, interaction):
 
         try:
             title="Now playing" if self.track_playing is not None else "Nothing is playing"
@@ -341,7 +340,7 @@ class Audio(commands.Cog, name="audio"):
             description=desc,
             color=self.bot.defaultColor
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
       
 
 
@@ -350,12 +349,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def pause(self, context: Context):
+    async def pause(self, interaction):
 
         # check als bot in vc zit
-        voice_client = context.message.guild.voice_client
+        voice_client = interaction.message.guild.voice_client
         if voice_client is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
         
         # pauzeer
@@ -365,9 +364,9 @@ class Audio(commands.Cog, name="audio"):
                 title=f"Paused!",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
         else:
-            await context.send(embed=self.not_playing_embed)
+            await interaction.response.send_message(embed=self.not_playing_embed)
       
         
 
@@ -376,12 +375,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def resume(self, context: Context):
+    async def resume(self, interaction):
 
         # check als bot in vc zit
-        voice_client = context.message.guild.voice_client
+        voice_client = interaction.message.guild.voice_client
         if voice_client is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
         
         # resume
@@ -391,9 +390,9 @@ class Audio(commands.Cog, name="audio"):
                 title=f"Resumed!",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
         else:
-            await context.send(embed=self.not_playing_embed)
+            await interaction.response.send_message(embed=self.not_playing_embed)
 
 
 
@@ -402,12 +401,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def skip(self, context: Context):
+    async def skip(self, interaction):
 
         # check als bot in vc zit
-        voice_client = context.message.guild.voice_client
+        voice_client = interaction.message.guild.voice_client
         if voice_client is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
         
         # skip
@@ -418,10 +417,10 @@ class Audio(commands.Cog, name="audio"):
                 title=f"Skipped!",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
         else:
-            await context.send(embed=self.not_playing_embed)
+            await interaction.response.send_message(embed=self.not_playing_embed)
 
 
 
@@ -430,12 +429,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def stop(self, context: Context):
+    async def stop(self, interaction):
 
         # check dat bot in vc zit
-        voice_client = context.message.guild.voice_client
+        voice_client = interaction.message.guild.voice_client
         if voice_client is None:
-            await context.send(embed=self.bot_not_in_vc_embed)
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
         
         
@@ -447,10 +446,10 @@ class Audio(commands.Cog, name="audio"):
                 title=f"Stopped!",
                 color=self.bot.defaultColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
         else:
-            await context.send(embed=self.not_playing_embed)
+            await interaction.response.send_message(embed=self.not_playing_embed)
 
         self.track_playing = None
         self.track_playing_url = None
@@ -462,14 +461,14 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def join(self, context: Context):
+    async def join(self, interaction):
         try:
             # user zit niet in vc
-            if not context.message.author.voice:
+            if not interaction.message.author.voice:
                 embed = self.not_in_vc_embed
             else:
                 # join channel
-                channel = context.author.voice.channel
+                channel = interaction.user.voice.channel
                 await channel.connect()
                 embed = discord.Embed(
                     title=f"Joined channel {channel.name}!",
@@ -481,7 +480,7 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.errorColor
             )
             
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
     
         
 
@@ -490,24 +489,24 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def leave(self, context: Context):
+    async def leave(self, interaction):
 
-        vc = context.message.guild.voice_client
+        vc = interaction.message.guild.voice_client
         if vc.is_connected():
             await vc.disconnect()
             embed = discord.Embed(
                 title=f"left channel!",
                 color=self.bot.succesColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
         else:
-            await context.send(embed=self.not_in_vc_embed)
+            await interaction.response.send_message(embed=self.not_in_vc_embed)
 
 
 
-    async def play_next(self, context: Context):
-        vc = context.message.guild.voice_client
+    async def play_next(self, interaction):
+        vc = interaction.message.guild.voice_client
 
         # doe niks zolang player aan het spelen is
         while vc.is_playing():
@@ -525,8 +524,8 @@ class Audio(commands.Cog, name="audio"):
                     title=f"Video must be less than 15 minutes long.",
                     color=self.bot.errorColor
                 ) 
-                await context.interaction.followup.send(embed=embed)
-                await self.play_next(context)
+                await interaction.followup.send(embed=embed)
+                await self.play_next(interaction)
                 return
         except Exception as e:
             self.bot.logger.warning(e)
@@ -540,8 +539,8 @@ class Audio(commands.Cog, name="audio"):
                 description=f"ben je zeker dat dit een geldige url is?\n{url}",
                 color=self.bot.errorColor
             )
-            await context.interaction.followup.send(embed=embed)
-            await self.play_next(context)
+            await interaction.followup.send(embed=embed)
+            await self.play_next(interaction)
         else:
             # speel de temp file af
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
@@ -555,7 +554,7 @@ class Audio(commands.Cog, name="audio"):
                 description=f"[{yt.title}]({url}) by {yt.author}",
                 color=self.bot.succesColor
             )
-            await context.interaction.followup.send(embed=embed)
+            await interaction.followup.send(embed=embed)
 
 
 
