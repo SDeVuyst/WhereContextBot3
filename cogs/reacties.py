@@ -13,25 +13,25 @@ class Reacties(commands.Cog, name="reacties"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(name="giblereact", description="OMG jonathan is so fine!!")
+    @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!")
     @checks.not_blacklisted()
     async def giblereact(self, context: Context):
         file, embed = await self.get_reactie_embed("giblereact.jpg", context.message.author.id, "Sexy giby")
         await context.send(file=file, embed=embed)
 
-    @commands.hybrid_command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing")
+    @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing")
     @checks.not_blacklisted()
     async def wholesquadlaughing(self, context: Context):
         file, embed = await self.get_reactie_embed("wholesquadlaughing.jpg", context.message.author.id, "Squad is laughing")
         await context.send(file=file, embed=embed)
 
-    @commands.hybrid_command(name="notfunny", description="bro that wasn't even funny")
+    @app_commands.command(name="notfunny", description="bro that wasn't even funny")
     @checks.not_blacklisted()
     async def notfunny(self, context: Context):
         file, embed = await self.get_reactie_embed("notfunny.jpg", context.message.author.id, "Not funny")
         await context.send(file=file, embed=embed)
 
-    @commands.hybrid_command(name="uthought", description="sike u thought")
+    @app_commands.command(name="uthought", description="sike u thought")
     @checks.not_blacklisted()
     async def uthought(self, context: Context):
         file, embed = await self.get_reactie_embed("uthought.jpg", context.message.author.id, "U thought")
@@ -133,7 +133,7 @@ class Reacties(commands.Cog, name="reacties"):
             "-bozarius III"
         ))
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="gible",
         description="gibby aka. smikkel aka capybara_Lover123",
     )
@@ -162,7 +162,7 @@ class Reacties(commands.Cog, name="reacties"):
             )
         await context.send(embed=embed)
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="nootje",
         description="nootje aka lil_kid_lover69 aka tough_guy_04",
     )
@@ -184,7 +184,7 @@ class Reacties(commands.Cog, name="reacties"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="pingy",
         description="pingy aka pingy1 aka pongy aka Lol",
     )
@@ -207,7 +207,7 @@ class Reacties(commands.Cog, name="reacties"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="ba",
         description="ba duy aka ba aka duy aka badwie",
     )
@@ -229,7 +229,7 @@ class Reacties(commands.Cog, name="reacties"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="meng",
         description="meng aka mongwong aka da GOAT"
     )
@@ -251,7 +251,7 @@ class Reacties(commands.Cog, name="reacties"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="broodman",
         description="jasman aka yachini aka yashja"
     )
@@ -272,7 +272,7 @@ class Reacties(commands.Cog, name="reacties"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="keleo",
         description="the one and only",
     )
