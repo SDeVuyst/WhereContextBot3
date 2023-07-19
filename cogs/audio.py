@@ -293,6 +293,16 @@ class Audio(commands.Cog, name="audio"):
                         description=f"[{yt.title}]({youtube_url}) by {yt.author}",
                         color=self.bot.defaultColor
                     )
+
+                    try:
+                        vid_id = extract.video_id(youtube_url)
+                        embed.set_thumbnail(
+                            url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
+                        )
+                    except:
+                        pass
+
+
                     await interaction.followup.send(embed=embed)
                     return
 
@@ -619,7 +629,7 @@ class Audio(commands.Cog, name="audio"):
             await self.play_next(interaction)
         else:
             # speel de temp file af
-            vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(context), self.bot.loop))
+            vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
 
             self.track_playing = f"{yt.title} by {yt.author}"
             self.track_playing_url = url
@@ -638,7 +648,7 @@ class Audio(commands.Cog, name="audio"):
                 )
             except:
                 pass
-            
+
             await interaction.followup.send(embed=embed)
 
 
