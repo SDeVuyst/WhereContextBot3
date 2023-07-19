@@ -13,6 +13,8 @@ class Reacties(commands.Cog, name="reacties"):
     def __init__(self, bot):
         self.bot = bot
 
+    muur = commands.SlashCommandGroup("muur", "De OG muur")
+
     @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!")
     @checks.not_blacklisted()
     async def giblereact(self, interaction):
@@ -58,14 +60,6 @@ class Reacties(commands.Cog, name="reacties"):
         return embed
     
 
-    @commands.hybrid_group(
-        name="muur",
-        description="De OG quotes muur",
-    )
-    @checks.not_blacklisted()
-    async def muur(self, interaction) -> None:
-        pass
-
 
     @muur.command(
         base="muur",
@@ -73,8 +67,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="Keleos golden rule",
     )
     @checks.not_blacklisted()
-    async def muur_1(self, interaction) -> None:
-        await interaction.response.send_message(embed=self.get_muur_embed(
+    async def muur_1(self, context) -> None:
+        await context.send(embed=self.get_muur_embed(
             "You only need 3 things in life, happiness and good weather", 
             "-Keleo (golden rule)"
         ))
@@ -86,8 +80,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="laten doen",
     )
     @checks.not_blacklisted()
-    async def muur_2(self, interaction) -> None:
-        await interaction.response.send_message(embed=self.get_muur_embed(
+    async def muur_2(self, context) -> None:
+        await context.send(embed=self.get_muur_embed(
             "Jij laat je toch ook altijd doen hé", 
             "-jeroentje pompoentje"
         ))
@@ -98,8 +92,8 @@ class Reacties(commands.Cog, name="reacties"):
         description=":skull:",
     )
     @checks.not_blacklisted()
-    async def muur_3(self, interaction) -> None:
-        await interaction.response.send_message(embed=self.get_muur_embed(
+    async def muur_3(self, context) -> None:
+        await context.send(embed=self.get_muur_embed(
             "ik ken mijn limieten", 
             "-Yours truly"
         ))
@@ -110,8 +104,8 @@ class Reacties(commands.Cog, name="reacties"):
         description="the danny special",
     )
     @checks.not_blacklisted()
-    async def muur_4(self, interaction) -> None:
-        await interaction.response.send_message(embed=self.get_muur_embed(
+    async def muur_4(self, context) -> None:
+        await context.send(embed=self.get_muur_embed(
             "ik vertrouw je voor geen haar!!", 
             "-danny vande fucking veire"
         ))
@@ -122,11 +116,12 @@ class Reacties(commands.Cog, name="reacties"):
         description="L bozo",
     )
     @checks.not_blacklisted()
-    async def muur_5(self, interaction) -> None:
-        await interaction.response.send_message(embed=self.get_muur_embed(
+    async def muur_5(self, context) -> None:
+        await context.send(embed=self.get_muur_embed(
             "L bozo", 
             "-bozarius III"
         ))
+
 
     @app_commands.command(
         name="gible",
