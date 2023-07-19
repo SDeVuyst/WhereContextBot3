@@ -595,22 +595,7 @@ class Audio(commands.Cog, name="audio"):
         vc = interaction.guild.voice_client
 
         # doe niks zolang player aan het spelen is
-        current_sec = 0
-        while vc.is_playing():
-            current_sec += 1
-            try:
-                # creeer een progress bar
-                total = 60
-                current = (current_sec / self.current_vid_length) * total
-                # First two arguments are mandatory
-                bardata = progressBar.splitBar(total, current)
-                self.playing_embed.description = self.playing_embed.description.split('\n')[0] + {bardata[0]} - f"{self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
-                await self.playing_message.edit(embed=self.playing_embed)
-
-            except Exception as e:
-                self.logger.warning(e)
-
-            await asyncio.sleep(1)
+        
 
         if len(self.queue) == 0: return
 
@@ -649,7 +634,7 @@ class Audio(commands.Cog, name="audio"):
             self.track_playing_url = url
 
             # creeer een progress bar
-            total = 60
+            total = 20
             current = 0
             # First two arguments are mandatory
             bardata = progressBar.splitBar(total, current)
@@ -673,6 +658,24 @@ class Audio(commands.Cog, name="audio"):
             self.current_vid_length = yt.length
 
             self.playing_message = await interaction.followup.send(embed=embed)
+
+            current_sec = 0
+            
+            while vc.is_playing():
+                current_sec += 1
+                try:
+                    # creeer een progress bar
+                    total = 20
+                    current = (current_sec / self.current_vid_length) * total
+                    # First two arguments are mandatory
+                    bardata = progressBar.splitBar(total, current)
+                    self.playing_embed.description = self.playing_embed.description.split('\n')[0] + {bardata[0]} - f"{self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
+                    await self.playing_message.edit(embed=self.playing_embed)
+
+                except Exception as e:
+                    self.logger.warning(e)
+
+                await asyncio.sleep(1)
 
 
     def format_seconds_to_mmss(self, seconds):
