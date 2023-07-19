@@ -84,8 +84,8 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): Users interaction
             effect (discord.app_commands.Choice[str]): Which effect to play
         """
-        # check als userin vc zit
-        if not interaction.message.author.voice:
+        # check als user in vc zit
+        if not interaction.user.voice:
             await interaction.response.send_message(embed=self.not_in_vc_embed)
             return
         try:
@@ -153,7 +153,7 @@ class Audio(commands.Cog, name="audio"):
             voice (discord.app_commands.Choice[str]): Which voice
         """
         # check als user in vc zit
-        if not interaction.message.author.voice:
+        if not interaction.user.voice:
             await interaction.response.send_message(embed=self.not_in_vc_embed)
             return
         
@@ -234,7 +234,7 @@ class Audio(commands.Cog, name="audio"):
 
 
         # check dat user in vc zit
-        if not interaction.message.author.voice:
+        if not interaction.user.voice:
             await interaction.response.send_message(embed=self.not_in_vc_embed)
             return
         
@@ -520,7 +520,7 @@ class Audio(commands.Cog, name="audio"):
 
         try:
             # user zit niet in vc
-            if not interaction.message.author.voice:
+            if not interaction.user.voice:
                 embed = self.not_in_vc_embed
             else:
                 # join channel
