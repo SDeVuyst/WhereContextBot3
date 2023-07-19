@@ -19,8 +19,7 @@ from discord.ext.commands import Bot, Context
 from helpers import db_manager
 import exceptions
 
-from datetime import datetime, timezone, timedelta
-from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta
 
 intents = discord.Intents.all()
 
@@ -29,6 +28,7 @@ bot = Bot(
     intents=intents,
     help_command=None,
 )
+
 
 bot.defaultColor = 0xF4900D
 bot.errorColor = 0xE02B2B

@@ -30,9 +30,7 @@ class General(commands.Cog, name="general"):
         self.bot = bot
 
 
-    @commands.hybrid_command(
-        name="help", description="List all commands the bot has loaded"
-    )
+    @app_commands.command(name="help", description="List all commands the bot has loaded")
     @checks.not_blacklisted()
     async def help(self, context: Context) -> None:
         admin = list(os.environ.get("owners").split(","))
