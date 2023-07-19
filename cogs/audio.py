@@ -91,7 +91,7 @@ class Audio(commands.Cog, name="audio"):
         try:
 
             # check als bot in vc zit
-            vc = interaction.message.guild.voice_client
+            vc = interaction.guild.voice_client
             if vc is None:
                 await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
                 return
@@ -158,7 +158,7 @@ class Audio(commands.Cog, name="audio"):
             return
         
         # check als bot in vc zit
-        vc = interaction.message.guild.voice_client
+        vc = interaction.guild.voice_client
         if vc is None:
             await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return      
@@ -239,7 +239,7 @@ class Audio(commands.Cog, name="audio"):
             return
         
         # check dat bot in vc zit
-        vc = interaction.message.guild.voice_client
+        vc = interaction.guild.voice_client
         if vc is None:
             await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
@@ -387,7 +387,7 @@ class Audio(commands.Cog, name="audio"):
         """
 
         # check als bot in vc zit
-        voice_client = interaction.message.guild.voice_client
+        voice_client = interaction.guild.voice_client
         if voice_client is None:
             await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
@@ -418,7 +418,7 @@ class Audio(commands.Cog, name="audio"):
         """
 
         # check als bot in vc zit
-        voice_client = interaction.message.guild.voice_client
+        voice_client = interaction.guild.voice_client
         if voice_client is None:
             await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
@@ -449,7 +449,7 @@ class Audio(commands.Cog, name="audio"):
         """
 
         # check als bot in vc zit
-        voice_client = interaction.message.guild.voice_client
+        voice_client = interaction.guild.voice_client
         if voice_client is None:
             await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
@@ -482,7 +482,7 @@ class Audio(commands.Cog, name="audio"):
         """
 
         # check dat bot in vc zit
-        voice_client = interaction.message.guild.voice_client
+        voice_client = interaction.guild.voice_client
         if voice_client is None:
             await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
             return  
@@ -553,7 +553,7 @@ class Audio(commands.Cog, name="audio"):
         """
 
 
-        vc = interaction.message.guild.voice_client
+        vc = interaction.guild.voice_client
         if vc.is_connected():
             await vc.disconnect()
             embed = discord.Embed(
@@ -573,7 +573,7 @@ class Audio(commands.Cog, name="audio"):
         Args:
             interaction (Interaction): Users interaction
         """
-        vc = interaction.message.guild.voice_client
+        vc = interaction.guild.voice_client
 
         # doe niks zolang player aan het spelen is
         while vc.is_playing():
