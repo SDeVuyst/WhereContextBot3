@@ -3,7 +3,6 @@ import random
 from discord.ext import commands
 import os
 from discord import app_commands
-from discord.ext.commands import Context
 import discord
 from helpers import checks
 
@@ -62,7 +61,6 @@ class Reacties(commands.Cog, name="reacties"):
 
 
     @muur.command(
-        base="muur",
         name="golden_rule",
         description="Keleos golden rule",
     )
@@ -75,7 +73,6 @@ class Reacties(commands.Cog, name="reacties"):
         
 
     @muur.command(
-        base="muur",
         name="laten_doen",
         description="laten doen",
     )
@@ -87,7 +84,6 @@ class Reacties(commands.Cog, name="reacties"):
         ))
 
     @muur.command(
-        base="muur",
         name="limieten",
         description=":skull:",
     )
@@ -99,7 +95,6 @@ class Reacties(commands.Cog, name="reacties"):
         ))
 
     @muur.command(
-        base="muur",
         name="danny",
         description="the danny special",
     )
@@ -111,7 +106,6 @@ class Reacties(commands.Cog, name="reacties"):
         ))
 
     @muur.command(
-        base="muur",
         name="bozo",
         description="L bozo",
     )

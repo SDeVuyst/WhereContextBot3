@@ -21,7 +21,7 @@ class Owner(commands.Cog, name="owner"):
         self.bot = bot
         
 
-    blacklist = commands.SlashCommandGroup("blacklist")
+    blacklist = commands.SlashCommandGroup("blacklist", "Control the blacklist")
         
 
 
