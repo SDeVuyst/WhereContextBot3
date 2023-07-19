@@ -656,10 +656,8 @@ class Audio(commands.Cog, name="audio"):
             except:
                 pass
 
-            self.playing_embed = embed
-            self.current_vid_length = yt.length
 
-            self.playing_message = await interaction.followup.send(embed=embed)
+            playing_message = await interaction.followup.send(embed=embed)
 
             current_sec = 0
 
@@ -671,8 +669,8 @@ class Audio(commands.Cog, name="audio"):
                     current = current_sec
                     # First two arguments are mandatory
                     bardata = progressBar.splitBar(total, current, size=20)
-                    self.playing_embed.description = self.playing_embed.description.split('\n')[0] + {bardata[0]} - f"{self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
-                    await self.playing_message.edit(embed=self.playing_embed)
+                    embed.description = f"{embed.description.split('\n')[0]}\n{bardata[0]} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
+                    await playing_message.edit(embed=embed)
 
                 except Exception as e:
                     self.bot.logger.warning(e)
