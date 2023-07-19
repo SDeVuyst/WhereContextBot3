@@ -395,7 +395,7 @@ class CommandSelect(Select):
     def __init__(self, bot, selected_cog):
         commands = []
         for y in bot.tree.walk_commands():
-            if y.extras['cog'] == selected_cog:
+            if y.extras.get('cog') == selected_cog:
                 commands.append((y.name, y.name))
 
         # stats die zelf geen command zijn
