@@ -59,7 +59,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="soundboard", description="Play effect from soundboard")
+    @app_commands.command(name="soundboard", description="Play effect from soundboard", extras={'cog': 'audio'})
     @app_commands.choices(effect=[
         discord.app_commands.Choice(name="hentai Xander", value="hentai.mp3"),
         discord.app_commands.Choice(name="alexa... shut the fuck up", value="alexa.mp3"),
@@ -127,7 +127,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="tts", description="Text to Speech")
+    @app_commands.command(name="tts", description="Text to Speech", extras={'cog': 'audio'})
     @app_commands.choices(voice=[
         discord.app_commands.Choice(name="Alexa", value="alexa"),
         discord.app_commands.Choice(name="Peter Griffin", value="peter-griffin"),
@@ -214,7 +214,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="play", description="play a youtube video or playlist (use multiple times to add to queue)")
+    @app_commands.command(name="play", description="play a youtube video or playlist (use multiple times to add to queue)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -309,7 +309,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="list", description="See the Queue")
+    @app_commands.command(name="list", description="See the Queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -346,7 +346,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="nowplaying", description="See the currently playing track")
+    @app_commands.command(name="nowplaying", description="See the currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -374,7 +374,7 @@ class Audio(commands.Cog, name="audio"):
       
 
 
-    @app_commands.command(name="pause", description="Pause currently playing track")
+    @app_commands.command(name="pause", description="Pause currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -405,7 +405,7 @@ class Audio(commands.Cog, name="audio"):
       
         
 
-    @app_commands.command(name="resume", description="Resume currently playing track")
+    @app_commands.command(name="resume", description="Resume currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -436,7 +436,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="skip", description="Skip the currently playing track")
+    @app_commands.command(name="skip", description="Skip the currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -469,7 +469,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="stop", description="Stop the listening session (this clears the queue!)")
+    @app_commands.command(name="stop", description="Stop the listening session (this clears the queue!)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -506,7 +506,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="join", description="bot joins voice channel")
+    @app_commands.command(name="join", description="bot joins voice channel", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
@@ -540,7 +540,7 @@ class Audio(commands.Cog, name="audio"):
     
         
 
-    @app_commands.command(name="leave", description="bot leaves voice channel")
+    @app_commands.command(name="leave", description="bot leaves voice channel", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.in_correct_server()

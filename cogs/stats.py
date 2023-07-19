@@ -76,6 +76,7 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.command(
         name="individuele_stats",
         description="How many times did a user use a command",
+        extras={'cog': 'stats'}
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
@@ -99,7 +100,7 @@ class Stats(commands.Cog, name="stats"):
         
 
 
-    @app_commands.command(name="changecommandcount", description="Change the command count of a user (admin only)")
+    @app_commands.command(name="changecommandcount", description="Change the command count of a user (admin only)", extras={'cog': 'stats'})
     @app_commands.describe(user="Which users count")
     @checks.is_owner()
     async def change_command_count(self,interaction, user: discord.User, amount: int):
@@ -183,7 +184,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @app_commands.command(name="leaderboard", description="Leaderboard of a command")
+    @app_commands.command(name="leaderboard", description="Leaderboard of a command", extras={'cog': 'stats'})
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
     async def leaderboard(self,interaction):
@@ -204,7 +205,7 @@ class Stats(commands.Cog, name="stats"):
         
 
 
-    @app_commands.command(name="bancount", description="How many times has a user been banned?")
+    @app_commands.command(name="bancount", description="How many times has a user been banned?", extras={'cog': 'stats'})
     @app_commands.describe(user="Which users ban count")
     @checks.not_blacklisted()
     async def bancount(self,interaction, user: discord.User):
@@ -247,7 +248,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @app_commands.command(name="changebancount", description="Change user ban count (owner only)")
+    @app_commands.command(name="changebancount", description="Change user ban count (owner only)", extras={'cog': 'stats'})
     @checks.is_owner()   
     async def change_ban_count(self,interaction, user: discord.User, amount: int):
         """Changes the ban count of a user
@@ -272,7 +273,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @app_commands.command(name="ncount", description="AYO??")
+    @app_commands.command(name="ncount", description="AYO??", extras={'cog': 'stats'})
     @app_commands.describe(user="Which users' n-word count")
     @checks.not_blacklisted()
     @checks.not_in_dm()
@@ -316,7 +317,7 @@ class Stats(commands.Cog, name="stats"):
         await interaction.response.send_message(embed=embed)
     
 
-    @app_commands.command(name="changencount", description="Change the count of a user (admin only)")
+    @app_commands.command(name="changencount", description="Change the count of a user (admin only)", extras={'cog': 'stats'})
     @app_commands.describe(user="Which users' n-word count")
     @app_commands.describe(amount="Amount to set the count to")
     @checks.is_owner()
@@ -394,7 +395,7 @@ class CommandSelect(Select):
     def __init__(self, bot, selected_cog):
         commands = []
         for y in bot.tree.walk_commands():
-            if y.cog and y.cog.qualified_name.lower() == selected_cog:
+            if y.extras['cog'] == selected_cog:
                 commands.append((y.name, y.name))
 
         # stats die zelf geen command zijn

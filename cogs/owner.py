@@ -22,6 +22,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="sync",
         description="Synchronizes the slash commands (admin only)",
+        extras={'cog': 'owner'}
     )
     @app_commands.describe(scope="The scope of the sync.")
     @app_commands.choices(scope=[
@@ -96,6 +97,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="load",
         description="Load a cog (admin only)",
+        extras={'cog': 'owner'}
     )
     @app_commands.describe(cog="The name of the cog to load")
     @checks.is_owner()
@@ -127,6 +129,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="unload",
         description="Unloads a cog (admin only)",
+        extras={'cog': 'owner'}
     )
     @app_commands.describe(cog="The name of the cog to unload")
     @checks.is_owner()
@@ -157,6 +160,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="reload",
         description="Reloads a cog (admin only)",
+        extras={'cog': 'owner'}
     )
     @app_commands.describe(cog="The name of the cog to reload")
     @checks.is_owner()
@@ -187,6 +191,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="cogs",
         description="See loaded/unloaded cogs (admin only)",
+        extras={'cog': 'owner'}
     )
     @checks.is_owner()
     async def cogs(self, interaction) -> None:
@@ -217,6 +222,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="restart",
         description="Make the bot restart (admin only)",
+        extras={'cog': 'owner'}
     )
     @checks.is_owner()
     async def restart(self, interaction) -> None:
@@ -236,6 +242,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="blacklistshow",
         description="Shows the list of all blacklisted users (admin only)",
+        extras={'cog': 'owner'}
     )
     @checks.is_owner()
     async def blacklist_show(self, interaction) -> None:
@@ -280,6 +287,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="blacklistadd",
         description="Lets you add a user from not being able to use the bot (admin only)",
+        extras={'cog': 'owner'}
     )
     @app_commands.describe(user="The user that should be added to the blacklist")
     @checks.is_owner()
@@ -320,9 +328,11 @@ class Owner(commands.Cog, name="owner"):
         await interaction.response.send_message(embed=embed)
 
 
+
     @app_commands.command(
         name="blacklistremove",
         description="Lets you remove a user from not being able to use the bot (admin only)",
+        extras={'cog': 'owner'}
     )
     @app_commands.describe(user="The user that should be removed from the blacklist.")
     @checks.is_owner()

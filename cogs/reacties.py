@@ -13,7 +13,7 @@ class Reacties(commands.Cog, name="reacties"):
         self.bot = bot
 
 
-    @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!")
+    @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
     async def giblereact(self, interaction):
         """Sends the' gible' reaction
@@ -26,7 +26,7 @@ class Reacties(commands.Cog, name="reacties"):
 
 
 
-    @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing")
+    @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
     async def wholesquadlaughing(self, interaction):
         """Sends the 'whole squad laughing' reaction
@@ -39,7 +39,7 @@ class Reacties(commands.Cog, name="reacties"):
 
 
 
-    @app_commands.command(name="notfunny", description="bro that wasn't even funny")
+    @app_commands.command(name="notfunny", description="bro that wasn't even funny", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
     async def notfunny(self, interaction):
         """Sends the 'not funny' reaction
@@ -52,7 +52,7 @@ class Reacties(commands.Cog, name="reacties"):
 
 
 
-    @app_commands.command(name="uthought", description="sike u thought")
+    @app_commands.command(name="uthought", description="sike u thought", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
     async def uthought(self, interaction):
         """Sends the 'u thought' reaction
@@ -108,6 +108,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="golden_rule",
         description="Keleos golden rule",
+        extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
     async def muur_1(self, interaction) -> None:
@@ -126,6 +127,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="laten_doen",
         description="laten doen",
+        extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
     async def muur_2(self, interaction) -> None:
@@ -144,6 +146,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="limieten",
         description=":skull:",
+        extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
     async def muur_3(self, interaction) -> None:
@@ -162,6 +165,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="danny",
         description="the danny special",
+        extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
     async def muur_4(self, interaction) -> None:
@@ -180,6 +184,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="bozo",
         description="L bozo",
+        extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
     async def muur_5(self, interaction) -> None:
@@ -198,6 +203,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="gible",
         description="gibby aka. smikkel aka capybara_Lover123",
+        extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),
@@ -235,6 +241,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="nootje",
         description="nootje aka lil_kid_lover69 aka tough_guy_04",
+        extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),
@@ -264,6 +271,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="pingy",
         description="pingy aka pingy1 aka pongy aka Lol",
+        extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),
@@ -294,6 +302,7 @@ class Reacties(commands.Cog, name="reacties"):
     @app_commands.command(
         name="ba",
         description="ba duy aka ba aka duy aka badwie",
+        extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),
@@ -322,7 +331,8 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="meng",
-        description="meng aka mongwong aka da GOAT"
+        description="meng aka mongwong aka da GOAT",
+        extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),
@@ -351,7 +361,8 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="broodman",
-        description="jasman aka yachini aka yashja"
+        description="jasman aka yachini aka yashja",
+        extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),

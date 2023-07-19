@@ -15,10 +15,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
     # COMMANDS
     
-    @app_commands.command(
-        name="context_debug",
-        description="debug stats for /play-game (admin only)",
-    )
+    @app_commands.command(name="context_debug",description="debug stats for /play-game (admin only)", extras={'cog': 'outofcontext'})
     @checks.is_owner()
     @checks.in_correct_server()
     @checks.not_in_dm()
@@ -46,6 +43,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     @app_commands.command(
         name="play-game",
         description="Play the out of context game",
+        extras={'cog': 'outofcontext'}
     )
     @app_commands.describe(groep="Toon het spel ook aan andere personen")
     @checks.not_blacklisted()

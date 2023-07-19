@@ -30,7 +30,7 @@ class General(commands.Cog, name="general"):
         self.bot = bot
 
 
-    @app_commands.command(name="help", description="List all commands the bot has loaded")
+    @app_commands.command(name="help", description="List all commands the bot has loaded", extras={'cog': 'general'})
     @checks.not_blacklisted()
     async def help(self, interaction) -> None:
         """ Sends info about all available commands
@@ -95,7 +95,7 @@ class General(commands.Cog, name="general"):
         return await menu.start()
 
 
-    @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)")
+    @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'general'})
     @has_permissions(ban_members=True)
     @commands.cooldown(rate=1, per=180)
     @checks.in_correct_server()
@@ -125,7 +125,7 @@ class General(commands.Cog, name="general"):
         
 
 
-    @app_commands.command(name="ping", description="Check if the bot is alive")
+    @app_commands.command(name="ping", description="Check if the bot is alive", extras={'cog': 'general'})
     @checks.not_blacklisted()
     async def ping(self, interaction) -> None:
         """Check if the bot is alive
@@ -144,7 +144,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="say", description="The bot will say anything you want")
+    @app_commands.command(name="say", description="The bot will say anything you want", extras={'cog': 'general'})
     @app_commands.describe(message="The message that should be repeated by the bot")
     @checks.not_blacklisted()
     async def say(self, interaction, *, message: str) -> None:
@@ -159,7 +159,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="embed", description="The bot will say anything you want, but within embeds")
+    @app_commands.command(name="embed", description="The bot will say anything you want, but within embeds", extras={'cog': 'general'})
     @app_commands.describe(message="The message that should be repeated by the bot")
     @checks.not_blacklisted()
     async def embed(self, interaction, *, message: str) -> None:
@@ -175,7 +175,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('countdown_title')}")
+    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('countdown_title')}", extras={'cog': 'general'})
     @checks.not_blacklisted()
     async def countdown(self, interaction) -> None:
         """Countdown till agiven moment in time
@@ -209,7 +209,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="dm", description="let the bot DM a user")
+    @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
@@ -235,7 +235,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="chat", description="Chat with the bot")
+    @app_commands.command(name="chat", description="Chat with the bot", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=2, per=30)
@@ -279,7 +279,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="image", description="Create an image")
+    @app_commands.command(name="image", description="Create an image", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
@@ -322,7 +322,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="invite", description="Create an invite")
+    @app_commands.command(name="invite", description="Create an invite", extras={'cog': 'general'})
     @checks.not_blacklisted()
     async def invite(self, interaction) -> None:
         """Send an invite to the main server
@@ -339,7 +339,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="remindme", description="Remind me of an event")
+    @app_commands.command(name="remindme", description="Remind me of an event", extras={'cog': 'general'})
     @checks.is_owner()
     async def remindme(self, interaction, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
         """Sets a reminder
