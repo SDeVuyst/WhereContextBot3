@@ -270,26 +270,26 @@ async def autonick(member):
 
 
 @bot.event
-async def on_command_completion(context: Context) -> None:
+async def on_app_command_completion(interaction, command) -> None:
     """
     The code in this event is executed every time a normal command has been *successfully* executed.
 
     :param context: The context of the command that has been executed.
     """
-    full_command_name = context.command.qualified_name
+    full_command_name = command.qualified_name
     split = full_command_name.split(" ")
     executed_command = str(split[0])
-    if context.guild is not None:
+    if interaction.guild is not None:
         bot.logger.info(
-            f"Executed {executed_command} command in {context.guild.name} (ID: {context.guild.id}) by {context.author} (ID: {context.author.id})"
+            f"Executed {executed_command} command in {interaction.guild.name} (ID: {interaction.guild.id}) by {interaction.user} (ID: {interaction.user.id})"
         )
     else:
         bot.logger.info(
-            f"Executed {executed_command} command by {context.author} (ID: {context.author.id}) in DMs"
+            f"Executed {executed_command} command by {interaction.user} (ID: {interaction.user.id}) in DMs"
         )
 
     # add stats to db
-    await db_manager.increment_or_add_command_count(context.author.id, executed_command, 1)
+    await db_manager.increment_or_add_command_count(interaction.user.id, executed_command, 1)
 
 
 
