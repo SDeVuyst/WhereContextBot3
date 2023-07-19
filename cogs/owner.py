@@ -14,14 +14,12 @@ from discord.ext.commands import Context
 from helpers import checks, db_manager
 
 
-blacklist = app_commands.Group(name="blacklist")
-
 class Owner(commands.Cog, name="owner"):
     def __init__(self, bot):
         self.bot = bot
         
 
-    blacklist = commands.SlashCommandGroup("blacklist", "Control the blacklist")
+    blacklist = app_commands.AppCommandGroup(name="blacklist", description="Control the blacklist")
         
 
 

@@ -12,7 +12,7 @@ class Reacties(commands.Cog, name="reacties"):
     def __init__(self, bot):
         self.bot = bot
 
-    muur = commands.SlashCommandGroup("muur", "De OG muur")
+    muur = app_commands.AppCommandGroup(name="muur", description="De OG muur")
 
     @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!")
     @checks.not_blacklisted()
