@@ -18,7 +18,7 @@ class Owner(commands.Cog, name="owner"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="sync",
         description="Synchronizes the slash commands (admin only)",
     )
@@ -85,7 +85,7 @@ class Owner(commands.Cog, name="owner"):
 
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="load",
         description="Load a cog (admin only)",
     )
@@ -114,7 +114,7 @@ class Owner(commands.Cog, name="owner"):
 
         await context.send(embed=embed)
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="unload",
         description="Unloads a cog (admin only)",
     )
@@ -143,7 +143,7 @@ class Owner(commands.Cog, name="owner"):
 
         await context.send(embed=embed)
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="reload",
         description="Reloads a cog (admin only)",
     )
@@ -173,7 +173,7 @@ class Owner(commands.Cog, name="owner"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="cogs",
         description="See loaded/unloaded cogs (admin only)",
     )
@@ -203,7 +203,7 @@ class Owner(commands.Cog, name="owner"):
         await context.send(embed=embed)
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="restart",
         description="Make the bot restart (admin only)",
     )
@@ -222,7 +222,7 @@ class Owner(commands.Cog, name="owner"):
         
 
 
-    @commands.hybrid_group(
+    @app_commands.command(
         name="blacklist",
         description="Get the list of all blacklisted users (admin only)",
     )
