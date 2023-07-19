@@ -64,7 +64,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @commands.hybrid_command(
+    @app_commands.command(
         name="individuele_stats",
         description="How many times did a user use a command",
     )
@@ -84,7 +84,7 @@ class Stats(commands.Cog, name="stats"):
         
 
 
-    @commands.hybrid_command(name="changecommandcount", description="Change the command count of a user (admin only)")
+    @app_commands.command(name="changecommandcount", description="Change the command count of a user (admin only)")
     @app_commands.describe(user="Which users count")
     @checks.is_owner()
     async def change_command_count(self, context: Context, user: discord.User, amount: int):
@@ -153,7 +153,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @commands.hybrid_command(name="leaderboard", description="Leaderboard of a command")
+    @app_commands.command(name="leaderboard", description="Leaderboard of a command")
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=10)
     async def leaderboard(self, context: Context):
@@ -169,7 +169,7 @@ class Stats(commands.Cog, name="stats"):
         
 
 
-    @commands.hybrid_command(name="bancount", description="How many times has a user been banned?")
+    @app_commands.command(name="bancount", description="How many times has a user been banned?")
     @app_commands.describe(user="Which users ban count")
     @checks.not_blacklisted()
     async def bancount(self, context: Context, user: discord.User):
@@ -206,7 +206,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @commands.hybrid_command(name="changebancount", description="Change user ban count (owner only)")
+    @app_commands.command(name="changebancount", description="Change user ban count (owner only)")
     @checks.is_owner()   
     async def change_ban_count(self, context: Context, user: discord.User, amount: int):
         # krijg count uit db
@@ -224,7 +224,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @commands.hybrid_command(name="ncount", description="AYO??")
+    @app_commands.command(name="ncount", description="AYO??")
     @app_commands.describe(user="Which users' n-word count")
     @checks.not_blacklisted()
     @checks.not_in_dm()
@@ -261,7 +261,7 @@ class Stats(commands.Cog, name="stats"):
         await context.send(embed=embed)
     
 
-    @commands.hybrid_command(name="changencount", description="Change the count of a user (admin only)")
+    @app_commands.command(name="changencount", description="Change the count of a user (admin only)")
     @app_commands.describe(user="Which users' n-word count")
     @app_commands.describe(amount="Amount to set the count to")
     @checks.is_owner()
