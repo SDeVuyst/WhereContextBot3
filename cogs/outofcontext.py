@@ -11,13 +11,13 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     def __init__(self, bot):
         self.bot = bot
         self.ctx_menu_add = app_commands.ContextMenu(
-            name='Add Context',
+            name='AddContext',
             callback=self.context_add,
         )
         self.bot.tree.add_command(self.ctx_menu_add)
 
         self.ctx_menu_remove = app_commands.ContextMenu(
-            name='Remove Context',
+            name='RemoveContext',
             callback=self.context_remove,
         )
         self.bot.tree.add_command(self.ctx_menu_remove)

@@ -33,6 +33,12 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="help", description="List all commands the bot has loaded")
     @checks.not_blacklisted()
     async def help(self, interaction) -> None:
+        """
+        Sends info about all available commands.
+
+        :param interaction: The command interaction.
+        """
+
         admin = list(os.environ.get("owners").split(","))
 
         menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
@@ -57,7 +63,6 @@ class General(commands.Cog, name="general"):
             data = []
             for command in commands:
                 description = command.description.partition("\n")[0]
-                # TODO fix command ids
                 data.append(f"</{command.name}:{command.id}> - {description}")
 
             if c == "outofcontext":
@@ -87,19 +92,22 @@ class General(commands.Cog, name="general"):
         return await menu.start()
 
 
-    @commands.hybrid_command(
-        name="lien",
-        description="LIEN LOCKDOWN (admin only)",
-    )
+    @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)")
     @has_permissions(ban_members=True)
     @commands.cooldown(rate=1, per=180)
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def lien(self, context: Context) -> None:
+    async def lien(self, interaction) -> None:
+        """
+        Lockdown.
+
+        :param interaction: The command interaction.
+        """
+
         # kick grom
         try:
             gromID = int(os.environ.get("grom"))
-            grom = await context.guild.fetch_member(gromID)
+            grom = await interaction.guild.fetch_member(gromID)
             await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
         # grom kick error
         except:
@@ -110,20 +118,17 @@ class General(commands.Cog, name="general"):
             description="<@464400950702899211> has been kicked.",
             color=self.bot.errorColor
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
         
 
 
-    @commands.hybrid_command(
-        name="ping",
-        description="Check if the bot is alive",
-    )
+    @app_commands.command(name="ping", description="Check if the bot is alive")
     @checks.not_blacklisted()
-    async def ping(self, context: Context) -> None:
+    async def ping(self, interaction) -> None:
         """
         Check if the bot is alive.
 
-        :param context: The hybrid command context.
+        :param interaction: The command interaction.
         """
         embed = discord.Embed(
             title="🏓 Pong!",
@@ -131,53 +136,49 @@ class General(commands.Cog, name="general"):
             color=self.bot.succesColor if (self.bot.latency * 1000) < 150 else self.bot.defaultColor
         )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
-    @commands.hybrid_command(
-        name="say",
-        description="The bot will say anything you want",
-    )
+    @app_commands.command(name="say", description="The bot will say anything you want")
     @app_commands.describe(message="The message that should be repeated by the bot")
     @checks.not_blacklisted()
-    async def say(self, context: Context, *, message: str) -> None:
+    async def say(self, interaction, *, message: str) -> None:
         """
         The bot will say anything you want.
 
-        :param context: The hybrid command context.
+        :param interaction: The command interaction.
         :param message: The message that should be repeated by the bot.
         """
 
-        await context.send(message)
+        await interaction.response.send_message(message)
 
 
 
-    @commands.hybrid_command(
-        name="embed",
-        description="The bot will say anything you want, but within embeds",
-    )
+    @app_commands.command(name="embed", description="The bot will say anything you want, but within embeds")
     @app_commands.describe(message="The message that should be repeated by the bot")
     @checks.not_blacklisted()
-    async def embed(self, context: Context, *, message: str) -> None:
+    async def embed(self, interaction, *, message: str) -> None:
         """
         The bot will say anything you want, but using embeds.
 
-        :param context: The hybrid command context.
+        :param interaction: The command interaction.
         :param message: The message that should be repeated by the bot.
         """
 
         embed = discord.Embed(title=message, color=self.bot.defaultColor)
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
-    @commands.hybrid_command(
-        name="countdown",
-        description=f"Countdown till {os.environ.get('countdown_title')}",
-    )
+    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('countdown_title')}")
     @checks.not_blacklisted()
-    async def countdown(self, context: Context) -> None:
+    async def countdown(self, interaction) -> None:
+        """
+        Countdown till a given moment in time.
+
+        :param interaction: The command interaction.
+        """
 
         deadline = datetime.strptime(os.environ.get("countdown"), "%d/%m/%y %H:%M:%S")
         diff = deadline - datetime.now()
@@ -199,49 +200,57 @@ class General(commands.Cog, name="general"):
         )
 
  
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
-    @commands.hybrid_command(
-        name="dm",
-        description="let the bot DM a user",
-    )
+
+    @app_commands.command(name="dm", description="let the bot DM a user")
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
-    async def dm(self, context: Context, user: discord.User, content: str) -> None:
-   
+    async def dm(self, interaction, user: discord.User, content: str) -> None:
+        """
+        Dm's a given user.
+
+        :param interaction: The command interaction.
+        :param user: Which user.
+        :param content: What to send the user.
+        """
+
+
         # stuur dm naar gebruiker
         await user.send(content=content)
 
         # stuur dm naar admin
         owner = int(list(os.environ.get("owners").split(","))[0])
         admin = await self.bot.fetch_user(owner)
-        await admin.send(content=f"{context.author.display_name} dm'd {user.display_name}: {content}")
+        await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
 
         # stuur confirmatie
-        await context.send(content="done.", ephemeral=True)
+        await interaction.response.send_message(content="done.", ephemeral=True)
 
 
 
-    @commands.hybrid_command(
-        name="chat",
-        description="Chat with the bot",
-    )
+    @app_commands.command(name="chat", description="Chat with the bot")
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=2, per=30)
-    async def chat(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
+    async def chat(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
+        """
+        Chat with chatgpt.
 
-        await context.defer()
+        :param interaction: The command interaction.
+        :param prompt: Your question.
+        """
+        await interaction.response.defer()
 
         try:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but very sarcastic bot who is not afraid to trash-talk. You were made by solos."},
-                    {"role": "user", "content": f'Mijn naam is  {context.author.display_name}. Anwser the question delimited by triple quotes in about 75 words. """{prompt}"""'},
+                    {"role": "user", "content": f'Mijn naam is  {interaction.user.display_name}. Anwser the question delimited by triple quotes in about 75 words. """{prompt}"""'},
 
                 ],
                 temperature=0.5,
@@ -263,20 +272,22 @@ class General(commands.Cog, name="general"):
         
 
         # stuur het antwoord
-        await context.interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 
 
-    @commands.hybrid_command(
-        name="image",
-        description="Create an image",
-    )
+    @app_commands.command(name="image", description="Create an image")
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
-    async def image(self, context: Context, prompt: app_commands.Range[str, 1, 200]) -> None:
+    async def image(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
+        """
+        Creates an AI image
 
-        await context.defer()
+        :param interaction: The command interaction.
+        :param prompt: Description of what to create.
+        """
+        await interaction.response.defer()
 
         try:
             response = openai.Image.create(
@@ -303,31 +314,36 @@ class General(commands.Cog, name="general"):
         
 
         # stuur het antwoord
-        await context.interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed)
 
 
 
-    @commands.hybrid_command(
-        name="invite",
-        description="Create an invite",
-    )
+    @app_commands.command(name="invite", description="Create an invite")
     @checks.not_blacklisted()
-    async def invite(self, context: Context) -> None:
+    async def invite(self, interaction) -> None:
+        """
+        Sends an invite to the main server
+
+        :param interaction: The command interaction.
+        """
         guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
         channel = await guild.fetch_channel(int(os.environ.get("channel")))
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
-        await context.send(link)
+        await interaction.response.send_message(link)
 
 
 
-    @commands.hybrid_command(
-        name="remindme",
-        description="Remind me of an event",
-    )
+    @app_commands.command(name="remindme", description="Remind me of an event")
     @checks.is_owner()
-    async def remindme(self, context: Context, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
+    async def remindme(self, interaction, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
+        """
+        Creates a reminder.
 
+        :param interaction: The command interaction.
+        :param wanneer: When should the bot set the reminder.
+        :param waarover: What is the reminder about.
+        """
         t = dateparser.parse(wanneer, settings={
             'DATE_ORDER': 'DMY',
             'TIMEZONE': 'CEST',
@@ -351,7 +367,7 @@ class General(commands.Cog, name="general"):
         else:
 
             # zet reminder in db
-            succes = await db_manager.set_reminder(context.author.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
+            succes = await db_manager.set_reminder(interaction.user.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
 
             
             desc = f"I will remind you at ```{t.strftime('%d/%m/%y %H:%M:%S')} CEST``` for ```{waarover}```" if succes else "Something went wrong!"
@@ -361,7 +377,7 @@ class General(commands.Cog, name="general"):
                 color=self.bot.succesColor if succes else self.bot.errorColor
             )
 
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
