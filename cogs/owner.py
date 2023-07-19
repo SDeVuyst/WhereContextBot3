@@ -37,18 +37,21 @@ class Owner(commands.Cog, name="owner"):
         try:
 
             if scope.value == "global":
-                await context.bot.tree.sync()
+                cmds = await context.bot.tree.sync()
+                self.save_ids(cmds)
+
                 embed = discord.Embed(
                     description="Slash commands have been globally synchronized.",
                     color=self.bot.succesColor,
                 )
                 await context.send(embed=embed)
-                return
             
             elif scope.value == "server":
 
                 # context.bot.tree.copy_global_to(guild=context.guild)
-                await context.bot.tree.sync(guild=context.guild)
+                cmds = await context.bot.tree.sync(guild=context.guild)
+                self.save_ids(cmds)
+
                 embed = discord.Embed(
                     description="Slash commands have been synchronized in this server.",
                     color=self.bot.succesColor,
@@ -60,6 +63,8 @@ class Owner(commands.Cog, name="owner"):
             )
             await context.send(embed=embed)
 
+            
+
         except discord.HTTPException as e:
             self.bot.logger.warning(e)
             embed = discord.Embed(
@@ -67,7 +72,18 @@ class Owner(commands.Cog, name="owner"):
                 color=self.bot.errorColor,
             )
             await context.send(embed=embed)
-            
+
+
+
+    def save_ids(self, cmds):
+        for cmd in cmds:
+            if cmd.guild_id is None:  # it's a global slash command
+                self.bot.tree._global_commands[cmd.name].id = cmd.id
+            else:  # it's a guild specific command
+                self.bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
+
+
+
 
     @commands.hybrid_command(
         name="load",
