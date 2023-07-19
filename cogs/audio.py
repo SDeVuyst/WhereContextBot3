@@ -10,7 +10,7 @@ import tempfile
 from helpers import checks, http, ytdl_helper
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
-
+from StringProgressBar import progressBar
 
 
 
@@ -595,7 +595,21 @@ class Audio(commands.Cog, name="audio"):
         vc = interaction.guild.voice_client
 
         # doe niks zolang player aan het spelen is
+        current_sec = 0
         while vc.is_playing():
+            current_sec += 1
+            try:
+                # creeer een progress bar
+                total = 60
+                current = (current_sec / self.current_vid_length) * total
+                # First two arguments are mandatory
+                bardata = progressBar.splitBar(total, current)
+                self.playing_embed.description = self.playing_embed.description.split('\n')[0] + {bardata[0]} - f"{self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
+                await self.playing_message.edit(embed=self.playing_embed)
+
+            except Exception as e:
+                self.logger.warning(e)
+
             await asyncio.sleep(1)
 
         if len(self.queue) == 0: return
@@ -634,10 +648,16 @@ class Audio(commands.Cog, name="audio"):
             self.track_playing = f"{yt.title} by {yt.author}"
             self.track_playing_url = url
 
+            # creeer een progress bar
+            total = 60
+            current = 0
+            # First two arguments are mandatory
+            bardata = progressBar.splitBar(total, current)
+
             # confirmatie
             embed = discord.Embed(
-                title=f"Playing music!",
-                description=f"[{yt.title}]({url}) by {yt.author}",
+                title=f"🎵 Playing music!",
+                description=f"[{yt.title}]({url}) by {yt.author}\n{bardata[0]} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}",
                 color=self.bot.succesColor
             )
 
@@ -649,9 +669,16 @@ class Audio(commands.Cog, name="audio"):
             except:
                 pass
 
-            await interaction.followup.send(embed=embed)
+            self.playing_embed = embed
+            self.current_vid_length = yt.length
+
+            self.playing_message = await interaction.followup.send(embed=embed)
 
 
+    def format_seconds_to_mmss(self, seconds):
+        minutes = seconds // 60
+        seconds %= 60
+        return "%02i:%02i" % (minutes, seconds)
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
