@@ -32,10 +32,10 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="help", description="List all commands the bot has loaded")
     @checks.not_blacklisted()
-    async def help(self, context: Context) -> None:
+    async def help(self, interaction) -> None:
         admin = list(os.environ.get("owners").split(","))
 
-        menu = ViewMenu(context.interaction, menu_type=ViewMenu.TypeEmbed)
+        menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
             "audio": "🎙️ Audio",
             "general": "🤖 General",
