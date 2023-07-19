@@ -12,7 +12,6 @@ class Reacties(commands.Cog, name="reacties"):
     def __init__(self, bot):
         self.bot = bot
 
-    muur = app_commands.AppCommandGroup(name="muur", description="De OG muur")
 
     @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!")
     @checks.not_blacklisted()
@@ -60,58 +59,58 @@ class Reacties(commands.Cog, name="reacties"):
     
 
 
-    @muur.command(
+    @app_commands.command(
         name="golden_rule",
         description="Keleos golden rule",
     )
     @checks.not_blacklisted()
-    async def muur_1(self, context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_1(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "You only need 3 things in life, happiness and good weather", 
             "-Keleo (golden rule)"
         ))
         
 
-    @muur.command(
+    @app_commands.command(
         name="laten_doen",
         description="laten doen",
     )
     @checks.not_blacklisted()
-    async def muur_2(self, context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_2(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "Jij laat je toch ook altijd doen hé", 
             "-jeroentje pompoentje"
         ))
 
-    @muur.command(
+    @app_commands.command(
         name="limieten",
         description=":skull:",
     )
     @checks.not_blacklisted()
-    async def muur_3(self, context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_3(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "ik ken mijn limieten", 
             "-Yours truly"
         ))
 
-    @muur.command(
+    @app_commands.command(
         name="danny",
         description="the danny special",
     )
     @checks.not_blacklisted()
-    async def muur_4(self, context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_4(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "ik vertrouw je voor geen haar!!", 
             "-danny vande fucking veire"
         ))
 
-    @muur.command(
+    @app_commands.command(
         name="bozo",
         description="L bozo",
     )
     @checks.not_blacklisted()
-    async def muur_5(self, context) -> None:
-        await context.send(embed=self.get_muur_embed(
+    async def muur_5(self, interaction) -> None:
+        await interaction.response.send_message(embed=self.get_muur_embed(
             "L bozo", 
             "-bozarius III"
         ))

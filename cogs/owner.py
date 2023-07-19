@@ -17,10 +17,6 @@ from helpers import checks, db_manager
 class Owner(commands.Cog, name="owner"):
     def __init__(self, bot):
         self.bot = bot
-        
-
-    blacklist = app_commands.AppCommandGroup(name="blacklist", description="Control the blacklist")
-        
 
 
     @app_commands.command(
@@ -230,12 +226,12 @@ class Owner(commands.Cog, name="owner"):
         
 
 
-    @blacklist.command(
-        name="show",
+    @app_commands.command(
+        name="blacklistshow",
         description="Shows the list of all blacklisted users (admin only)",
     )
     @checks.is_owner()
-    async def blacklist_show(self, context) -> None:
+    async def blacklist_show(self, interaction) -> None:
         """
         Shows the list of all blacklisted users.
 
@@ -248,7 +244,7 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description="There are currently no blacklisted users.", color=self.bot.defaultColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # error
@@ -258,7 +254,7 @@ class Owner(commands.Cog, name="owner"):
                 description=blacklisted_users[1],
                 color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
 
         # alles is ok
@@ -270,17 +266,17 @@ class Owner(commands.Cog, name="owner"):
             )
             users.append(f"• {user.mention} ({user}) - Blacklisted at {bluser[1].strftime('%d/%m/%Y - %H:%M:%S')}")
         embed.description = "\n".join(users)
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
-    @blacklist.command(
-        name="add",
+    @app_commands.command(
+        name="blacklistadd",
         description="Lets you add a user from not being able to use the bot (admin only)",
     )
     @app_commands.describe(user="The user that should be added to the blacklist")
     @checks.is_owner()
-    async def blacklist_add(self, context, user: discord.User) -> None:
+    async def blacklist_add(self, interaction, user: discord.User) -> None:
         """
         Lets you add a user from not being able to use the bot.
 
@@ -293,7 +289,7 @@ class Owner(commands.Cog, name="owner"):
                 description=f"**{user.name}** is already in the blacklist.",
                 color=self.bot.errorColor,
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         total = await db_manager.add_user_to_blacklist(user_id)
 
@@ -303,7 +299,7 @@ class Owner(commands.Cog, name="owner"):
                 description=f"Er is iets misgegaan.",
                 color=self.bot.errorColor,
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # alles oke
@@ -314,16 +310,16 @@ class Owner(commands.Cog, name="owner"):
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
-    @blacklist.command(
-        name="remove",
+    @app_commands.command(
+        name="blacklistremove",
         description="Lets you remove a user from not being able to use the bot (admin only)",
     )
     @app_commands.describe(user="The user that should be removed from the blacklist.")
     @checks.is_owner()
-    async def blacklist_remove(self, context, user: discord.User) -> None:
+    async def blacklist_remove(self, interaction, user: discord.User) -> None:
         """
         Lets you remove a user from not being able to use the bot.
 
@@ -335,7 +331,7 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"**{user.name}** is not in the blacklist.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         total = await db_manager.remove_user_from_blacklist(user_id)
 
@@ -344,7 +340,7 @@ class Owner(commands.Cog, name="owner"):
             embed = discord.Embed(
                 description=f"Er is iets misgegaan.", color=self.bot.errorColor
             )
-            await context.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
             return
         
         # alles ok
@@ -355,7 +351,7 @@ class Owner(commands.Cog, name="owner"):
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 
