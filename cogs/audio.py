@@ -669,7 +669,8 @@ class Audio(commands.Cog, name="audio"):
                     current = current_sec
                     # First two arguments are mandatory
                     bardata = progressBar.splitBar(total, current, size=20)
-                    embed.description = f"{embed.description.split('\n')[0]}\n{bardata[0]} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
+                    first_desc = embed.description.split('\n')[0]
+                    embed.description = f"{first_desc}\n{bardata[0]} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}"
                     await playing_message.edit(embed=embed)
 
                 except Exception as e:
