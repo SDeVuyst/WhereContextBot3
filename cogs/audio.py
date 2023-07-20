@@ -729,7 +729,8 @@ class Audio(commands.Cog, name="audio"):
                 except Exception as e:
                     self.bot.logger.warning(e)
 
-                await asyncio.sleep(1)
+                # geen 1 sec door delay en functies uitvoeren
+                await asyncio.sleep(0.8)
 
 
     def format_seconds_to_mmss(self, seconds):
