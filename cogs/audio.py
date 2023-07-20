@@ -466,7 +466,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    @app_commands.describe(message="How many tracks the bot should skip")
+    @app_commands.describe(aantal="How many tracks the bot should skip")
     async def skip(self, interaction, aantal:int=1):
         """Skips the currently playing audio
 
