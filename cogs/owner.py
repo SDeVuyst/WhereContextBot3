@@ -38,7 +38,7 @@ class Owner(commands.Cog, name="owner"):
             scope (discord.app_commands.Choice[str]): The scope to sync, can be global or server
         """
         try:
-            interaction.response.defer()
+            await interaction.response.defer()
 
             if scope.value == "global":
                 cmds = await self.bot.tree.sync()
