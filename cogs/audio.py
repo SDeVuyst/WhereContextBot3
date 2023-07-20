@@ -251,6 +251,12 @@ class Audio(commands.Cog, name="audio"):
             return  
         
         await interaction.response.defer()
+
+        # in_front kan value hebben als param door user gesubmit is, anders is het al int
+        try:
+            in_front = in_front.value
+        except:
+            pass
         
         try:
 
@@ -262,7 +268,7 @@ class Audio(commands.Cog, name="audio"):
                     desc = ""
                     vid_urls = Playlist(youtube_url)
                     for i, vid_url in enumerate(vid_urls):
-                        if in_front.value == 1:
+                        if in_front == 1:
                             self.queue.insert(0, vid_url)
                         else:
                             self.queue.append(vid_url)
@@ -287,7 +293,7 @@ class Audio(commands.Cog, name="audio"):
                 yt = YouTube(youtube_url)
                 
                 # voeg lied aan queue toe
-                if in_front.value == 1:
+                if in_front == 1:
                     self.queue.insert(0, youtube_url)
                 else:
                     self.queue.append(youtube_url)
@@ -586,7 +592,7 @@ class Audio(commands.Cog, name="audio"):
                 channel = interaction.user.voice.channel
                 await channel.connect()
                 embed = discord.Embed(
-                    title=f"☑️ Joined channel {channel.name}!",
+                    title=f"✅ Joined channel {channel.name}!",
                     color=self.bot.succesColor
                 )
         except discord.ClientException:
