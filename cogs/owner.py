@@ -38,6 +38,7 @@ class Owner(commands.Cog, name="owner"):
             scope (discord.app_commands.Choice[str]): The scope to sync, can be global or server
         """
         try:
+            interaction.response.defer()
 
             if scope.value == "global":
                 cmds = await self.bot.tree.sync()
@@ -47,7 +48,7 @@ class Owner(commands.Cog, name="owner"):
                     description="Slash commands have been globally synchronized.",
                     color=self.bot.succesColor,
                 )
-                await interaction.response.send_message(embed=embed)
+                await interaction.followup.send(embed=embed)
                 return
             
             elif scope.value == "server":
@@ -60,12 +61,13 @@ class Owner(commands.Cog, name="owner"):
                     description="Slash commands have been synchronized in this server.",
                     color=self.bot.succesColor,
                 )
-                await interaction.response.send_message(embed=embed)
+                await interaction.followup.send(embed=embed)
                 return
+            
             embed = discord.Embed(
                 description="The scope must be `global` or `server`.", color=self.bot.errorColor
             )
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
 
             
 
