@@ -10,6 +10,17 @@ from helpers import checks, db_manager
 class OutOfContext(commands.Cog, name="outofcontext"):
     def __init__(self, bot):
         self.bot = bot
+        self.addcontext_contextmenu = app_commands.ContextMenu(
+            name='Add Context',
+            callback=self.context_add,
+        )
+        self.bot.tree.add_command(self.addcontext_contextmenu)
+        
+        self.removecontext_contextmenu = app_commands.ContextMenu(
+            name='Remove Context',
+            callback=self.context_remove,
+        )
+        self.bot.tree.add_command(self.removecontext_contextmenu)
 
         self.currently_playing = False
 
@@ -278,6 +289,96 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         return embed
 
 
+
+    @checks.not_blacklisted()
+    async def context_add(self, interaction: discord.Interaction, message:discord.Message):
+        """
+        Lets you add a message to the OOC game.
+
+        """
+        submitted_id = interaction.user.id
+
+        # check als message uit OOC komt
+        if message.channel.id != int(os.environ.get('channel')):
+            embed = discord.Embed(
+                description="Bericht moet in #out-of-context staan!",
+                color=self.bot.errorColor,
+            )
+            embed.set_footer(text=f"{message.id}")
+            await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+            return
+
+        # check als bericht al in db staat
+        if await db_manager.is_in_ooc(message.id):
+            embed = discord.Embed(
+                description=f"Message is already in the game.",
+                color=self.bot.errorColor,
+            )
+            embed.set_footer(text=f"{message.id}")
+            await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+            return
+        
+        # voeg toe
+        total = await db_manager.add_message_to_ooc(message.id, submitted_id)
+
+        # error
+        if total == -1:
+            embed = discord.Embed(
+                description=f"Er is iets misgegaan.",
+                color=self.bot.errorColor,
+            )
+            embed.set_footer(text=f"{message.id}")
+            await interaction.response.send_message(embed=embed)
+            return
+        
+        # alles oke
+        embed = discord.Embed(
+            description=f"[Message]({message.jump_url}) has been added to the game",
+            color=self.bot.succesColor,
+        )
+        embed.set_footer(
+            text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
+        )
+        await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+
+
+
+    @checks.not_blacklisted()
+    async def context_remove(self, interaction: discord.Interaction, message:discord.Message):
+        """
+        Lets you remove a message to the OOC game.
+
+        """
+        # check als bericht bestaat
+        if not await db_manager.is_in_ooc(id):
+            embed = discord.Embed(
+                description=f"**{id}** is not in the game.",
+                color=self.bot.errorColor,
+            )
+            return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+        
+        # verwijder bericht
+        total = await db_manager.remove_message_from_ooc(id)
+
+        # error
+        if total == -1:
+            embed = discord.Embed(
+                description=f"Er is iets misgegaan.",
+                color=self.bot.errorColor,
+            )
+            return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+        
+        m = await interaction.guild.get_channel(int(os.environ.get("channel"))).fetch_message(id)
+        
+        # alles oke
+        embed = discord.Embed(
+            description=f"[Message]({m.jump_url}) has been removed from the game",
+            color=self.bot.succesColor,
+        )
+        embed.set_footer(
+            text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
+        )
+        return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
 
 # behandelt alle knoppen
 class Menu(discord.ui.View):
