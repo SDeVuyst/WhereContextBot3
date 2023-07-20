@@ -488,7 +488,8 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
 
             # currently playing track should also be included in the loop
-            self.queue.append(self.track_playing_url)
+            if (self.queue or [None])[-1] != self.track_playing_url:
+                self.queue.append(self.track_playing_url)
 
             # turn looping on/off
             self.looping = not self.looping
