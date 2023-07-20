@@ -461,11 +461,12 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def skip(self, interaction):
+    async def skip(self, interaction, aantal:int=1):
         """Skips the currently playing audio
 
         Args:
             interaction (Interaction): Users Interaction
+            aantal (int): amount of tracks to skip, defaults to 1
         """
 
         # check als bot in vc zit
@@ -476,6 +477,7 @@ class Audio(commands.Cog, name="audio"):
         
         # skip
         if voice_client.is_playing():
+            self.queue = self.queue[aantal-1:]
             voice_client.stop()
             
             embed = discord.Embed(
