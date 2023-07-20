@@ -60,7 +60,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     @checks.not_blacklisted()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def play(self, interaction, groep: bool) -> None:
+    async def play(self, interaction, groep: bool=False) -> None:
         """Play the out of context game
 
         Args:
