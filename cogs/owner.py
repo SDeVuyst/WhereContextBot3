@@ -42,7 +42,7 @@ class Owner(commands.Cog, name="owner"):
 
             if scope.value == "global":
                 cmds = await self.bot.tree.sync()
-                self.save_ids(cmds)
+                self.bot.save_ids(cmds)
 
                 embed = discord.Embed(
                     description="Slash commands have been globally synchronized.",
@@ -55,7 +55,7 @@ class Owner(commands.Cog, name="owner"):
 
                 # context.bot.tree.copy_global_to(guild=context.guild)
                 cmds = await self.bot.tree.sync(guild=interaction.guild)
-                self.save_ids(cmds)
+                self.bot.save_ids(cmds)
 
                 embed = discord.Embed(
                     description="Slash commands have been synchronized in this server.",
@@ -78,24 +78,6 @@ class Owner(commands.Cog, name="owner"):
                 color=self.bot.errorColor,
             )
             await interaction.response.send_message(embed=embed)
-
-
-
-    def save_ids(self, cmds):
-        """Saves the ids of commands
-
-        Args:
-            cmds (Command)
-        """
-        for cmd in cmds:
-            try:
-                if cmd.guild_id is None:  # it's a global slash command
-                    self.bot.tree._global_commands[cmd.name].id = cmd.id
-                else:  # it's a guild specific command
-                    self.bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
-            except:
-                pass
-
 
 
 

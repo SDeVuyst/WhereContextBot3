@@ -37,6 +37,24 @@ bot.succesColor = 0x39AC39
 
 bot.loaded = set()
 bot.unloaded = set()
+
+def save_ids_func(self, cmds):
+    """Saves the ids of commands
+
+    Args:
+        cmds (Command)
+    """
+    for cmd in cmds:
+        try:
+            if cmd.guild_id is None:  # it's a global slash command
+                self.bot.tree._global_commands[cmd.name].id = cmd.id
+            else:  # it's a guild specific command
+                self.bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
+        except:
+            pass
+
+bot.save_ids = save_ids_func
+
 # Setup both of the loggers
 
 
@@ -118,7 +136,8 @@ async def on_ready() -> None:
     status_task.start()
     check_remindme.start()
 
-    await bot.tree.sync()
+    cmds = await bot.tree.sync()
+    bot.save_ids(cmds)
 
 
 @tasks.loop(minutes=1.0)
