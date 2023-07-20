@@ -38,7 +38,7 @@ bot.succesColor = 0x39AC39
 bot.loaded = set()
 bot.unloaded = set()
 
-def save_ids_func(self, cmds):
+def save_ids_func(cmds):
     """Saves the ids of commands
 
     Args:
@@ -47,9 +47,9 @@ def save_ids_func(self, cmds):
     for cmd in cmds:
         try:
             if cmd.guild_id is None:  # it's a global slash command
-                self.bot.tree._global_commands[cmd.name].id = cmd.id
+                bot.tree._global_commands[cmd.name].id = cmd.id
             else:  # it's a guild specific command
-                self.bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
+                bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
         except:
             pass
 
