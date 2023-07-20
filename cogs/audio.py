@@ -77,6 +77,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
+    @app_commands.describe(effect="Which effect to play")
     async def soundboard(self, interaction, effect: discord.app_commands.Choice[str]):
         """ Play a soundboard effect in vc
 
@@ -144,6 +145,8 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=120)
+    @app_commands.describe(speech="What to say")
+    @app_commands.describe(voice="Which voice to say your text in")
     async def tts(self, interaction, speech: str, voice: discord.app_commands.Choice[str]):
         """ Play a tts message in vc
 
@@ -220,9 +223,11 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     @app_commands.choices(in_front=[
-        discord.app_commands.Choice(name="yes", value=1),
         discord.app_commands.Choice(name="no", value=0),
+        discord.app_commands.Choice(name="yes", value=1),   
     ])
+    @app_commands.describe(youtube_url="The url of the video or playlist you want to play")
+    @app_commands.describe(in_front="Whether the track should be in the front of the queue or in the back")
     async def play(self, interaction, youtube_url: str, in_front: discord.app_commands.Choice[int]):
         """ Play audio from a video
 
@@ -461,6 +466,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
+    @app_commands.describe(message="How many tracks the bot should skip")
     async def skip(self, interaction, aantal:int=1):
         """Skips the currently playing audio
 
