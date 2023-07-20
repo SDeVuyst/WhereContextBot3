@@ -663,7 +663,7 @@ class Audio(commands.Cog, name="audio"):
                     title=f"Video must be less than 15 minutes long.",
                     color=self.bot.errorColor
                 ) 
-                await interaction.followup.send(embed=embed)
+                await interaction.channel.send(embed=embed)
                 await self.play_next(interaction)
                 return
         except Exception as e:
@@ -678,7 +678,7 @@ class Audio(commands.Cog, name="audio"):
                 description=f"ben je zeker dat dit een geldige url is?\n{url}",
                 color=self.bot.errorColor
             )
-            await interaction.followup.send(embed=embed)
+            await interaction.channel.send(embed=embed)
             await self.play_next(interaction)
 
         else:
@@ -710,7 +710,7 @@ class Audio(commands.Cog, name="audio"):
                 pass
 
 
-            playing_message = await interaction.followup.send(embed=embed)
+            playing_message = await interaction.channel.send(embed=embed)
 
             current_sec = 0
             time_delay = float(os.environ.get("time_delay"))
