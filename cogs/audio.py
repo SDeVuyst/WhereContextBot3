@@ -661,8 +661,8 @@ class Audio(commands.Cog, name="audio"):
 
             current_sec = 0
 
-            while vc.is_playing():
-                current_sec += 1
+            while vc.is_playing() or vc.is_paused():
+                current_sec += 1 if not vc.is_paused() else 0
                 try:
                     # creeer een progress bar
                     total = yt.length
