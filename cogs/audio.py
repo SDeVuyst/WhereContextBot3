@@ -486,10 +486,15 @@ class Audio(commands.Cog, name="audio"):
             return  
         
         if voice_client.is_playing():
-            # switch the looping
+
+            # currently playing track should also be included in the loop
+            self.queue.append(self.track_playing_url)
+
+            # turn looping on/off
             self.looping = not self.looping
+
             embed = discord.Embed(
-                title=f"🔁 Set looping to: {self.looping}!",
+                title="🔁 Looping enabled!" if self.looping else "🔁 Looping disabled!",
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
