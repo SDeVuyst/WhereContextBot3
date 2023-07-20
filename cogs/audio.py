@@ -270,7 +270,7 @@ class Audio(commands.Cog, name="audio"):
                         description=desc,
                         color=self.bot.defaultColor
                     )
-                    await interaction.response.send_message(embed=embed)
+                    await interaction.followup.send(embed=embed)
                     
                     if not vc.is_playing():
                         await self.play_next(interaction)
