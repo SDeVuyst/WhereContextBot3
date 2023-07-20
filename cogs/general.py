@@ -217,7 +217,7 @@ class General(commands.Cog, name="general"):
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
     @app_commands.describe(user="What user to DM")
-    @app_commands.describe(conent="What to DM to the user")
+    @app_commands.describe(content="What to DM to the user")
     async def dm(self, interaction, user: discord.User, content: str) -> None:
         """Let the bot DM a user
 
