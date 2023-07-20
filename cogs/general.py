@@ -216,6 +216,8 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
+    @app_commands.describe(user="What user to DM")
+    @app_commands.describe(conent="What to DM to the user")
     async def dm(self, interaction, user: discord.User, content: str) -> None:
         """Let the bot DM a user
 
@@ -242,6 +244,7 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=2, per=30)
+    @app_commands.describe(prompt="Your question/conversation piece")
     async def chat(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
         """Chat with the bot using AI
 
@@ -286,6 +289,7 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
+    @app_commands.describe(prompt="A detailed description of what to create")
     async def image(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
         """Create an image using Ai
 
@@ -344,6 +348,8 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="remindme", description="Remind me of an event", extras={'cog': 'general'})
     @checks.is_owner()
+    @app_commands.describe(message="When should the bot send you a reminder")
+    @app_commands.describe(message="What should the bot remind you for")
     async def remindme(self, interaction, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
         """Sets a reminder
 
