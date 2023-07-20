@@ -319,7 +319,7 @@ class Audio(commands.Cog, name="audio"):
                     await interaction.followup.send(embed=embed)
                     return
 
-                await self.play_next(interaction)
+                await self.play_next(interaction, True)
             
         except Exception:
             embed = discord.Embed(
@@ -636,7 +636,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    async def play_next(self, interaction):
+    async def play_next(self, interaction, first_player=False):
         """Plays the next audio in queue
 
         Args:
@@ -662,8 +662,11 @@ class Audio(commands.Cog, name="audio"):
                 embed = discord.Embed(
                     title=f"Video must be less than 15 minutes long.",
                     color=self.bot.errorColor
-                ) 
-                await interaction.channel.send(embed=embed)
+                )
+                if first_player:
+                    await interaction.followup.send(embed=embed)
+                else:
+                    await interaction.channel.send(embed=embed)
                 await self.play_next(interaction)
                 return
         except Exception as e:
@@ -678,7 +681,10 @@ class Audio(commands.Cog, name="audio"):
                 description=f"ben je zeker dat dit een geldige url is?\n{url}",
                 color=self.bot.errorColor
             )
-            await interaction.channel.send(embed=embed)
+            if first_player:
+                await interaction.followup.send(embed=embed)
+            else:
+                await interaction.channel.send(embed=embed)
             await self.play_next(interaction)
 
         else:
@@ -710,7 +716,10 @@ class Audio(commands.Cog, name="audio"):
                 pass
 
 
-            playing_message = await interaction.channel.send(embed=embed)
+            if first_player:
+                playing_message = await interaction.followup.send(embed=embed)
+            else:
+                playing_message = await interaction.channel.send(embed=embed)
 
             current_sec = 0
             time_delay = float(os.environ.get("time_delay"))
