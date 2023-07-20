@@ -639,7 +639,7 @@ class Audio(commands.Cog, name="audio"):
             total = 20
             current = 0
             # First two arguments are mandatory
-            bardata = progressBar.splitBar(total, current, size=20)
+            bardata = progressBar.splitBar(total, current, size=18)
 
             # confirmatie
             embed = discord.Embed(
@@ -662,13 +662,13 @@ class Audio(commands.Cog, name="audio"):
             current_sec = 0
 
             while vc.is_playing() or vc.is_paused():
-                current_sec += 1 if not vc.is_paused() else 0
+                current_sec += 1 if vc.is_playing() else 0
                 try:
                     # creeer een progress bar
                     total = yt.length
                     current = current_sec
                     # First two arguments are mandatory
-                    bardata = progressBar.splitBar(total, current, size=20)
+                    bardata = progressBar.splitBar(total, current, size=18)
                     first_desc = embed.description.split('\n')[0]
                     embed.description = f"{first_desc}\n{bardata[0]} - {self.format_seconds_to_mmss(current_sec)} / {self.format_seconds_to_mmss(yt.length)}"
                     await playing_message.edit(embed=embed)
