@@ -86,10 +86,13 @@ class Owner(commands.Cog, name="owner"):
             cmds (Command)
         """
         for cmd in cmds:
-            if cmd.guild_id is None:  # it's a global slash command
-                self.bot.tree._global_commands[cmd.name].id = cmd.id
-            else:  # it's a guild specific command
-                self.bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
+            try:
+                if cmd.guild_id is None:  # it's a global slash command
+                    self.bot.tree._global_commands[cmd.name].id = cmd.id
+                else:  # it's a guild specific command
+                    self.bot.tree._guild_commands[cmd.guild_id][cmd.name].id = cmd.id
+            except:
+                pass
 
 
 

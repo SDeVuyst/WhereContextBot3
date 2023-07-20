@@ -65,8 +65,11 @@ class General(commands.Cog, name="general"):
 
             data = []
             for command in commands:
-                description = command.description.partition("\n")[0]
-                data.append(f"</{command.name}:{command.id}> - {description}")
+                try:
+                    description = command.description.partition("\n")[0]
+                    data.append(f"</{command.name}:{command.id}> - {description}")
+                except:
+                    pass
 
             if c == "outofcontext":
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
