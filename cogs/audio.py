@@ -713,7 +713,7 @@ class Audio(commands.Cog, name="audio"):
             playing_message = await interaction.followup.send(embed=embed)
 
             current_sec = 0
-
+            time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
                 current_sec += 1 if vc.is_playing() else 0
                 try:
@@ -730,7 +730,7 @@ class Audio(commands.Cog, name="audio"):
                     self.bot.logger.warning(e)
 
                 # geen 1 sec door delay en functies uitvoeren
-                await asyncio.sleep(0.8)
+                await asyncio.sleep(time_delay)
 
 
     def format_seconds_to_mmss(self, seconds):
