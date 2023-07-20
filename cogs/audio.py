@@ -20,19 +20,19 @@ class Audio(commands.Cog, name="audio"):
         self.bot = bot
 
         self.bot_not_in_vc_embed = discord.Embed(
-            title=f"Bot is not in vc",
+            title=f"🔇 Bot is not in vc",
             description="use /join to add bot to vc",
             color=self.bot.errorColor
         ) 
 
         self.not_playing_embed = discord.Embed(
-            title=f"The bot is not playing anything at the moment.",
+            title=f"🔇 The bot is not playing anything at the moment.",
             description="Use /play to play a song",
             color=self.bot.defaultColor
         )
 
         self.not_in_vc_embed = discord.Embed(
-            title=f"You are not in a voice channel",
+            title=f"🔇 You are not in a voice channel",
             color=self.bot.errorColor
         ) 
 
@@ -56,6 +56,7 @@ class Audio(commands.Cog, name="audio"):
         self.ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
         self.queue = []
+        self.looping = False
 
 
 
@@ -112,7 +113,7 @@ class Audio(commands.Cog, name="audio"):
             
             # confirmatie 
             embed = discord.Embed(
-                title=f"played {effect.name}!",
+                title=f"📻 played {effect.name}!",
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -201,7 +202,7 @@ class Audio(commands.Cog, name="audio"):
             
             # confirmatie
             embed = discord.Embed(
-                title=f"Said ```{speech}``` in a {voice.name} voice!",
+                title=f"🎤 Said ```{speech}``` in a {voice.name} voice!",
                 color=self.bot.succesColor
             )
             await interaction.followup.send(embed=embed)
@@ -271,7 +272,7 @@ class Audio(commands.Cog, name="audio"):
                             desc += f"{i+1}: [{yt.title}]({vid_url}) by {yt.author}\n\n"
 
                     embed = discord.Embed(
-                        title=f"Added to Queue",
+                        title=f"🎵 Added to Queue",
                         description=desc,
                         color=self.bot.defaultColor
                     )
@@ -295,7 +296,7 @@ class Audio(commands.Cog, name="audio"):
                 if vc.is_playing():
                     
                     embed = discord.Embed(
-                        title=f"Added to Queue",
+                        title=f"🎵 Added to Queue",
                         description=f"[{yt.title}]({youtube_url}) by {yt.author}",
                         color=self.bot.defaultColor
                     )
@@ -340,7 +341,7 @@ class Audio(commands.Cog, name="audio"):
         # lege queue
         if len(self.queue) == 0:
             embed = discord.Embed(
-                title=f"Queue is empty!",
+                title=f"📝 Queue is empty!",
                 color=self.bot.defaultColor
             )
 
@@ -353,7 +354,7 @@ class Audio(commands.Cog, name="audio"):
                     desc += f"{i+1}: [{yt.title}]({url}) by {yt.author}\n\n"
 
             embed = discord.Embed(
-                title=f"Queue",
+                title=f"📝 Queue",
                 description=desc,
                 color=self.bot.defaultColor
             )
@@ -375,10 +376,10 @@ class Audio(commands.Cog, name="audio"):
         """
 
         try:
-            title="Now playing" if self.track_playing is not None else "Nothing is playing"
+            title="🎵 Now playing" if self.track_playing is not None else "❌ Nothing is playing"
             desc = f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None
         except:
-            title="Nothing is playing"
+            title="❌ Nothing is playing"
             desc = None
 
         embed = discord.Embed(
@@ -421,7 +422,7 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
             voice_client.pause()
             embed = discord.Embed(
-                title=f"Paused!",
+                title=f"⏸️ Paused!",
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
@@ -452,7 +453,37 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_paused():
             voice_client.resume()
             embed = discord.Embed(
-                title=f"Resumed!",
+                title=f"▶️ Resumed!",
+                color=self.bot.succesColor
+            )
+            await interaction.response.send_message(embed=embed)
+        else:
+            await interaction.response.send_message(embed=self.not_playing_embed)
+
+
+    @app_commands.command(name="loop", description="Loop the queue", extras={'cog': 'audio'})
+    @checks.not_blacklisted()
+    @checks.in_audio_command_channel()
+    @checks.in_correct_server()
+    @checks.not_in_dm()
+    async def loop(self, interaction):
+        """ Loop the queue
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+
+        # check als bot in vc zit
+        voice_client = interaction.guild.voice_client
+        if voice_client is None:
+            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
+            return  
+        
+        if voice_client.is_playing():
+            # switch the looping
+            self.looping = not self.looping
+            embed = discord.Embed(
+                title=f"🔁 Set looping to: {self.looping}!",
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
@@ -487,7 +518,7 @@ class Audio(commands.Cog, name="audio"):
             voice_client.stop()
             
             embed = discord.Embed(
-                title=f"Skipped!",
+                title=f"⏭️ Skipped!",
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
@@ -521,7 +552,7 @@ class Audio(commands.Cog, name="audio"):
             self.queue = []
             voice_client.stop()
             embed = discord.Embed(
-                title=f"Stopped!",
+                title=f"⏹️ Stopped!",
                 color=self.bot.defaultColor
             )
             await interaction.response.send_message(embed=embed)
@@ -555,12 +586,12 @@ class Audio(commands.Cog, name="audio"):
                 channel = interaction.user.voice.channel
                 await channel.connect()
                 embed = discord.Embed(
-                    title=f"Joined channel {channel.name}!",
+                    title=f"☑️ Joined channel {channel.name}!",
                     color=self.bot.succesColor
                 )
         except discord.ClientException:
             embed = discord.Embed(
-                title=f"Already in voice channel",
+                title=f"🎧 Already in voice channel",
                 color=self.bot.errorColor
             )
             
@@ -580,12 +611,11 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): Users Interaction
         """
 
-
         vc = interaction.guild.voice_client
         if vc.is_connected():
             await vc.disconnect()
             embed = discord.Embed(
-                title=f"left channel!",
+                title=f"🤖 left channel!",
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
@@ -605,11 +635,15 @@ class Audio(commands.Cog, name="audio"):
 
         # doe niks zolang player aan het spelen is
         
-
         if len(self.queue) == 0: return
 
         # krijg volgende url
         url = self.queue.pop(0)
+
+        # voeg url terug toe aan queue als loop aanstaat
+        if self.looping:
+            self.queue.append(url)
+
         yt = YouTube(url)
         # video mag max 15 min duren
         try:
