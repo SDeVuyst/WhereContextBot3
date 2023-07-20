@@ -191,9 +191,11 @@ class General(commands.Cog, name="general"):
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
+            title = f"⌛ Time till {os.environ.get('countdown_title')}"
             desc = f"{os.environ.get('countdown_title')} IS NU UIT!"
             kleur = self.bot.succesColor
         else:
+            title = f"⏳ Time till {os.environ.get('countdown_title')}"
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
@@ -201,7 +203,7 @@ class General(commands.Cog, name="general"):
             
 
         embed = discord.Embed(
-            title=f"Time till {os.environ.get('countdown_title')}",
+            title=title,
             description=desc,
             color=kleur
         )
@@ -236,7 +238,7 @@ class General(commands.Cog, name="general"):
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
 
         # stuur confirmatie
-        await interaction.response.send_message(content="done.", ephemeral=True)
+        await interaction.response.send_message(content="✅ done.", ephemeral=True)
 
 
 
