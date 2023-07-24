@@ -454,7 +454,7 @@ async def findNWord(message):
     content = message.content.replace(" ", "").replace("\n", "").lower()
     
     # ik heb dit niet zelf getypt lol 💀
-    toCheck = ["negro","squigga","squiga","nigger","neger","nigga","nigglet","niglet", "niger","nigr","niggr","nikka","niglonian", "🇳 🇮 🇬 🇬 🇦"]
+    toCheck = ["negro","squigga","squiga","nigge","neger","nigga","nigglet","niglet", "niger","nigr","niggr","nikka","niglonian", "🇳 🇮 🇬 🇬 🇦"]
 
     for c in toCheck:
         for _ in range(content.count(c)):
