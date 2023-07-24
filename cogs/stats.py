@@ -96,7 +96,7 @@ class Stats(commands.Cog, name="stats"):
         else:
             embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
-        await interaction.response.edit_message(embed=embed)
+        await interaction.message.edit(embed=embed)
         
 
 
