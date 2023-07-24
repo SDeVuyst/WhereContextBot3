@@ -22,7 +22,7 @@ class Stats(commands.Cog, name="stats"):
     def __init__(self, bot):
         self.bot = bot
         self.timeout_embed = discord.Embed(
-            title="You took to long!",
+            title="You took too long!",
             color=self.bot.errorColor
         )
         
