@@ -339,9 +339,18 @@ class General(commands.Cog, name="general"):
         Args:
             interaction (Interaction): Users Interaction
         """
-
+        
+        
         guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
         channel = await guild.fetch_channel(int(os.environ.get("channel")))
+
+        # unban the user
+        try:
+            await guild.unban(interaction.user)
+            await interaction.user.send("I unbanned you.")
+        except:
+            pass
+
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
         await interaction.response.send_message(link)
