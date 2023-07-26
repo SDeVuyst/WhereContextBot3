@@ -345,11 +345,12 @@ class General(commands.Cog, name="general"):
         channel = await guild.fetch_channel(int(os.environ.get("channel")))
 
         # unban the user
-        try:
-            await guild.unban(interaction.user)
-            await interaction.user.send("I unbanned you.")
-        except:
-            pass
+        if bool(os.environ.get("autounban")):
+            try:
+                await guild.unban(interaction.user)
+                await interaction.user.send("I unbanned you.")
+            except:
+                pass
 
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
