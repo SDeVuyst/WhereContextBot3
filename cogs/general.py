@@ -345,7 +345,7 @@ class General(commands.Cog, name="general"):
         channel = await guild.fetch_channel(int(os.environ.get("channel")))
 
         # unban the user
-        if bool(os.environ.get("autounban")):
+        if os.environ.get("autounban") == "True":
             try:
                 await guild.unban(interaction.user)
                 await interaction.user.send("I unbanned you.")
