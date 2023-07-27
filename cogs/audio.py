@@ -7,7 +7,7 @@ from discord.ext.commands import Context
 import discord
 import asyncio
 import tempfile
-from helpers import checks, http, ytdl_helper, SpotifyToYoutube
+from helpers import checks, http, spotifytoyoutube, ytdl_helper
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
 from StringProgressBar import progressBar
@@ -269,7 +269,7 @@ class Audio(commands.Cog, name="audio"):
                     if url.find("list=") != -1:
                         vid_urls = Playlist(url)
                     else:
-                        spToYt = SpotifyToYoutube()
+                        spToYt = spotifytoyoutube.SpotifyToYT()
                         vid_urls = spToYt.spotifyToYoutubeURLs(url)
 
 
@@ -298,7 +298,7 @@ class Audio(commands.Cog, name="audio"):
             else:
                 # check als url spotify track is of yt vid
                 if url.find("open.spotify.com/track") != -1:
-                    spToYt = SpotifyToYoutube()
+                    spToYt = spotifytoyoutube.SpotifyToYT()
                     yt = YouTube(spToYt.spotifyToYoutubeURLs(url)[0])
                 else:
                     yt = YouTube(url)
@@ -338,7 +338,7 @@ class Audio(commands.Cog, name="audio"):
                 description=f"ben je zeker dat dit een geldige url is?\n{url}",
                 color=self.bot.errorColor
             )
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
             return
 
 
