@@ -75,7 +75,7 @@ class SpotifyToYT:
 
 
     def getVideoIds(self, queries, api):
-        service = self.makePublicService(api)
+        service = self.makePublicService()
         ids = []
         for i in range(len(queries)):
             request = service.search().list(part="snippet",
@@ -99,7 +99,7 @@ class SpotifyToYT:
             api = self.connect()
             items_name = self.fetch_playlist_by_id(api,spotifyID)
             queries = self.query_builder(self.extract_data(api,items_name[0]))
-            return self.getVideoIds(queries)
+            return self.getVideoIds(queries, api)
 
         elif song_match:
             spotifyID = song_match[1]
@@ -111,7 +111,7 @@ class SpotifyToYT:
             item['album_name']= items_name[0]['album']['name']
 
             queries = self.query_builder([item])
-            return self.getVideoIds(queries)
+            return self.getVideoIds(queries, api)
 
         else:
             return None
