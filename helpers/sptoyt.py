@@ -6,26 +6,26 @@ from googleapiclient.discovery import build
 from spotipy.oauth2 import SpotifyClientCredentials
 
 
-spotify_client_id = os.environ.get("spotify_client_id")
-spotify_client_secret = os.environ.get("spotify_client_secret")
-yt_api = os.environ.get("yt_api")
+
 
 class SpotifyToYT:
 
     def __init__(self):
-        pass
+        self.spotify_client_id = os.environ.get("spotify_client_id")
+        self.spotify_client_secret = os.environ.get("spotify_client_secret")
+        self.yt_api = os.environ.get("yt_api")
 
     #create api
-    def connect(self, cl_id,cl_secret):
+    def connect(self):
         sp = spotipy.Spotify(
         auth_manager=SpotifyClientCredentials(
-            client_id=cl_id, client_secret=cl_secret)
+            client_id=self.spotify_client_id, client_secret=self.spotify_client_secret)
         )
         return sp
 
 
     #fetch the playlist
-    def fetch_playlist_by_id(self, api,id):
+    def fetch_playlist_by_id(self, api, id):
         playlist_response = api.playlist(playlist_id=id)
         name = playlist_response['name']
         playlist_items = playlist_response['tracks']['items']
@@ -34,7 +34,7 @@ class SpotifyToYT:
 
 
     #fetch the playlist
-    def fetch_track_by_id(self, api,id):
+    def fetch_track_by_id(self, api, id):
         track_response = api.track(track_id=id)
         name = track_response['name']
         
@@ -69,12 +69,12 @@ class SpotifyToYT:
         return queries
 
 
-    def makePublicService(self, api_key):
-        service = build(serviceName='youtube',version='v3',developerKey=api_key)
+    def makePublicService(self):
+        service = build(serviceName='youtube',version='v3',developerKey=self.yt_api)
         return service
 
 
-    def getVideoIds(self, queries,api):
+    def getVideoIds(self, queries, api):
         service = self.makePublicService(api)
         ids = []
         for i in range(len(queries)):
@@ -96,14 +96,14 @@ class SpotifyToYT:
 
         if pl_match:
             spotifyID = pl_match[1]
-            api = self.connect(spotify_client_id,spotify_client_secret)
+            api = self.connect()
             items_name = self.fetch_playlist_by_id(api,spotifyID)
             queries = self.query_builder(self.extract_data(api,items_name[0]))
-            return self.getVideoIds(queries,yt_api)
+            return self.getVideoIds(queries)
 
         elif song_match:
             spotifyID = song_match[1]
-            api = self.connect(spotify_client_id,spotify_client_secret)
+            api = self.connect()
             items_name = self.fetch_track_by_id(api,spotifyID)
             item = dict.fromkeys(['track_name','artist_name','album_name'])
             item['track_name'] = items_name[1]
@@ -111,7 +111,7 @@ class SpotifyToYT:
             item['album_name']= items_name[0]['album']['name']
 
             queries = self.query_builder([item])
-            return self.getVideoIds(queries,yt_api)
+            return self.getVideoIds(queries)
 
         else:
             return None
