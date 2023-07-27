@@ -260,7 +260,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         # check als bericht bestaat
         if not await db_manager.is_in_ooc(id):
             embed = discord.Embed(
-                description=f"**{id}** is not in the game.",
+                description=f"Message is not in the game.",
                 color=self.bot.errorColor,
             )
             return embed
