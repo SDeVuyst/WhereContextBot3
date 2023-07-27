@@ -400,8 +400,10 @@ class CommandSelect(Select):
 
         # stats die zelf geen command zijn
         if selected_cog == "outofcontext":
-            commands.append(("Messages Played", "messages_played"))
-            commands.append(("Messages Deleted", "messages_deleted"))
+            commands.append(("Messages Played In Game", "messages_played"))
+            commands.append(("Messages Deleted In Game", "messages_deleted"))
+            commands.append(("Messages Added", "Add"))
+            commands.append(("Messages Deleted", "Remove"))
         
         elif selected_cog == "stats":
             commands.insert(0, ("N-Words said", "ncountCHECK"))
