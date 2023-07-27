@@ -332,6 +332,7 @@ class Audio(commands.Cog, name="audio"):
 
                 await self.play_next(interaction, True)
             
+            
         except Exception as e:
             self.bot.logger.error(e)
             embed = discord.Embed(

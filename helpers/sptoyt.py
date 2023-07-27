@@ -85,7 +85,7 @@ class SpotifyToYT:
             response = request.execute()
             videoid = response['items'][0]['id']['videoId']
 
-            ids.append(f"www.youtube.com/watch?v={videoid}")
+            ids.append(f"https://www.youtube.com/watch?v={videoid}")
 
         return ids
 
