@@ -111,7 +111,7 @@ class SpotifyToYT:
             item['album_name']= items_name[0]['album']['name']
 
             queries = self.query_builder([item])
-            return self.getVideoIds(queries, api)
+            return self.getVideoIds(queries, api)[0]
 
         else:
             return None

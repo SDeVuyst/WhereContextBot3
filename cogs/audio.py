@@ -299,9 +299,9 @@ class Audio(commands.Cog, name="audio"):
                 # check als url spotify track is of yt vid
                 if url.find("open.spotify.com/track") != -1:
                     spToYt = sptoyt.SpotifyToYT()
-                    yt = YouTube(spToYt.spotifyToYoutubeURLs(url)[0])
-                else:
-                    yt = YouTube(url)
+                    url = spToYt.spotifyToYoutubeURLs(url)
+                
+                yt = YouTube(url)
                 
                 # voeg lied aan queue toe
                 if in_front == 1:
@@ -332,7 +332,7 @@ class Audio(commands.Cog, name="audio"):
 
                 await self.play_next(interaction, True)
             
-            
+
         except Exception as e:
             self.bot.logger.error(e)
             embed = discord.Embed(
