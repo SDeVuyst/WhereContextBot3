@@ -332,10 +332,10 @@ class Audio(commands.Cog, name="audio"):
 
                 await self.play_next(interaction, True)
             
-        except Exception:
+        except Exception as e:
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
-                description=f"ben je zeker dat dit een geldige url is?\n{url}",
+                description=f"ben je zeker dat dit een geldige url is?\n{url}\n{e}",
                 color=self.bot.errorColor
             )
             await interaction.followup.send(embed=embed)
