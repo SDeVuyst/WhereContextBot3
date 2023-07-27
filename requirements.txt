@@ -10,3 +10,5 @@ openai
 dateparser
 reactionmenu
 StringProgressBar
+spotipy
+google-api-python-client

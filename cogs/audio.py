@@ -7,7 +7,7 @@ from discord.ext.commands import Context
 import discord
 import asyncio
 import tempfile
-from helpers import checks, http, ytdl_helper
+from helpers import checks, http, ytdl_helper, SpotifyToYoutube
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
 from StringProgressBar import progressBar
@@ -227,14 +227,14 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="no", value=0),
         discord.app_commands.Choice(name="yes", value=1),   
     ])
-    @app_commands.describe(youtube_url="The url of the video or playlist you want to play")
+    @app_commands.describe(url="The url of the video or playlist you want to play (Youtube or Spotify)")
     @app_commands.describe(in_front="Whether the track should be in the front of the queue or in the back")
-    async def play(self, interaction, youtube_url: str, in_front: discord.app_commands.Choice[int]=0):
+    async def play(self, interaction, url: str, in_front: discord.app_commands.Choice[int]=0):
         """ Play audio from a video
 
         Args:
             interaction (Interaction): User Interaction
-            youtube_url (str): Youtube url
+            url (str): url of youtube video/playlist or spotify playlist/song
             in_front (discord.app_commands.Choice[int]): If the audio has to be played now or put in queue
         """
 
@@ -260,13 +260,19 @@ class Audio(commands.Cog, name="audio"):
         
         try:
 
-            # playlist
-            if youtube_url.find("list=") != -1:
+            # youtube playlist
+            if url.find("list=") != -1 or url.find("open.spotify.com/playlist") != -1:
 
                     # krijg afzonderlijke urls van videos in playlist 
                     # voeg de urls toe aan queue
                     desc = ""
-                    vid_urls = Playlist(youtube_url)
+                    if url.find("list=") != -1:
+                        vid_urls = Playlist(url)
+                    else:
+                        spToYt = SpotifyToYoutube()
+                        vid_urls = spToYt.spotifyToYoutubeURLs(url)
+
+
                     for i, vid_url in enumerate(vid_urls):
                         if in_front == 1:
                             self.queue.insert(0, vid_url)
@@ -290,25 +296,30 @@ class Audio(commands.Cog, name="audio"):
 
             # enkele video
             else:
-                yt = YouTube(youtube_url)
+                # check als url spotify track is of yt vid
+                if url.find("open.spotify.com/track") != -1:
+                    spToYt = SpotifyToYoutube()
+                    yt = YouTube(spToYt.spotifyToYoutubeURLs(url)[0])
+                else:
+                    yt = YouTube(url)
                 
                 # voeg lied aan queue toe
                 if in_front == 1:
-                    self.queue.insert(0, youtube_url)
+                    self.queue.insert(0, url)
                 else:
-                    self.queue.append(youtube_url)
+                    self.queue.append(url)
                 
                 # stuur confirmatie dat lied is toegevoegd
                 if vc.is_playing():
                     
                     embed = discord.Embed(
                         title=f"🎵 Added to Queue",
-                        description=f"[{yt.title}]({youtube_url}) by {yt.author}",
+                        description=f"[{yt.title}]({url}) by {yt.author}",
                         color=self.bot.defaultColor
                     )
 
                     try:
-                        vid_id = extract.video_id(youtube_url)
+                        vid_id = extract.video_id(url)
                         embed.set_thumbnail(
                             url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
                         )
@@ -324,7 +335,7 @@ class Audio(commands.Cog, name="audio"):
         except Exception:
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
-                description=f"ben je zeker dat dit een geldige url is?\n{youtube_url}",
+                description=f"ben je zeker dat dit een geldige url is?\n{url}",
                 color=self.bot.errorColor
             )
             await interaction.response.send_message(embed=embed)
