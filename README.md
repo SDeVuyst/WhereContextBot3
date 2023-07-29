@@ -1,99 +1,277 @@
 # WhereContextbot3
 
-ELKE TITEL IS EEN COG DIE TELKENS HUN COMMANDS BESSCHRIJFT
+## Commands
 
-## Muur
+### Audio
 
-* /muur [naam]   toont een bepaalde quote
+###### /soundboard
 
-## Counter
+Plays the chosen sound effect in voice chat.
 
-* /ncount @user				toon het aantal nwords van een gegeven user
-* /changencount @user amount	pas het aantal nwords van de gegeven user aan naar amount (admin only)
+###### /tts
 
-## General
+Plays a chosen text-to-speech message in voice chat in a chosen voice.
 
-* /help	Toon de lijst van alle actieve commands
-* /lien		kick grom + lockdown alert (admin only)
-* /ping	check de latency van de bot
-* /say		laat de bot eender wat zeggen
-* /embed	laat de bot eender wat zeggen, maar in een embed
-* /chat	chat met de ai chatbox
-* /image	creeer een afbeelding met de gegeven prompt
-* /countdown  countdown tot een gegeven moment
+###### /play
 
-## Namen
+Plays the audio of a YouTube or Spotify track/playlist in voice chat.
 
-Telkens met een parameter dat random kan zijn, of een specifiek bericht.
+###### /list
 
-* /gible		Stuurt een bericht over gible
-* /nootje		Stuurt een bericht over nootje
-* /pingy		Stuurt een bericht over pingy
-* /ba			Stuurt een bericht over ba
-* /meng		Stuurt een bericht over meng
-* /broodman	Stuurt een bericht over broodman
-* /keleo Stuur een bericht over keleo
+List the tracks that are in the queue.
 
-## Out of Context
+###### /nowplaying
 
-* /play-game	[True/False] Speel het out of context spel, true als andere mensen het spel ook mogen zien, anders false
+Display the currently playing track.
 
-  * previous		ga terug naar het vorige bericht
-  * next			ga naar het volgende bericht
-  * remove		verwijder het huidige bericht uit het spel
-  * quit			stop met spelen
-* Hoe toevoegen?
+###### /pause
 
-  ![1685635456686](image/README/1685635456686.png)
+Pause the currently playing audio.
 
-  Rechtermuisklik/lang drukken voor mobile **OP HET BERICHT** dat je wilt toevoegen -> apps -> Add Context
-* Hoe verwijderen?	idem aan toevoegen/verwijderen terwijl je het spel aan het spelen bent
+###### /resume
 
-## Reacties
+Resume the paused audio.
 
-* /giblereact
+###### /loop
 
-  ![1685635883355](image/README/1685635883355.jpg)
-* /wholesquadlaughing
+Toggle the loop function. Played tracks will get added back into the queue.
 
-  ![1685635894640](image/README/1685635894640.jpg)
-* /notfunny
+###### /skip
 
-  ![1685635909652](image/README/1685635909652.jpg)
-* /uthought
+Skip a variable number of tracks.
 
-  ![1685635917332](image/README/1685635917332.jpg)
+###### /stop
 
-## Owner
+Stops playing audio & clears the queue.
 
-Alles in deze cog is admin only
+###### /join
 
-* /sync [Global/Server]	Synchronyseer de commands globaal/in server
-* /load cog		Laad een bepaalde cog in
-* /unload cog	Unload een bepaalde cog
-* /reload cog	Reload een bepaalde cog
-* /cogs		Toont een overzicht van alle cogs, ingeladen en niet ingeladen
-* /restart		Herstart de bot, dit laadt ook alle cogs opnieuw in
-* /blacklist show 	Toon een lijst van alle blackliste users. Blackliste users kunnen de bot helemaal niet gebruiken
-* /blacklist add user		Voeg een gebruiker toe aan de blacklist
-* /blacklist remove		Verwijder een gebruiker van de blacklist
+Joins the voice chat.
 
-## Stats
+###### /leave
 
-* /individuele_stats @user #command Hoeveel keer heeft iemand een command gebruikt
-* /changecommandcount @usrer #command #count verander de count van user van command
-* /leaderboard #command toont top 10 voor gegeven command
+Leaves the voice chat.
 
-## Audio
+### General
 
-* /join		bot joined de voice channel waar je inzit
-* /leave	bot leaved de voice channel
-* /soundboard		bot speelt een sound effect af
-* /tts	bot speelt een text to speech bericht af
-* /play bot speelt de audio van een youtube video af
-* /play-playlist		bot speelt de audios af van een youtube playlist
-* /skip	bot skipt een lied
-* /pause	pauzeer de audio die aan het afspelen is
-* /resume	speel de audio verder af
-* /stop	stop met afspelen, en maakt de queue leeg
-* /nowplaying	toont de track dat nu aan het afspelen is
+###### /help
+
+Displays a help embed with help for every command
+
+###### /lien
+
+Triggers the Lien lockdown. This kicks grom.
+
+###### /ping
+
+Checks if the bot is alive.
+
+###### /say
+
+Says anything the user wants to say.
+
+###### /embed
+
+Says anything the user wants to say, but in an embed.
+
+###### /countdown
+
+Displays the countdown till a given moment in time.
+
+###### /dm
+
+The bot anonymously dm's a chosen user with a chosen message.
+
+###### /chat
+
+Chat with the bot using AI technology.
+
+###### /image
+
+Let the bot create an image using your imagination.
+
+###### /invite
+
+Sends an invite to the main server.
+
+###### /remindme
+
+Set a reminder.
+
+### Out Of Context
+
+###### /context_debug
+
+Shows some stats about the Out Of Context game
+
+###### /play_game
+
+Play the Out Of Context game
+
+###### Add Context
+
+Adds an Out Of Context message to the game.
+
+On pc, right click on a message, choose apps, and click on 'Add Context'
+
+On mobile, long click on a message, choose apps, and click on 'Add Context'
+
+![1690626544220](image/README/1690626544220.png)
+
+###### Remove Context
+
+Removes an Out Of Context message to the game.
+
+On pc, right click on a message, choose apps, and click on 'Remove Context'
+
+On mobile, long click on a message, choose apps, and click on 'Remove Context'
+
+![1690626568658](image/README/1690626568658.png)
+
+### Owner
+
+###### /sync
+
+Syncs commands.
+
+###### /load_cog
+
+Load a cog.
+
+###### /unload_cog
+
+Unload a cog.
+
+###### /reload_cog
+
+Reload a cog.
+
+###### /cogs
+
+Displays a list of loaded cogs.
+
+###### /restart
+
+Restarts the bot.
+
+###### /blacklist_show
+
+Shows a list of all blacklisted users.
+
+###### /blacklist_add
+
+Add a user to the blacklist.
+
+###### /blacklist_remove
+
+Remove a user from the blacklist.
+
+### Reacties
+
+###### /giblereact
+
+###### /wholesquadlaughing
+
+###### /notfunny
+
+###### /uthought
+
+###### /golden_rule
+
+###### /laten_doen
+
+###### /limieten
+
+###### /danny
+
+###### /bozo
+
+###### /gible
+
+###### /nootje
+
+###### /pingy
+
+###### /ba
+
+###### /meng
+
+###### /broodman
+
+###### /keleo
+
+### Stats
+
+###### /stats_individual
+
+See how many times a user has used a command.
+
+###### /changecommandcount
+
+Change the command count of a user.
+
+###### /leaderboard
+
+Displays the top 10 users of a command
+
+Choose which subdivision your command is in first, and then choose your command.
+
+![1690626851414](image/README/1690626851414.png)
+
+
+###### /bancount
+
+Displays the amount of times a user has been banned.
+
+###### /changebancount
+
+Change the ban count of a user.
+
+###### /ncount
+
+Displays the amount of times a user has said the nword.
+
+###### /changencount
+
+Change the nword count of a user.
+
+
+## System variables
+
+* application_id
+* autounban
+* channel
+* countdown
+* countdown_title
+* DATABASE_URL
+* grom
+* guild_id
+* openaisecret
+* owners
+* permissions
+* spotify_client_id
+* spotify_client_secret
+* time_delay
+* token
+* uberduckapi
+* uberducksecret
+* yt_api
+
+## Requirements / Technologies used
+
+* discord.py
+* psycopg2
+* yt_dlp
+* PyNaCl==1.4.0
+* ffmpeg
+* aiohttp>=3.7.4
+* requests
+* pytube
+* openai
+* dateparser
+* reactionmenu
+* StringProgressBar
+* spotipy
+* google-api-python-client
+
+Also thanks to [kkrypt0n](https://github.com/kkrypt0nn/Python-Discord-Bot-Template) for providing a very helpful template.
