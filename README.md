@@ -4,111 +4,111 @@
 
 ### Audio
 
-###### /soundboard
+#### /soundboard
 
 Plays the chosen sound effect in voice chat.
 
-###### /tts
+#### /tts
 
 Plays a chosen text-to-speech message in voice chat in a chosen voice.
 
-###### /play
+#### /play
 
 Plays the audio of a YouTube or Spotify track/playlist in voice chat.
 
-###### /list
+#### /list
 
 List the tracks that are in the queue.
 
-###### /nowplaying
+#### /nowplaying
 
 Display the currently playing track.
 
-###### /pause
+#### /pause
 
 Pause the currently playing audio.
 
-###### /resume
+#### /resume
 
 Resume the paused audio.
 
-###### /loop
+#### /loop
 
 Toggle the loop function. Played tracks will get added back into the queue.
 
-###### /skip
+#### /skip
 
 Skip a variable number of tracks.
 
-###### /stop
+#### /stop
 
 Stops playing audio & clears the queue.
 
-###### /join
+#### /join
 
 Joins the voice chat.
 
-###### /leave
+#### /leave
 
 Leaves the voice chat.
 
 ### General
 
-###### /help
+#### /help
 
 Displays a help embed with help for every command
 
-###### /lien
+#### /lien
 
 Triggers the Lien lockdown. This kicks grom.
 
-###### /ping
+#### /ping
 
 Checks if the bot is alive.
 
-###### /say
+#### /say
 
 Says anything the user wants to say.
 
-###### /embed
+#### /embed
 
 Says anything the user wants to say, but in an embed.
 
-###### /countdown
+#### /countdown
 
 Displays the countdown till a given moment in time.
 
-###### /dm
+#### /dm
 
 The bot anonymously dm's a chosen user with a chosen message.
 
-###### /chat
+#### /chat
 
 Chat with the bot using AI technology.
 
-###### /image
+#### /image
 
 Let the bot create an image using your imagination.
 
-###### /invite
+#### /invite
 
 Sends an invite to the main server.
 
-###### /remindme
+#### /remindme
 
 Set a reminder.
 
 ### Out Of Context
 
-###### /context_debug
+#### /context_debug
 
 Shows some stats about the Out Of Context game
 
-###### /play_game
+#### /play_game
 
 Play the Out Of Context game
 
-###### Add Context
+#### Add Context
 
 Adds an Out Of Context message to the game.
 
@@ -118,7 +118,7 @@ On mobile, long click on a message, choose apps, and click on 'Add Context'
 
 ![1690626544220](image/README/1690626544220.png)
 
-###### Remove Context
+#### Remove Context
 
 Removes an Out Of Context message to the game.
 
@@ -130,87 +130,87 @@ On mobile, long click on a message, choose apps, and click on 'Remove Context'
 
 ### Owner
 
-###### /sync
+#### /sync
 
 Syncs commands.
 
-###### /load_cog
+#### /load_cog
 
 Load a cog.
 
-###### /unload_cog
+#### /unload_cog
 
 Unload a cog.
 
-###### /reload_cog
+#### /reload_cog
 
 Reload a cog.
 
-###### /cogs
+#### /cogs
 
 Displays a list of loaded cogs.
 
-###### /restart
+#### /restart
 
 Restarts the bot.
 
-###### /blacklist_show
+#### /blacklist_show
 
 Shows a list of all blacklisted users.
 
-###### /blacklist_add
+#### /blacklist_add
 
 Add a user to the blacklist.
 
-###### /blacklist_remove
+#### /blacklist_remove
 
 Remove a user from the blacklist.
 
 ### Reacties
 
-###### /giblereact
+#### /giblereact
 
-###### /wholesquadlaughing
+#### /wholesquadlaughing
 
-###### /notfunny
+#### /notfunny
 
-###### /uthought
+#### /uthought
 
-###### /golden_rule
+#### /golden_rule
 
-###### /laten_doen
+#### /laten_doen
 
-###### /limieten
+#### /limieten
 
-###### /danny
+#### /danny
 
-###### /bozo
+#### /bozo
 
-###### /gible
+#### /gible
 
-###### /nootje
+#### /nootje
 
-###### /pingy
+#### /pingy
 
-###### /ba
+#### /ba
 
-###### /meng
+#### /meng
 
-###### /broodman
+#### /broodman
 
-###### /keleo
+#### /keleo
 
 ### Stats
 
-###### /stats_individual
+#### /stats_individual
 
 See how many times a user has used a command.
 
-###### /changecommandcount
+#### /changecommandcount
 
 Change the command count of a user.
 
-###### /leaderboard
+#### /leaderboard
 
 Displays the top 10 users of a command
 
@@ -219,19 +219,19 @@ Choose which subdivision your command is in first, and then choose your command.
 ![1690626851414](image/README/1690626851414.png)
 
 
-###### /bancount
+#### /bancount
 
 Displays the amount of times a user has been banned.
 
-###### /changebancount
+#### /changebancount
 
 Change the ban count of a user.
 
-###### /ncount
+#### /ncount
 
 Displays the amount of times a user has said the nword.
 
-###### /changencount
+#### /changencount
 
 Change the nword count of a user.
 
