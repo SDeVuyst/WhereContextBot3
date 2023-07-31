@@ -9,6 +9,6 @@ pytube
 openai
 dateparser
 reactionmenu
-StringProgressBar
+strprogressbar
 spotipy
 google-api-python-client

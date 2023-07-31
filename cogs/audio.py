@@ -10,7 +10,7 @@ import tempfile
 from helpers import checks, http, sptoyt, ytdl_helper
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
-from StringProgressBar import progressBar
+from strprogressbar import ProgressBar
 
 
 
@@ -712,12 +712,12 @@ class Audio(commands.Cog, name="audio"):
             total = 20
             current = 0
             # First two arguments are mandatory
-            bardata = progressBar.splitBar(total, current, size=18)
+            bardata = ProgressBar(current, total, 18)
 
             # confirmatie
             embed = discord.Embed(
                 title=f"🎵 Playing music!",
-                description=f"[{yt.title}]({url}) by {yt.author}\n{bardata[0]} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}",
+                description=f"[{yt.title}]({url}) by {yt.author}\n{bardata} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}",
                 color=self.bot.succesColor
             )
 
@@ -744,9 +744,9 @@ class Audio(commands.Cog, name="audio"):
                     total = yt.length
                     current = current_sec
                     # First two arguments are mandatory
-                    bardata = progressBar.splitBar(total, current, size=18)
+                    bardata = ProgressBar(current, total, 18)
                     first_desc = embed.description.split('\n')[0]
-                    embed.description = f"{first_desc}\n{bardata[0]} - {self.format_seconds_to_mmss(current_sec)} / {self.format_seconds_to_mmss(yt.length)}"
+                    embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(current_sec)} / {self.format_seconds_to_mmss(yt.length)}"
                     await playing_message.edit(embed=embed)
 
                 except Exception as e:
