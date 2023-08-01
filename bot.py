@@ -239,7 +239,7 @@ async def autoroles(member):
 
     roles = {
         # yachja                   minecraft           cultured            perms               yachja
-        733845345225670686: [739212609248690248, 740301828071358738, 756224050237538325, 1119328394568548402],
+        733845345225670686: [739212609248690248, 740301828071358738, 1119328394568548402],
         # gible                    gent                minecraft
         559715606014984195: [1024341053786038332, 739212609248690248],
         # arno                     perms               homeless          sugardaddy          gent                minecraft         
