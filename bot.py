@@ -338,7 +338,7 @@ async def on_voice_state_update(member, before, after) -> None:
 
 
 @bot.event
-async def on_command_error(context: Context, error) -> None:
+async def on_app_command_error(context: Context, error) -> None:
     """
     The code in this event is executed every time a normal valid command catches an error.
 
