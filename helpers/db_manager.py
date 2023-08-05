@@ -229,7 +229,7 @@ async def messages_in_ooc():
         return -1
     
 
-async def increment_or_add_nword(user_id: int):
+async def increment_or_add_nword(user_id: int, amount: int):
 
     alreadyExists = await is_in_ncounter(user_id)
 
@@ -239,12 +239,12 @@ async def increment_or_add_nword(user_id: int):
             with con.cursor() as cursor:
                 if alreadyExists:
                     cursor.execute(
-                        "UPDATE nword_counter SET count = count + 1 WHERE user_id=%s", (str(user_id),)
+                        "UPDATE nword_counter SET count = count + %s WHERE user_id=%s", (amount, str(user_id),)
                     )   
                 else:
                     cursor.execute(
                         "INSERT INTO nword_counter(user_id, count) VALUES (%s, %s)",
-                        (str(user_id), 1,)
+                        (str(user_id), amount,)
                     )
 
                 cursor.commit()

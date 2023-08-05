@@ -12,6 +12,7 @@ import os
 import platform
 import random
 import psycopg2
+import re
 
 import discord
 from discord.ext import commands, tasks
@@ -422,14 +423,14 @@ async def on_app_command_error(context: Context, error) -> None:
         await context.send(embed=embed, ephemeral=True)
 
     else:
-        # embed = discord.Embed(
-        #     title="Error!",
-        #     # We need to capitalize because the command arguments have no capital letter in the code.
-        #     description=str(error).capitalize(),
-        #     color=bot.errorColor,
-        # )
-        # await context.send(embed=embed)
-        raise error
+        embed = discord.Embed(
+            title="Error!",
+            # We need to capitalize because the command arguments have no capital letter in the code.
+            description=str(error).capitalize(),
+            color=bot.errorColor,
+        )
+        await context.send(embed=embed)
+        bot.logger.error(error)
 
 
 async def load_cogs() -> None:
@@ -453,14 +454,11 @@ async def load_cogs() -> None:
 async def findNWord(message):
     content = message.content.replace(" ", "").replace("\n", "").lower()
     
-    # ik heb dit niet zelf getypt lol 💀
-    toCheck = ["negro","squigga","squiga","nigge","neger","nigga","nigglet","niglet", "niger","nigr","niggr","nikka","niglonian", "🇳 🇮 🇬 🇬 🇦"]
-
-    for c in toCheck:
-        for _ in range(content.count(c)):
-            await db_manager.increment_or_add_nword(message.author.id)
-            bot.logger.info(f"{message.author.display_name} said nword: {message.content}")
-            
+    pattern = r'(^|\W)[nNɴ🇳]+[ie1ɪi🇮]+[gɢgk🇬]+[l]*[eᴇea3🇦🇦rqrʀ]+'
+    count = len(re.findall(pattern, content, flags=re.IGNORECASE))
+    await db_manager.increment_or_add_nword(message.author.id, count)
+    bot.logger.info(f"{message.author.display_name} said nword {count} times: {message.content}")
+    
 
     
 
