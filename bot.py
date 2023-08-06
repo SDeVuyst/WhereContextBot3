@@ -452,12 +452,19 @@ async def load_cogs() -> None:
 
 
 async def findNWord(message):
-    content = message.content.replace(" ", "").replace("\n", "").lower()
+    content = message.content.replace("\n", " ").lower()
+
+    # words that get detected as nwords but are not
+    ban_list = ['vinager', 'vineger', 'vinegar', 'monika', 'https', 'negeer', 'enige', 'zonnig', 'nieke', 'innige']
+    if any(ban in content for ban in ban_list):
+        return
     
-    pattern = r'(^|\W)[nNɴ🇳]+[ie1ɪi🇮]+[gɢgk🇬]+[l]*[eᴇea3🇦🇦rqrʀ]+'
+    # find nwords
+    pattern = r'(^|\s|\w)?[nNɴ🇳]+[ie1ɪi🇮]+[gɢg🇬]+[l]*[eᴇea3🇦🇦rqrʀ]+[s]*(bal+)?[s\.\!\?\,]*($|\s)+'
     count = len(re.findall(pattern, content, flags=re.IGNORECASE))
-    await db_manager.increment_or_add_nword(message.author.id, count)
-    bot.logger.info(f"{message.author.display_name} said nword {count} times: {message.content}")
+    if count > 0:
+        await db_manager.increment_or_add_nword(message.author.id, count)
+        bot.logger.info(f"{message.author.display_name} said nword {count} times: {message.content}")
     
 
     
