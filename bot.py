@@ -460,7 +460,7 @@ async def findNWord(message):
         return
     
     # find nwords
-    pattern = r'(^|\s|\w)?[nNɴ🇳]+[ie1ɪi🇮]+[gɢg🇬]+[l]*[eᴇea3🇦🇦rqrʀ]+[s]*(bal+)?[s\.\!\?\,]*($|\s)+'
+    pattern = r'(^|\s|\w)?[nNɴ🇳]+[ie1ɪi🇮]+[gɢg🇬]+[l]*[eᴇea3🇦🇦rqrʀ]+[s]*'
     count = len(re.findall(pattern, content, flags=re.IGNORECASE))
     if count > 0:
         await db_manager.increment_or_add_nword(message.author.id, count)
