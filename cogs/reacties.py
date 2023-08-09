@@ -42,7 +42,7 @@ class Reacties(commands.Cog, name="reacties"):
 
 
     @app_commands.command(name="uthought", description="sike u thought", extras={'cog': 'reacties'})
-    @checks.cost_nword_two()
+    @checks.cost_nword(3)
     @checks.not_blacklisted()
     async def uthought(self, interaction):
         """Sends the 'u thought' reaction
