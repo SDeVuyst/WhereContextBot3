@@ -30,8 +30,6 @@ bot = Bot(
     help_command=None,
 )
 
-tree = discord.app_commands.CommandTree(bot)
-
 bot.defaultColor = 0xF4900D
 bot.errorColor = 0xE02B2B
 bot.succesColor = 0x39AC39
@@ -338,7 +336,7 @@ async def on_voice_state_update(member, before, after) -> None:
                 break
 
 
-@tree.error
+@bot.tree.error
 async def on_app_command_error(interaction, error):
     """
     The code in this event is executed every time a command catches an error.
