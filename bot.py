@@ -336,7 +336,6 @@ async def on_voice_state_update(member, before, after) -> None:
                 break
 
 
-@bot.tree.on_error
 async def on_tree_error(interaction, error):
     """
     The code in this event is executed every time a command catches an error.
@@ -345,7 +344,7 @@ async def on_tree_error(interaction, error):
     :param error: The error that has been faced.
     """
     bot.logger.error(error)
-    if isinstance(error, commands.CommandOnCooldown):
+    if isinstance(error, discord.app_commands.CommandOnCooldown):
         minutes, seconds = divmod(error.retry_after, 60)
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
@@ -390,7 +389,7 @@ async def on_tree_error(interaction, error):
                 f"{interaction.user} (ID: {interaction.user.id}) tried to execute an owner only command in the bot's DMs, but the user is not an owner of the bot."
             )
 
-    elif isinstance(error, commands.MissingPermissions):
+    elif isinstance(error, discord.app_commands.MissingPermissions):
         embed = discord.Embed(
             description="You are missing the permission(s) `"
             + ", ".join(error.missing_permissions)
@@ -399,7 +398,7 @@ async def on_tree_error(interaction, error):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    elif isinstance(error, commands.BotMissingPermissions):
+    elif isinstance(error, discord.app_commands.BotMissingPermissions):
         embed = discord.Embed(
             description="I am missing the permission(s) `"
             + ", ".join(error.missing_permissions)
@@ -408,7 +407,7 @@ async def on_tree_error(interaction, error):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    elif isinstance(error, commands.MissingRequiredArgument):
+    elif isinstance(error, discord.app_commands.MissingRequiredArgument):
         embed = discord.Embed(
             title="You are missing some required arguments!",
             # We need to capitalize because the command arguments have no capital letter in the code.
@@ -445,6 +444,8 @@ async def on_tree_error(interaction, error):
         await interaction.response.send_message(embed=embed)
         bot.logger.error(error)
 
+
+bot.tree.on_error = on_tree_error
 
 
 async def load_cogs() -> None:
