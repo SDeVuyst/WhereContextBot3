@@ -17,9 +17,8 @@ import re
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Bot, Context
-from helpers import db_manager, checks
+from helpers import db_manager
 import exceptions
-from discord import app_commands
 
 from datetime import datetime, timedelta
 
@@ -346,6 +345,7 @@ async def on_command_error(context: Context, error) -> None:
     :param context: The context of the normal command that failed executing.
     :param error: The error that has been faced.
     """
+    bot.logger.error(error)
     if isinstance(error, commands.CommandOnCooldown):
         minutes, seconds = divmod(error.retry_after, 60)
         hours, minutes = divmod(minutes, 60)
