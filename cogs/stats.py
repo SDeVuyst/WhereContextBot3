@@ -369,8 +369,16 @@ class CommandView(View):
             interaction (Interaction): Users interaction
             select_item (Select): Selected item
         """
+        formatted = {
+            "audio": "🎙️ Audio",
+            "general": "🤖 General",
+            "stats": "📊 Statistics",
+            "outofcontext": "📸 Out Of Context",
+            "reacties": "💭 Reacties",
+            "owner": "👨‍🔧 Owner"
+        }
         self.children[0].disabled = True
-        self.children[0].placeholder = select_item.values[0]
+        self.children[0].placeholder = formatted[select_item.values[0]]
         command_select = CommandSelect(self.bot, select_item.values[0])
         self.add_item(command_select)
         await interaction.message.edit(view=self)
@@ -385,7 +393,6 @@ class CommandView(View):
         """
         self.chosen_command = choices[0]
         self.children[1].disabled= True
-        self.children[1].placeholder = choices[0]
         await interaction.message.edit(view=self)
         await interaction.response.defer()
         self.stop()
