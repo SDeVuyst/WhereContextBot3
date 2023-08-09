@@ -15,7 +15,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
-    @checks.cost5_nword()
+    @checks.cost_nword_two()
     async def wholesquadlaughing(self, interaction):
         """Sends the 'whole squad laughing' reaction
 
@@ -42,6 +42,7 @@ class Reacties(commands.Cog, name="reacties"):
 
 
     @app_commands.command(name="uthought", description="sike u thought", extras={'cog': 'reacties'})
+    @checks.cost_nword_two()
     @checks.not_blacklisted()
     async def uthought(self, interaction):
         """Sends the 'u thought' reaction

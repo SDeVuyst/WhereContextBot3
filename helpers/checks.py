@@ -102,14 +102,12 @@ def cost_nword(cost: int) -> Callable[[T], T]:
             raise MissingNwords(exact_count, cost)
         
         # update nword count
-        await db_manager.set_nword_count(ctx.author.id, exact_count-cost)
+        return await db_manager.set_nword_count(ctx.author.id, exact_count-cost)
 
-        return True
-    
     return commands.check(predicate)
 
 
-def cost5_nword() -> Callable[[T], T]:
+def cost_nword_two() -> Callable[[T], T]:
     
 
     async def predicate(ctx: commands.Context):
@@ -132,8 +130,7 @@ def cost5_nword() -> Callable[[T], T]:
             raise MissingNwords(exact_count, 5)
         
         # update nword count
-        await db_manager.set_nword_count(ctx.author.id, exact_count-5)
+        return await db_manager.set_nword_count(ctx.author.id, exact_count-5)
 
-        return True
     
     return commands.check(predicate)
