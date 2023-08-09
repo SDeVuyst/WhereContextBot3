@@ -422,6 +422,15 @@ async def on_app_command_error(context: Context, error) -> None:
         )
         await context.send(embed=embed, ephemeral=True)
 
+    elif isinstance(error, exceptions.MissingNwords):
+        embed = discord.Embed(
+            title="You don't have enough N-words!",
+            # We need to capitalize because the command arguments have no capital letter in the code.
+            description=str(error).capitalize(),
+            color=bot.errorColor,
+        )
+        await context.send(embed=embed, ephemeral=True)
+
     else:
         embed = discord.Embed(
             title="Error!",

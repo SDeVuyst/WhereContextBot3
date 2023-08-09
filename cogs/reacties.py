@@ -13,21 +13,9 @@ class Reacties(commands.Cog, name="reacties"):
         self.bot = bot
 
 
-    @app_commands.command(name="giblereact", description="OMG jonathan is so fine!!", extras={'cog': 'reacties'})
-    @checks.not_blacklisted()
-    async def giblereact(self, interaction):
-        """Sends the' gible' reaction
-
-        Args:
-            interaction (Interaction): users interaction
-        """
-        file, embed = await self.get_reactie_embed("giblereact.jpg", interaction.user.id, "Sexy giby")
-        await interaction.response.send_message(file=file, embed=embed)
-
-
-
     @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
+    @checks.cost_nword(5)
     async def wholesquadlaughing(self, interaction):
         """Sends the 'whole squad laughing' reaction
 
@@ -211,6 +199,7 @@ class Reacties(commands.Cog, name="reacties"):
         app_commands.Choice(name="tnt", value=1),
         app_commands.Choice(name="kkrbek", value=2),
         app_commands.Choice(name="dans", value=3),
+        app_commands.Choice(name="so fine", value=4),
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
@@ -222,7 +211,7 @@ class Reacties(commands.Cog, name="reacties"):
             interaction (Interaction): Users Interaction
             choices (app_commands.Choice[int]): Choices of possible reactions
         """
-        messages = ["daar gaat je base gible", "wapz tnt over gible z'n base", "KAAANKEERRRBEK GIBLE", "dans"]
+        messages = ["daar gaat je base gible", "wapz tnt over gible z'n base", "KAAANKEERRRBEK GIBLE", "dans", "so fine"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
 
         if m == "dans":
@@ -230,11 +219,17 @@ class Reacties(commands.Cog, name="reacties"):
                 color=self.bot.defaultColor
             )
             embed.set_image(url="https://cdn.discordapp.com/attachments/1114464141508345906/1115720385070121000/ezgif.com-video-to-gif.gif")
+        
+        elif m == "so fine":
+            file, embed = await self.get_reactie_embed("giblereact.jpg", interaction.user.id, "Sexy giby")
+            return await interaction.response.send_message(file=file, embed=embed)
+        
         else:
             embed = discord.Embed(
                 title=m,
                 color=self.bot.defaultColor,
             )
+
         await interaction.response.send_message(embed=embed)
 
 

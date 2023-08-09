@@ -31,10 +31,21 @@ class UserNotOwner(commands.CheckFailure):
 
 class WrongChannel(commands.CheckFailure):
     """
-    Thrown when a user is attempting something, but is not an owner of the bot.
+    Thrown when a user is attempting something, but is in the wrong channel.
     """
 
     def __init__(self, message="Wrong channel!"):
         self.message = message
         super().__init__(self.message)
 
+
+class MissingNwords(commands.CheckFailure):
+    """
+    Thrown when a user is attempting something, but has too little nwords.
+    """
+
+    def __init__(self, usercount: int, required:int):
+        self.usercount = usercount
+        self.required = required
+        self.message = f"You need {required} N-words to use this command, but you only have {usercount}."
+        super().__init__(self.message)

@@ -74,3 +74,30 @@ def not_in_dm() -> Callable[[T], T]:
         return True
     
     return commands.check(predicate)
+
+
+def cost_nword(cost: int) -> Callable[[T], T]:
+
+    async def predicate(ctx: commands.Context):
+        nword_count = await db_manager.get_nword_count(ctx.author.id)
+        # Geen berichten
+        if len(nword_count) == 0 or int(nword_count[0][0]) == 0:
+            exact_count = 0
+        
+        # error
+        elif nword_count[0] == -1:
+            raise Exception("Could not fetch nword count!")
+        
+        else:
+            exact_count = int(nword_count[0][0])
+
+        # user heeft niet genoeg nwords
+        if exact_count < cost:
+            raise MissingNwords(exact_count, cost)
+        
+        # update nword count
+        await db_manager.set_nword_count(ctx.author.id, exact_count-cost)
+
+        return True
+    
+    return commands.check(predicate)
