@@ -446,7 +446,6 @@ async def on_app_command_error(interaction, error):
         bot.logger.error(error)
 
 
-bot.tree.on_error = on_tree_error
 
 
 async def load_cogs() -> None:
