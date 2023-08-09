@@ -78,6 +78,8 @@ def not_in_dm() -> Callable[[T], T]:
 
 
 def cost_nword(cost: int) -> Callable[[T], T]:
+    
+    print(f"called {cost}")
 
     async def predicate(ctx: commands.Context):
         

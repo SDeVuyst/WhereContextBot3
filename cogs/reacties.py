@@ -29,6 +29,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(name="notfunny", description="bro that wasn't even funny", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
+    @checks.cost_nword(5)
     async def notfunny(self, interaction):
         """Sends the 'not funny' reaction
 
