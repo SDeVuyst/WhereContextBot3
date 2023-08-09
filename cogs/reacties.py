@@ -13,6 +13,9 @@ class Reacties(commands.Cog, name="reacties"):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        self.bot.errorhandler()
 
     @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing", extras={'cog': 'reacties'})
     @checks.not_blacklisted()

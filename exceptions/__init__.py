@@ -6,10 +6,10 @@ Description:
 Version: 5.5.0
 """
 
-from discord.ext import commands
+from discord import app_commands
 
 
-class UserBlacklisted(commands.CheckFailure):
+class UserBlacklisted(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but is blacklisted.
     """
@@ -19,7 +19,7 @@ class UserBlacklisted(commands.CheckFailure):
         super().__init__(self.message)
 
 
-class UserNotOwner(commands.CheckFailure):
+class UserNotOwner(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but is not an owner of the bot.
     """
@@ -29,7 +29,7 @@ class UserNotOwner(commands.CheckFailure):
         super().__init__(self.message)
 
 
-class WrongChannel(commands.CheckFailure):
+class WrongChannel(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but is in the wrong channel.
     """
@@ -39,7 +39,7 @@ class WrongChannel(commands.CheckFailure):
         super().__init__(self.message)
 
 
-class MissingNwords(commands.CheckFailure):
+class MissingNwords(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but has too little nwords.
     """

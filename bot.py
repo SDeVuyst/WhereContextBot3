@@ -16,7 +16,7 @@ import re
 
 import discord
 from discord.ext import commands, tasks
-from discord.ext.commands import Bot, Context
+from discord.ext.commands import Bot
 from helpers import db_manager
 import exceptions
 
@@ -336,8 +336,8 @@ async def on_voice_state_update(member, before, after) -> None:
                 break
 
 
-@bot.tree.error
-async def on_app_command_error(interaction, error):
+@bot.tree.on_error
+async def on_tree_error(interaction, error):
     """
     The code in this event is executed every time a command catches an error.
 
@@ -444,7 +444,6 @@ async def on_app_command_error(interaction, error):
         )
         await interaction.response.send_message(embed=embed)
         bot.logger.error(error)
-
 
 
 
