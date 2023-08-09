@@ -13,12 +13,9 @@ class Reacties(commands.Cog, name="reacties"):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        self.bot.errorhandler()
-
-    @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing", extras={'cog': 'reacties'})
+    @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing (1🇳)", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
+    @checks.cost_nword(1)
     async def wholesquadlaughing(self, interaction):
         """Sends the 'whole squad laughing' reaction
 
@@ -30,9 +27,9 @@ class Reacties(commands.Cog, name="reacties"):
 
 
 
-    @app_commands.command(name="notfunny", description="bro that wasn't even funny", extras={'cog': 'reacties'})
-    @checks.cost_nword(5)
+    @app_commands.command(name="notfunny", description="bro that wasn't even funny (1🇳)", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
+    @checks.cost_nword(1)
     async def notfunny(self, interaction):
         """Sends the 'not funny' reaction
 
@@ -44,9 +41,9 @@ class Reacties(commands.Cog, name="reacties"):
 
 
 
-    @app_commands.command(name="uthought", description="sike u thought", extras={'cog': 'reacties'})
-    @checks.cost_nword(3)
+    @app_commands.command(name="uthought", description="sike u thought (1🇳)", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
+    @checks.cost_nword(1)
     async def uthought(self, interaction):
         """Sends the 'u thought' reaction
 
@@ -100,10 +97,11 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="golden_rule",
-        description="Keleos golden rule",
+        description="Keleos golden rule (2🇳)",
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     async def golden_rule(self, interaction) -> None:
         """Sends the 'golden rule' muur reaction
 
@@ -119,10 +117,11 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="laten_doen",
-        description="laten doen",
+        description="laten doen (2🇳)",
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     async def laten_doen(self, interaction) -> None:
         """Sends the 'laten doen' muur reaction
 
@@ -138,10 +137,11 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="limieten",
-        description=":skull:",
+        description=":skull: (2🇳)",
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     async def limieten(self, interaction) -> None:
         """Sends the 'limieten' muur reaction
 
@@ -157,10 +157,11 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="danny",
-        description="the danny special",
+        description="the danny special (2🇳)",
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     async def danny(self, interaction) -> None:
         """Sends the 'danny' muur reaction
 
@@ -176,10 +177,11 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="bozo",
-        description="L bozo",
+        description="L bozo (2🇳)",
         extras={'cog': 'reacties'}
     )
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     async def bozo(self, interaction) -> None:
         """Sends the 'L bozo' muur reaction
 
@@ -195,7 +197,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="gible",
-        description="gibby aka. smikkel aka capybara_Lover123",
+        description="gibby aka. smikkel aka capybara_Lover123 (2🇳)",
         extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
@@ -208,6 +210,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def gible(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'gible' naam reaction
@@ -241,7 +244,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="nootje",
-        description="nootje aka lil_kid_lover69 aka tough_guy_04",
+        description="nootje aka lil_kid_lover69 aka tough_guy_04 (2🇳)",
         extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
@@ -251,6 +254,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def nootje(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'nootje' naam reaction
@@ -272,7 +276,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="pingy",
-        description="pingy aka pingy1 aka pongy aka Lol",
+        description="pingy aka pingy1 aka pongy aka Lol (2🇳)",
         extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
@@ -283,6 +287,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def pingy(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'pingy' naam reaction
@@ -304,7 +309,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="ba",
-        description="ba duy aka ba aka duy aka badwie",
+        description="ba duy aka ba aka duy aka badwie (2🇳)",
         extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
@@ -314,6 +319,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def ba(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'ba' naam reaction
@@ -335,7 +341,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="meng",
-        description="meng aka mongwong aka da GOAT",
+        description="meng aka mongwong aka da GOAT (2🇳)",
         extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
@@ -345,6 +351,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def meng(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'meng' naam reaction
@@ -366,7 +373,7 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="broodman",
-        description="jasman aka yachini aka yashja",
+        description="jasman aka yachini aka yashja (2🇳)",
         extras={'cog': 'reacties'}
     )
     @app_commands.choices(choices=[
@@ -375,6 +382,7 @@ class Reacties(commands.Cog, name="reacties"):
     ])
     # This will only allow non-blacklisted members to execute the command
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def broodman(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'broodman' naam reaction
@@ -396,13 +404,14 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(
         name="keleo",
-        description="the one and only",
+        description="the one and only (2🇳)",
     )
     @app_commands.choices(choices=[
         app_commands.Choice(name="random", value=-1),
         app_commands.Choice(name="rooftop madness", value=0),
     ])
     @checks.not_blacklisted()
+    @checks.cost_nword(2)
     @app_commands.describe(choices="Choose the reaction you want to send")
     async def keleo(self, interaction, choices: app_commands.Choice[int]):
         """Send the 'keleo' naam reaction

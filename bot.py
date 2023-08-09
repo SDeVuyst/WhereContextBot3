@@ -343,7 +343,7 @@ async def on_tree_error(interaction, error):
     :param context: The context of the normal command that failed executing.
     :param error: The error that has been faced.
     """
-    bot.logger.error(error)
+    bot.logger.info(error)
     if isinstance(error, discord.app_commands.CommandOnCooldown):
         minutes, seconds = divmod(error.retry_after, 60)
         hours, minutes = divmod(minutes, 60)
