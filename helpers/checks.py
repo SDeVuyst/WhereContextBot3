@@ -10,7 +10,7 @@ import discord
 import os
 from typing import Callable, TypeVar
 
-from discord.ext import commands
+from discord import app_commands
 
 from exceptions import *
 from helpers import db_manager
@@ -23,12 +23,12 @@ def is_owner() -> Callable[[T], T]:
     This is a custom check to see if the user executing the command is an owner of the bot.
     """
 
-    async def predicate(context: commands.Context) -> bool:
-        if str(context.author.id) not in list(os.environ.get("owners").split(",")):
+    async def predicate(interaction) -> bool:
+        if str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
             raise UserNotOwner
         return True
 
-    return commands.check(predicate)
+    return app_commands.check(predicate)
 
 
 def not_blacklisted() -> Callable[[T], T]:
@@ -36,44 +36,44 @@ def not_blacklisted() -> Callable[[T], T]:
     This is a custom check to see if the user executing the command is blacklisted.
     """
 
-    async def predicate(context: commands.Context) -> bool:
-        if await db_manager.is_blacklisted(context.author.id):
+    async def predicate(interaction) -> bool:
+        if await db_manager.is_blacklisted(interaction.user.id):
             raise UserBlacklisted
         return True
 
-    return commands.check(predicate)
+    return app_commands.check(predicate)
 
 
 def in_audio_command_channel() -> Callable[[T], T]:
 
-    async def predicate(ctx: commands.Context):
-        if ctx.channel.id not in [1114464141508345906, 727511733970665493]:
+    async def predicate(interaction):
+        if interaction.channel.id not in [1114464141508345906, 727511733970665493]:
             raise WrongChannel("Only able to play in #out-of-context-game or #music-bot")
         return True
     
-    return commands.check(predicate)
+    return app_commands.check(predicate)
 
 
 def in_correct_server() -> Callable[[T], T]:
 
-    async def predicate(ctx: commands.Context):
+    async def predicate(interaction):
 
-        if ctx.guild.id not in [int(os.environ.get("guild_id")),] and not isinstance(ctx.channel, discord.channel.DMChannel):
+        if interaction.guild_id not in [int(os.environ.get("guild_id")),] and not isinstance(interaction.channel, discord.channel.DMChannel):
             raise WrongChannel("You are only able to use this command in the main server, use /invite to get an invite")
         return True
     
-    return commands.check(predicate)
+    return app_commands.check(predicate)
 
 
 def not_in_dm() -> Callable[[T], T]:
 
-    async def predicate(ctx: commands.Context):
+    async def predicate(interaction):
 
-        if isinstance(ctx.channel, discord.channel.DMChannel):
+        if isinstance(interaction.channel, discord.channel.DMChannel):
             raise WrongChannel("You cannot use this command in dm, use /invite to get an invite")
         return True
     
-    return commands.check(predicate)
+    return app_commands.check(predicate)
 
 
 
@@ -81,9 +81,9 @@ def cost_nword(cost: int) -> Callable[[T], T]:
 
     print(f"called {cost}")
 
-    async def predicate(ctx: commands.Context):
+    async def predicate(interaction):
         
-        nword_count = await db_manager.get_nword_count(ctx.author.id)
+        nword_count = await db_manager.get_nword_count(interaction.user.id)
         print(cost, nword_count)
 
         # Geen berichten
@@ -102,35 +102,6 @@ def cost_nword(cost: int) -> Callable[[T], T]:
             raise MissingNwords(exact_count, cost)
         
         # update nword count
-        return await db_manager.set_nword_count(ctx.author.id, exact_count-cost)
+        return await db_manager.set_nword_count(interaction.user.id, exact_count-cost)
 
-    return commands.check(predicate)
-
-
-def cost_nword_two() -> Callable[[T], T]:
-    
-
-    async def predicate(ctx: commands.Context):
-        
-        nword_count = await db_manager.get_nword_count(ctx.author.id)
-
-        # Geen berichten
-        if len(nword_count) == 0 or int(nword_count[0][0]) == 0:
-            exact_count = 0
-        
-        # error
-        elif nword_count[0] == -1:
-            raise Exception("Could not fetch nword count!")
-        
-        else:
-            exact_count = int(nword_count[0][0])
-
-        # user heeft niet genoeg nwords
-        if exact_count < 5:
-            raise MissingNwords(exact_count, 5)
-        
-        # update nword count
-        return await db_manager.set_nword_count(ctx.author.id, exact_count-5)
-
-    
-    return commands.check(predicate)
+    return app_commands.check(predicate)
