@@ -407,15 +407,6 @@ async def on_tree_error(interaction, error):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
-    elif isinstance(error, discord.app_commands.MissingRequiredArgument):
-        embed = discord.Embed(
-            title="You are missing some required arguments!",
-            # We need to capitalize because the command arguments have no capital letter in the code.
-            description=str(error).capitalize(),
-            color=bot.errorColor,
-        )
-        await interaction.response.send_message(embed=embed)
-
     elif isinstance(error, exceptions.WrongChannel):
         embed = discord.Embed(
             title="Wrong channel!",
