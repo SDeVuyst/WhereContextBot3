@@ -79,12 +79,9 @@ def not_in_dm() -> Callable[[T], T]:
 
 def cost_nword(cost: int) -> Callable[[T], T]:
 
-    print(f"called {cost}")
-
     async def predicate(interaction):
         
         nword_count = await db_manager.get_nword_count(interaction.user.id)
-        print(cost, nword_count)
 
         # Geen berichten
         if len(nword_count) == 0 or int(nword_count[0][0]) == 0:

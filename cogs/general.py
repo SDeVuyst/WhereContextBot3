@@ -77,7 +77,7 @@ class General(commands.Cog, name="general"):
 
             embed = discord.Embed(
                 title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"Ask <@{int(admin[0])}> for more help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\nSommige commands kosten N-Words, bv. voor een command dat 2 N-Words kost, staat er (2🇳) bij de beschrijving", 
+                description=f"Ask <@{int(admin[0])}> for more help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\nSommige commands kosten N-Words, bv. voor een command dat 2 N-Words kost, staat er (2🪙) bij de beschrijving", 
                 color=self.bot.defaultColor
             )
 
