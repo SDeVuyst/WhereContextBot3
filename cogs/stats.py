@@ -96,7 +96,7 @@ class Stats(commands.Cog, name="stats"):
         else:
             embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
-        await interaction.edit_original_response(embed=embed)
+        await interaction.edit_original_response(embed=embed, view=None)
         
 
 
@@ -201,7 +201,7 @@ class Stats(commands.Cog, name="stats"):
         else:
             embed = await self.get_leaderboard_embed(view.chosen_command)
 
-        await interaction.followup.send(embed=embed)
+        await interaction.edit_original_response(embed=embed, view=None)
         
 
 
