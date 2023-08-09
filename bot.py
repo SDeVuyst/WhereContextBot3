@@ -300,7 +300,7 @@ async def on_app_command_completion(interaction, command) -> None:
     executed_command = str(split[0])
     if interaction.guild is not None:
         bot.logger.info(
-            f"Executed {executed_command} command in {interaction.guild.name} (ID: {interaction.guild.id}) by {interaction.user} (ID: {interaction.user.id})"
+            f"Executed {executed_command} command in {interaction.guild.name} (ID: {interaction.guild_id}) by {interaction.user} (ID: {interaction.user.id})"
         )
     else:
         bot.logger.info(
@@ -337,8 +337,7 @@ async def on_voice_state_update(member, before, after) -> None:
                 break
 
 
-@bot.event
-async def on_application_command_error(context: Context, error) -> None:
+async def on_tree_error(interaction, error):
     """
     The code in this event is executed every time a command catches an error.
 
@@ -354,7 +353,7 @@ async def on_application_command_error(context: Context, error) -> None:
             description=f"**Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
             color=bot.errorColor,
         )
-        await context.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.UserBlacklisted):
         """
@@ -364,14 +363,14 @@ async def on_application_command_error(context: Context, error) -> None:
         embed = discord.Embed(
             description="You are blacklisted from using the bot!", color=bot.errorColor
         )
-        await context.send(embed=embed, ephemeral=True)
-        if context.guild:
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        if interaction.guild:
             bot.logger.warning(
-                f"{context.author} (ID: {context.author.id}) tried to execute a command in the guild {context.guild.name} (ID: {context.guild.id}), but the user is blacklisted from using the bot."
+                f"{interaction.user} (ID: {interaction.user.id}) tried to execute a command in the guild {interaction.guild.name} (ID: {interaction.guild_id}), but the user is blacklisted from using the bot."
             )
         else:
             bot.logger.warning(
-                f"{context.author} (ID: {context.author.id}) tried to execute a command in the bot's DMs, but the user is blacklisted from using the bot."
+                f"{interaction.user} (ID: {interaction.user.id}) tried to execute a command in the bot's DMs, but the user is blacklisted from using the bot."
             )
 
     elif isinstance(error, exceptions.UserNotOwner):
@@ -381,14 +380,14 @@ async def on_application_command_error(context: Context, error) -> None:
         embed = discord.Embed(
             description="You are not the owner of the bot!", color=bot.errorColor
         )
-        await context.send(embed=embed, ephemeral=True)
-        if context.guild:
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+        if interaction.guild:
             bot.logger.warning(
-                f"{context.author} (ID: {context.author.id}) tried to execute an owner only command in the guild {context.guild.name} (ID: {context.guild.id}), but the user is not an owner of the bot."
+                f"{interaction.user} (ID: {interaction.user.id}) tried to execute an owner only command in the guild {interaction.guild.name} (ID: {interaction.guild_id}), but the user is not an owner of the bot."
             )
         else:
             bot.logger.warning(
-                f"{context.author} (ID: {context.author.id}) tried to execute an owner only command in the bot's DMs, but the user is not an owner of the bot."
+                f"{interaction.user} (ID: {interaction.user.id}) tried to execute an owner only command in the bot's DMs, but the user is not an owner of the bot."
             )
 
     elif isinstance(error, commands.MissingPermissions):
@@ -398,7 +397,7 @@ async def on_application_command_error(context: Context, error) -> None:
             + "` to execute this command!",
             color=bot.errorColor,
         )
-        await context.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, commands.BotMissingPermissions):
         embed = discord.Embed(
@@ -407,7 +406,7 @@ async def on_application_command_error(context: Context, error) -> None:
             + "` to fully perform this command!",
             color=bot.errorColor,
         )
-        await context.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(
@@ -416,7 +415,7 @@ async def on_application_command_error(context: Context, error) -> None:
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     elif isinstance(error, exceptions.WrongChannel):
         embed = discord.Embed(
@@ -425,7 +424,7 @@ async def on_application_command_error(context: Context, error) -> None:
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await context.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.MissingNwords):
         embed = discord.Embed(
@@ -434,7 +433,7 @@ async def on_application_command_error(context: Context, error) -> None:
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await context.send(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     else:
         embed = discord.Embed(
@@ -443,8 +442,11 @@ async def on_application_command_error(context: Context, error) -> None:
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await context.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
         bot.logger.error(error)
+
+
+bot.tree.on_error = on_tree_error
 
 
 async def load_cogs() -> None:
