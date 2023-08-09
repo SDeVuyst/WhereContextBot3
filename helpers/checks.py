@@ -76,10 +76,14 @@ def not_in_dm() -> Callable[[T], T]:
     return commands.check(predicate)
 
 
+
 def cost_nword(cost: int) -> Callable[[T], T]:
 
     async def predicate(ctx: commands.Context):
+        
         nword_count = await db_manager.get_nword_count(ctx.author.id)
+        print(cost, nword_count)
+
         # Geen berichten
         if len(nword_count) == 0 or int(nword_count[0][0]) == 0:
             exact_count = 0
