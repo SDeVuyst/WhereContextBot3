@@ -341,7 +341,7 @@ async def on_voice_state_update(member, before, after) -> None:
 @bot.event
 async def on_app_command_error(context: Context, error) -> None:
     """
-    The code in this event is executed every time a normal valid command catches an error.
+    The code in this event is executed every time a command catches an error.
 
     :param context: The context of the normal command that failed executing.
     :param error: The error that has been faced.
@@ -355,6 +355,7 @@ async def on_app_command_error(context: Context, error) -> None:
             color=bot.errorColor,
         )
         await context.send(embed=embed, ephemeral=True)
+
     elif isinstance(error, exceptions.UserBlacklisted):
         """
         The code here will only execute if the error is an instance of 'UserBlacklisted', which can occur when using
@@ -372,6 +373,7 @@ async def on_app_command_error(context: Context, error) -> None:
             bot.logger.warning(
                 f"{context.author} (ID: {context.author.id}) tried to execute a command in the bot's DMs, but the user is blacklisted from using the bot."
             )
+
     elif isinstance(error, exceptions.UserNotOwner):
         """
         Same as above, just for the @checks.is_owner() check.
@@ -388,6 +390,7 @@ async def on_app_command_error(context: Context, error) -> None:
             bot.logger.warning(
                 f"{context.author} (ID: {context.author.id}) tried to execute an owner only command in the bot's DMs, but the user is not an owner of the bot."
             )
+
     elif isinstance(error, commands.MissingPermissions):
         embed = discord.Embed(
             description="You are missing the permission(s) `"
@@ -396,6 +399,7 @@ async def on_app_command_error(context: Context, error) -> None:
             color=bot.errorColor,
         )
         await context.send(embed=embed, ephemeral=True)
+
     elif isinstance(error, commands.BotMissingPermissions):
         embed = discord.Embed(
             description="I am missing the permission(s) `"
@@ -404,6 +408,7 @@ async def on_app_command_error(context: Context, error) -> None:
             color=bot.errorColor,
         )
         await context.send(embed=embed, ephemeral=True)
+
     elif isinstance(error, commands.MissingRequiredArgument):
         embed = discord.Embed(
             title="You are missing some required arguments!",
