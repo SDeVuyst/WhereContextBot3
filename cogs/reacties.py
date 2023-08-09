@@ -7,33 +7,6 @@ import discord
 from helpers import checks, db_manager 
 from exceptions import MissingNwords
 
-def cost_nword(cost):
-
-    async def predicate(ctx: commands.Context):
-        
-        nword_count = await db_manager.get_nword_count(ctx.author.id)
-        print(cost, nword_count)
-
-        # Geen berichten
-        if len(nword_count) == 0 or int(nword_count[0][0]) == 0:
-            exact_count = 0
-        
-        # error
-        elif nword_count[0] == -1:
-            raise Exception("Could not fetch nword count!")
-        
-        else:
-            exact_count = int(nword_count[0][0])
-
-        # user heeft niet genoeg nwords
-        if exact_count < cost:
-            raise MissingNwords(exact_count, cost)
-        
-        # update nword count
-        return await db_manager.set_nword_count(ctx.author.id, exact_count-cost)
-
-    return commands.check(predicate)
-
 
 # Here we name the cog and create a new class for the cog.
 class Reacties(commands.Cog, name="reacties"):
@@ -43,7 +16,6 @@ class Reacties(commands.Cog, name="reacties"):
 
     @app_commands.command(name="wholesquadlaughing", description="damn bro you got the whole squad laughing", extras={'cog': 'reacties'})
     @checks.not_blacklisted()
-    @cost_nword(5)
     async def wholesquadlaughing(self, interaction):
         """Sends the 'whole squad laughing' reaction
 
