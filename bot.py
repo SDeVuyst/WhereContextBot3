@@ -271,7 +271,7 @@ async def autoroles(member):
 async def autonick(member):
     nicks = {
         # yachja
-        733845345225670686: "gayass",
+        733845345225670686: "the flesh 🥩",
         # gible      
         559715606014984195: "smikkelkontje",     
         # arno        
