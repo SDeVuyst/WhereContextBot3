@@ -214,10 +214,11 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
+    @app_commands.command(name="dm", description="let the bot DM a user (3🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @commands.cooldown(rate=1, per=20)
     @checks.not_in_dm()
+    @checks.cost_nword(3)
     @app_commands.describe(user="What user to DM")
     @app_commands.describe(content="What to DM to the user")
     async def dm(self, interaction, user: discord.User, content: str) -> None:
@@ -242,10 +243,11 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="chat", description="Chat with the bot", extras={'cog': 'general'})
+    @app_commands.command(name="chat", description="Chat with the bot (3🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @commands.cooldown(rate=2, per=30)
+    @checks.cost_nword(3)
     @app_commands.describe(prompt="Your question/conversation piece")
     async def chat(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
         """Chat with the bot using AI
@@ -287,9 +289,10 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="image", description="Create an image", extras={'cog': 'general'})
+    @app_commands.command(name="image", description="Create an image (5🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
+    @checks.cost_nword(5)
     @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
     @app_commands.describe(prompt="A detailed description of what to create")
     async def image(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:

@@ -60,7 +60,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="soundboard", description="Play effect from soundboard", extras={'cog': 'audio'})
+    @app_commands.command(name="soundboard", description="Play effect from soundboard (5🪙)", extras={'cog': 'audio'})
     @app_commands.choices(effect=[
         discord.app_commands.Choice(name="hentai Xander", value="hentai.mp3"),
         discord.app_commands.Choice(name="alexa... shut the fuck up", value="alexa.mp3"),
@@ -78,6 +78,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_audio_command_channel()
     @checks.in_correct_server()
     @checks.not_in_dm()
+    @checks.cost_nword(5)
     @app_commands.describe(effect="Which effect to play")
     async def soundboard(self, interaction, effect: discord.app_commands.Choice[str]):
         """ Play a soundboard effect in vc
@@ -129,7 +130,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="tts", description="Text to Speech", extras={'cog': 'audio'})
+    @app_commands.command(name="tts", description="Text to Speech (5🪙)", extras={'cog': 'audio'})
     @app_commands.choices(voice=[
         discord.app_commands.Choice(name="Alexa", value="alexa"),
         discord.app_commands.Choice(name="Peter Griffin", value="peter-griffin"),
@@ -146,6 +147,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.in_correct_server()
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=120)
+    @checks.cost_nword(5)
     @app_commands.describe(speech="What to say")
     @app_commands.describe(voice="Which voice to say your text in")
     async def tts(self, interaction, speech: str, voice: discord.app_commands.Choice[str]):
