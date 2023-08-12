@@ -60,7 +60,7 @@ class Audio(commands.Cog, name="audio"):
         self.looping = False
 
         self.pause_time = None
-        self.resume_time = None
+        self.pause_delta = None
 
 
     @app_commands.command(name="soundboard", description="Play effect from soundboard (5🪙)", extras={'cog': 'audio'})
@@ -446,7 +446,6 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
             voice_client.pause()
             self.pause_time = datetime.now()
-            self.resume_time = None
             embed = discord.Embed(
                 title=f"⏸️ Paused!",
                 color=self.bot.succesColor
@@ -477,7 +476,14 @@ class Audio(commands.Cog, name="audio"):
         
         # resume
         if voice_client.is_paused():
-            self.resume_time = datetime.now()
+            # calculate pause delta
+            if not self.pause_delta:
+                self.pause_delta = datetime.now() - self.pause_time
+            else:
+                self.pause_delta += datetime.now() - self.pause_time
+            
+            self.pause_time = None
+
             voice_client.resume()
             embed = discord.Embed(
                 title=f"▶️ Resumed!",
@@ -751,9 +757,8 @@ class Audio(commands.Cog, name="audio"):
                     embed.description = "⏸️ **Paused!**"
                 else:
                     # creeer een progress bar
-                    if self.pause_time and self.resume_time:
-                        time_diff = datetime.now() - start_time - (self.resume_time - self.pause_time)
-                    else:
+                    if self.pause_delta:
+                        time_diff = datetime.now() - start_time - self.pause_delta
                         time_diff = datetime.now() - start_time
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
@@ -777,7 +782,7 @@ class Audio(commands.Cog, name="audio"):
 
             # tijdstippen hebben we niet meer nodig
             self.pause_time = None
-            self.resume_time = None
+            self.pause_delta = None
 
 
     def format_seconds_to_mmss(self, seconds):
