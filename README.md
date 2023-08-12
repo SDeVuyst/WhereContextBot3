@@ -6,11 +6,11 @@
 
 #### /soundboard
 
-Plays the chosen sound effect in voice chat.
+Plays the chosen sound effect in voice chat. Costs 5 nwords to use.
 
 #### /tts
 
-Plays a chosen text-to-speech message in voice chat in a chosen voice.
+Plays a chosen text-to-speech message in voice chat in a chosen voice. Costs 5 nwords to use.
 
 #### /play
 
@@ -80,15 +80,15 @@ Displays the countdown till a given moment in time.
 
 #### /dm
 
-The bot anonymously dm's a chosen user with a chosen message.
+The bot anonymously dm's a chosen user with a chosen message. Costs 3 nwords to use.
 
 #### /chat
 
-Chat with the bot using AI technology.
+Chat with the bot using AI technology. Costs 3 nwords to use.
 
 #### /image
 
-Let the bot create an image using your imagination.
+Let the bot create an image using your imagination. Costs 5 nwords to use.
 
 #### /invite
 
@@ -168,37 +168,66 @@ Remove a user from the blacklist.
 
 ### Reacties
 
-#### /giblereact
 
 #### /wholesquadlaughing
 
+Costs 1 nwords to use.
+
 #### /notfunny
+
+Costs 1 nwords to use.
 
 #### /uthought
 
+Costs 1 nwords to use.
+
 #### /golden_rule
+
+Costs 2 nwords to use.
 
 #### /laten_doen
 
+Costs 2 nwords to use.
+
 #### /limieten
+
+Costs 2 nwords to use.
 
 #### /danny
 
+Costs 2 nwords to use.
+
 #### /bozo
+
+Costs 2 nwords to use.
 
 #### /gible
 
+Costs 2 nwords to use.
+
 #### /nootje
+
+Costs 2 nwords to use.
 
 #### /pingy
 
+Costs 2 nwords to use.
+
 #### /ba
+
+Costs 2 nwords to use.
 
 #### /meng
 
+Costs 2 nwords to use.
+
 #### /broodman
 
+Costs 2 nwords to use.
+
 #### /keleo
+
+Costs 2 nwords to use.
 
 ### Stats
 
