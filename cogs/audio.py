@@ -446,6 +446,7 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
             voice_client.pause()
             self.pause_time = datetime.now()
+            self.resume_time = None
             embed = discord.Embed(
                 title=f"⏸️ Paused!",
                 color=self.bot.succesColor
@@ -750,7 +751,7 @@ class Audio(commands.Cog, name="audio"):
                     embed.description = "⏸️ **Paused!**"
                 else:
                     # creeer een progress bar
-                    if self.pause_time:
+                    if self.pause_time and self.resume_time:
                         time_diff = datetime.now() - start_time - (self.resume_time - self.pause_time)
                     else:
                         time_diff = datetime.now() - start_time
@@ -769,20 +770,19 @@ class Audio(commands.Cog, name="audio"):
 
             # ten laatste zetten we de progress bar op de laatste seconde
             bardata = ProgressBar(total, total, 18)
-            first_desc = embed.description.split('\n')[0]
+            first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
             formatted_length = self.format_seconds_to_mmss(yt.length)
             embed.description = f"{first_desc}\n{bardata} - {formatted_length} / {formatted_length}"
             await playing_message.edit(embed=embed)
             self.pause_time = None
             self.resume_time = None
 
-        
-
 
     def format_seconds_to_mmss(self, seconds):
         minutes = seconds // 60
         seconds %= 60
         return "%02i:%02i" % (minutes, seconds)
+
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
