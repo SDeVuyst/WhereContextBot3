@@ -477,8 +477,8 @@ class Audio(commands.Cog, name="audio"):
         
         # resume
         if voice_client.is_paused():
-            voice_client.resume()
             self.resume_time = datetime.now()
+            voice_client.resume()
             embed = discord.Embed(
                 title=f"▶️ Resumed!",
                 color=self.bot.succesColor
@@ -756,7 +756,7 @@ class Audio(commands.Cog, name="audio"):
                     else:
                         time_diff = datetime.now() - start_time
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
-                    first_desc = embed.description.split('\n')[0]
+                    first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
                     embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {self.format_seconds_to_mmss(yt.length)}"
                 
                 try:
@@ -774,6 +774,8 @@ class Audio(commands.Cog, name="audio"):
             formatted_length = self.format_seconds_to_mmss(yt.length)
             embed.description = f"{first_desc}\n{bardata} - {formatted_length} / {formatted_length}"
             await playing_message.edit(embed=embed)
+
+            # tijdstippen hebben we niet meer nodig
             self.pause_time = None
             self.resume_time = None
 
