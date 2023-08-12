@@ -59,6 +59,8 @@ class Audio(commands.Cog, name="audio"):
         self.queue = []
         self.looping = False
 
+        self.pause_time = None
+        self.resume_time = None
 
 
     @app_commands.command(name="soundboard", description="Play effect from soundboard (5🪙)", extras={'cog': 'audio'})
