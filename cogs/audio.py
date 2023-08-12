@@ -745,7 +745,7 @@ class Audio(commands.Cog, name="audio"):
 
                     # creeer een progress bar
                     time_diff = datetime.now() - start_time
-                    bardata = ProgressBar(time_diff.total_seconds(), total, 18)
+                    bardata = ProgressBar(int(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.split('\n')[0]
                     embed.description = f"{first_desc}\n{bardata} - {time_diff.strftime('%M:%S')} / {self.format_seconds_to_mmss(yt.length)}"
                     await playing_message.edit(embed=embed)
