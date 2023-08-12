@@ -1,4 +1,4 @@
-import db_manager
+from . import db_manager
 import re
 
 async def findNWord(bot, message):
