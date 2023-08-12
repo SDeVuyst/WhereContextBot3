@@ -128,7 +128,7 @@ class Stats(commands.Cog, name="stats"):
                 color=self.bot.succesColor if succes else self.bot.defaultColor
             )
         
-        await interaction.followup.send(embed=embed)
+        await interaction.edit_original_response(embed=embed, view=None)
 
 
 
