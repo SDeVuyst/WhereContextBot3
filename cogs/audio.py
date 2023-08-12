@@ -754,7 +754,7 @@ class Audio(commands.Cog, name="audio"):
             time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
                 if vc.is_paused():
-                    embed.description = "⏸️ **Paused!**"
+                    embed.description = "⏸️ **Paused!**\n" + embed.description
                 else:
                     # creeer een progress bar
                     # bereken time diff
@@ -764,7 +764,7 @@ class Audio(commands.Cog, name="audio"):
                         time_diff = datetime.now() - start_time
 
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
-                    first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
+                    first_desc = embed.description.replace('⏸️ **Paused!**\n', '').split('\n')[0]
                     embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {self.format_seconds_to_mmss(yt.length)}"
                 
                 try:
