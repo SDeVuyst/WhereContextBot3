@@ -28,7 +28,7 @@ class Audio(commands.Cog, name="audio"):
 
         self.not_playing_embed = discord.Embed(
             title=f"🔇 The bot is not playing anything at the moment.",
-            description="Use /play to play a song",
+            description="Use /play to play a song or playlist",
             color=self.bot.defaultColor
         )
 
@@ -48,10 +48,6 @@ class Audio(commands.Cog, name="audio"):
             'no_warnings': True,
             'default_search': 'auto',
             'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
-        }
-
-        ffmpeg_options = {
-            'options': '-vn'
         }
 
         self.ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
@@ -289,9 +285,9 @@ class Audio(commands.Cog, name="audio"):
                             desc += f"{i+1}: [{yt.title}]({vid_url}) by {yt.author}\n\n"
 
                     embed = discord.Embed(
-                        title=f"🎵 Added to Queue",
+                        title=f"🎶 Added to Queue!",
                         description=desc,
-                        color=self.bot.defaultColor
+                        color=self.bot.succesColor
                     )
                     await interaction.followup.send(embed=embed)
                     
