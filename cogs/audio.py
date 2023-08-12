@@ -757,6 +757,15 @@ class Audio(commands.Cog, name="audio"):
                 # hoeveel keer de progress bar w geupdate
                 await asyncio.sleep(time_delay)
 
+            # ten laatste zetten we de progress bar op de laatste seconde
+            bardata = ProgressBar(total, total, 18)
+            first_desc = embed.description.split('\n')[0]
+            formatted_length = self.format_seconds_to_mmss(yt.length)
+            embed.description = f"{first_desc}\n{bardata} - {formatted_length} / {formatted_length}"
+            await playing_message.edit(embed=embed)
+
+        
+
 
     def format_seconds_to_mmss(self, seconds):
         minutes = seconds // 60
