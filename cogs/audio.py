@@ -3,6 +3,7 @@ import subprocess
 from discord.ext import commands
 import os
 from discord import app_commands
+from math import ceil
 import discord
 import asyncio
 import tempfile
@@ -745,7 +746,7 @@ class Audio(commands.Cog, name="audio"):
 
                     # creeer een progress bar
                     time_diff = datetime.now() - start_time
-                    bardata = ProgressBar(int(time_diff.total_seconds()), total, 18)
+                    bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.split('\n')[0]
                     embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {self.format_seconds_to_mmss(yt.length)}"
                     await playing_message.edit(embed=embed)
