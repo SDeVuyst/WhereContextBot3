@@ -3,7 +3,6 @@ import subprocess
 from discord.ext import commands
 import os
 from discord import app_commands
-from discord.ext.commands import Context
 import discord
 import asyncio
 import tempfile

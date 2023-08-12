@@ -4,8 +4,7 @@ from discord.ext import commands
 import os
 from discord import app_commands
 import discord
-from helpers import checks, db_manager 
-from exceptions import MissingNwords
+from helpers import checks
 
 
 # Here we name the cog and create a new class for the cog.

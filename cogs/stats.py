@@ -10,7 +10,6 @@ import discord
 from discord import app_commands
 from discord.components import SelectOption
 from discord.ext import commands
-from discord.ext.commands import Context
 from discord.interactions import Interaction
 from discord.ui import Select, View
 

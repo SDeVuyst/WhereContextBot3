@@ -12,12 +12,11 @@ import os
 import platform
 import random
 import psycopg2
-import re
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import tasks
 from discord.ext.commands import Bot
-from helpers import db_manager
+from helpers import db_manager, n_word_finder, auto
 import exceptions
 
 from datetime import datetime, timedelta
@@ -210,7 +209,7 @@ async def on_message(message: discord.Message) -> None:
         
 
 
-    await findNWord(message)
+    await n_word_finder.findNWord(bot, message)
     # await bot.process_commands(message)
 
 
@@ -226,66 +225,9 @@ async def on_member_remove(member):
 async def on_member_join(member):
     bot.logger.info(f"{member.id} joined the server!")
 
-    await autoroles(member)
-    await autonick(member)
+    await auto.autoroles(bot, member)
+    await auto.autonick(bot, member)
     
-
-async def autoroles(member):
-    # add member role
-    member_role = discord.utils.get(member.guild.roles, id=753959093185675345)
-    bot.logger.info(f"adding member role")
-    await member.add_roles(member_role)
-
-    roles = {
-        # yachja                   minecraft           cultured            perms               yachja
-        733845345225670686: [739212609248690248, 740301828071358738, 1119328394568548402],
-        # gible                    gent                minecraft
-        559715606014984195: [1024341053786038332, 739212609248690248],
-        # arno                     perms               homeless          sugardaddy          gent                minecraft         
-        273503117348306944: [756224050237538325, 801146953470967809, 827108224485294100, 1024341053786038332, 739212609248690248],
-        # pingy                    knie                 fortnut           spooderman          genshin             waifu bot             gent                minecraft           cultured            cringe             titanfood           perms
-        464400950702899211: [1129051258657968208, 946064405597138994, 918990342840275035, 817107290708639774, 778688939623710770, 1024341053786038332, 739212609248690248,740301828071358738, 836973694630887455, 787665548506955776, 756224050237538325],
-        # solos                indian tech god           gent              spooderman           wcb3                minecraft       not cultured         owner               perms               meng              cummaster
-        462932133170774036: [1079432980038172805, 1024341053786038332, 918990342840275035, 1119600252228489296, 739212609248690248, 805130046414127126, 799385460677804043, 756224050237538325, 777956016033103872, 851467556040474624]
-    }
-
-    
-
-    if member.id in roles:
-
-        # voeg autoroles toe
-        roles_to_add = roles.get(member.id)
-        for role_id in roles_to_add:
-            try:
-                new_role = discord.utils.get(member.guild.roles, id=role_id)
-                bot.logger.info(f"adding {role_id}")
-                await member.add_roles(new_role)
-            except:
-                bot.logger.warning(f"role {role_id} not found")
-
-        
-
-    await member.send('Added your roles back!')
-
-
-async def autonick(member):
-    nicks = {
-        # yachja
-        733845345225670686: "the flesh 🥩",
-        # gible      
-        559715606014984195: "smikkelkontje",     
-        # arno        
-        # 273503117348306944: "",
-        # pingy                 
-        # 464400950702899211: "",
-        # # solos             
-        462932133170774036: "kanye east",
-    }
-
-    if member.id in nicks:
-        await member.edit(nick=nicks.get(member.id))
-        await member.send(f'Set your nickname to "{nicks.get(member.id)}"')
-
 
 @bot.event
 async def on_app_command_completion(interaction, command) -> None:
@@ -308,7 +250,6 @@ async def on_app_command_completion(interaction, command) -> None:
 
     # add stats to db
     await db_manager.increment_or_add_command_count(interaction.user.id, executed_command, 1)
-
 
 
 # check for inactivity in voice channel
@@ -456,22 +397,6 @@ async def load_cogs() -> None:
                 bot.logger.error(f"Failed to load extension {extension}\n{exception}")
                 bot.unloaded.add(extension)
 
-
-async def findNWord(message):
-    content = message.content.replace("\n", " ").lower()
-
-    # words that get detected as nwords but are not
-    ban_list = ['vinager', 'vineger', 'vinegar', 'monika', 'https', 'negeer', 'enige', 'zonnig', 'nieke', 'innige']
-    if any(ban in content for ban in ban_list):
-        return
-    
-    # find nwords
-    pattern = r'(^|\s|\w)?[nNɴ🇳]+[\*\|\_]*[ie1ɪi🇮]+[\*\|\_]*[gɢg🇬]+[\*\|\_]*[l]*[\*\|\_]*[eᴇea3🇦🇦rqrʀ]+[\*\|\_]*[s]*'
-    count = len(re.findall(pattern, content, flags=re.IGNORECASE))
-    if count > 0:
-        await db_manager.increment_or_add_nword(message.author.id, count)
-        bot.logger.info(f"{message.author.display_name} said nword {count} times: {message.content}")
-    
 
     
 

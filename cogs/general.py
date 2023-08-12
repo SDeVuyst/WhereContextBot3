@@ -15,7 +15,7 @@ from datetime import datetime
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands import Context, has_permissions
+from discord.ext.commands import has_permissions
 
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 

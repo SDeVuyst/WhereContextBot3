@@ -1,5 +1,4 @@
 from discord.ext import commands
-from discord.ext.commands import Context
 import discord
 import os
 from discord import app_commands
