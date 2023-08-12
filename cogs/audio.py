@@ -757,9 +757,12 @@ class Audio(commands.Cog, name="audio"):
                     embed.description = "⏸️ **Paused!**"
                 else:
                     # creeer een progress bar
+                    # bereken time diff
                     if self.pause_delta:
                         time_diff = datetime.now() - start_time - self.pause_delta
+                    else:
                         time_diff = datetime.now() - start_time
+
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
                     embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {self.format_seconds_to_mmss(yt.length)}"
