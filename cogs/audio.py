@@ -10,6 +10,7 @@ from helpers import checks, http, sptoyt, ytdl_helper
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
 from strprogressbar import ProgressBar
+from datetime import datetime
 
 
 
@@ -736,24 +737,23 @@ class Audio(commands.Cog, name="audio"):
             else:
                 playing_message = await interaction.channel.send(embed=embed)
 
-            current_sec = 0
+            total = yt.length
+            start_time = datetime.now()
             time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
-                current_sec += 1 if vc.is_playing() else 0
                 try:
+
                     # creeer een progress bar
-                    total = yt.length
-                    current = current_sec
-                    # First two arguments are mandatory
-                    bardata = ProgressBar(current, total, 18)
+                    time_diff = datetime.now() - start_time
+                    bardata = ProgressBar(time_diff.total_seconds(), total, 18)
                     first_desc = embed.description.split('\n')[0]
-                    embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(current_sec)} / {self.format_seconds_to_mmss(yt.length)}"
+                    embed.description = f"{first_desc}\n{bardata} - {time_diff.strftime('%M:%S')} / {self.format_seconds_to_mmss(yt.length)}"
                     await playing_message.edit(embed=embed)
 
                 except Exception as e:
                     self.bot.logger.warning(e)
 
-                # geen 1 sec door delay en functies uitvoeren
+                # hoeveel keer de progress bar w geupdate
                 await asyncio.sleep(time_delay)
 
 
