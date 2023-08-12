@@ -555,6 +555,10 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
             self.queue = self.queue[aantal-1:]
             voice_client.stop()
+
+            # tijdstippen hebben we niet meer nodig
+            self.pause_time = None
+            self.pause_delta = None
             
             embed = discord.Embed(
                 title=f"⏭️ Skipped!",
@@ -589,6 +593,10 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
             # maak queue leeg
             self.queue = []
+            # tijdstippen hebben we niet meer nodig
+            self.pause_time = None
+            self.pause_delta = None
+            
             voice_client.stop()
             embed = discord.Embed(
                 title=f"⏹️ Stopped!",
