@@ -754,7 +754,7 @@ class Audio(commands.Cog, name="audio"):
             time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
                 if vc.is_paused():
-                    embed.description = "⏸️ **Paused!**\n" + embed.description
+                    embed.description = "⏸️ **Paused!**\n" + embed.description.replace('⏸️ **Paused!**\n', '')
                 else:
                     # creeer een progress bar
                     # bereken time diff
