@@ -3,6 +3,10 @@ from discord import Embed
 
 async def find_word(bot, message):
     
+    # message niet van yachja zelf
+    if message.author.id == int(os.environ.get("yachja")):
+        return
+    
     content = message.content.replace("\n", " ").lower()
     triggers = ["one piece", "one peak", "peak", "luffy"]
 
