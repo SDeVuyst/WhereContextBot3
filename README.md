@@ -285,6 +285,7 @@ Change the nword count of a user.
 * uberduckapi
 * uberducksecret
 * yt_api
+* yachja
 
 ## Requirements / Technologies used
 
