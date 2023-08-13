@@ -17,4 +17,6 @@ async def find_word(bot, message):
             color=bot.defaultColor,
         )
 
+        bot.logger.info(f"yachja trigger: {message.content}")
+
         await yachja.send(embed=embed)
