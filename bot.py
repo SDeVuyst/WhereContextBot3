@@ -212,7 +212,7 @@ async def on_message(message: discord.Message) -> None:
     await n_word_finder.findNWord(bot, message)
     await yachja_finder.find_word(bot, message)
     
-    await bot.process_commands(message)
+    # await bot.process_commands(message)
 
 
 
