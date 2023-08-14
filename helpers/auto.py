@@ -38,7 +38,7 @@ async def autoroles(bot, member):
     await member.send('Added your roles back!')
 
 
-async def autonick(member):
+async def autonick(bot, member):
     nicks = {
         # yachja
         733845345225670686: "the flesh 🥩",
