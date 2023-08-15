@@ -128,22 +128,22 @@ class General(commands.Cog, name="general"):
         
 
 
-    @app_commands.command(name="ping", description="Check if the bot is alive", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    async def ping(self, interaction) -> None:
-        """Check if the bot is alive
+    # @app_commands.command(name="ping", description="Check if the bot is alive", extras={'cog': 'general'})
+    # @checks.not_blacklisted()
+    # async def ping(self, interaction) -> None:
+    #     """Check if the bot is alive
 
-        Args:
-            interaction (Interaction): Users Interaction
-        """
+    #     Args:
+    #         interaction (Interaction): Users Interaction
+    #     """
 
-        embed = discord.Embed(
-            title="🏓 Pong!",
-            description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
-            color=self.bot.succesColor if (self.bot.latency * 1000) < 150 else self.bot.defaultColor
-        )
+    #     embed = discord.Embed(
+    #         title="🏓 Pong!",
+    #         description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
+    #         color=self.bot.succesColor if (self.bot.latency * 1000) < 150 else self.bot.defaultColor
+    #     )
 
-        await interaction.response.send_message(embed=embed)
+    #     await interaction.response.send_message(embed=embed)
 
 
 

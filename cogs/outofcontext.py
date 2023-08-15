@@ -25,29 +25,29 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
     # COMMANDS
     
-    @app_commands.command(name="context_debug",description="debug stats for /play-game (admin only)", extras={'cog': 'outofcontext'})
-    @checks.is_owner()
-    @checks.in_correct_server()
-    @checks.not_in_dm()
-    async def context_debug(self, interaction):
-        """Debug stats about the out of context game
+    # @app_commands.command(name="context_debug",description="debug stats for /play-game (admin only)", extras={'cog': 'outofcontext'})
+    # @checks.is_owner()
+    # @checks.in_correct_server()
+    # @checks.not_in_dm()
+    # async def context_debug(self, interaction):
+    #     """Debug stats about the out of context game
 
-        Args:
-            interaction (Interaction): Users interaction
-        """
+    #     Args:
+    #         interaction (Interaction): Users interaction
+    #     """
     
-        embed = discord.Embed(
-            title="Debug",
-            color=self.bot.defaultColor,
-            description=f"""Amount of messages: {len(self.menu.messages)}\n\n
-                Current index: {self.menu.currentIndex}\n\n
-                Messages played: {self.menu.messagesPlayed}\n\n
-                Messages deleted: {self.menu.messagesDeleted}\n\n
-                Author: {self.menu.author.display_name if self.currently_playing else "None"}\n\n
-                Currently playing: {self.currently_playing}"""
-        )
+    #     embed = discord.Embed(
+    #         title="Debug",
+    #         color=self.bot.defaultColor,
+    #         description=f"""Amount of messages: {len(self.menu.messages)}\n\n
+    #             Current index: {self.menu.currentIndex}\n\n
+    #             Messages played: {self.menu.messagesPlayed}\n\n
+    #             Messages deleted: {self.menu.messagesDeleted}\n\n
+    #             Author: {self.menu.author.display_name if self.currently_playing else "None"}\n\n
+    #             Currently playing: {self.currently_playing}"""
+    #     )
 
-        await interaction.response.send_message(embed=embed)
+    #     await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(

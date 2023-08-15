@@ -62,7 +62,7 @@ Displays a help embed with help for every command
 
 Triggers the Lien lockdown. This kicks grom.
 
-#### /ping
+#### /ping - disabled
 
 Checks if the bot is alive.
 
@@ -100,7 +100,7 @@ Set a reminder.
 
 ### Out Of Context
 
-#### /context_debug
+#### /context_debug - disabled
 
 Shows some stats about the Out Of Context game
 
