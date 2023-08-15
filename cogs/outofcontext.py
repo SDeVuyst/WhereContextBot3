@@ -295,7 +295,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         Lets you add a message to the OOC game.
 
         """
-        submitted_id = interaction.user.id
+        submitted_id = message.author.id
 
         # check als message uit OOC komt
         if message.channel.id != int(os.environ.get('channel')):
