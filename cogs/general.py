@@ -363,7 +363,6 @@ class General(commands.Cog, name="general"):
 
 
     @app_commands.command(name="remindme", description="Remind me of an event", extras={'cog': 'general'})
-    @checks.is_owner()
     @checks.not_blacklisted()
     @app_commands.describe(wanneer="When should the bot send you a reminder")
     @app_commands.describe(waarover="What should the bot remind you for")
