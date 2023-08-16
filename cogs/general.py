@@ -103,6 +103,7 @@ class General(commands.Cog, name="general"):
     @commands.cooldown(rate=1, per=180)
     @checks.in_correct_server()
     @checks.not_in_dm()
+    @checks.not_blacklisted()
     async def lien(self, interaction) -> None:
         """Kicks Jerome in case of emergency
 
@@ -363,6 +364,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="remindme", description="Remind me of an event", extras={'cog': 'general'})
     @checks.is_owner()
+    @checks.not_blacklisted()
     @app_commands.describe(wanneer="When should the bot send you a reminder")
     @app_commands.describe(waarover="What should the bot remind you for")
     async def remindme(self, interaction, wanneer: str, waarover: app_commands.Range[str, 1, 100]) -> None:
