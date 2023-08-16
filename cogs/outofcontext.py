@@ -290,6 +290,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
 
     @checks.not_blacklisted()
+    @checks.in_correct_server()
     async def context_add(self, interaction: discord.Interaction, message:discord.Message):
         """
         Lets you add a message to the OOC game.
@@ -343,6 +344,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
 
     @checks.not_blacklisted()
+    @checks.in_correct_server()
     async def context_remove(self, interaction: discord.Interaction, message:discord.Message):
         """
         Lets you remove a message to the OOC game.

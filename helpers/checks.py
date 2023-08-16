@@ -47,6 +47,9 @@ def not_blacklisted() -> Callable[[T], T]:
 def in_audio_command_channel() -> Callable[[T], T]:
 
     async def predicate(interaction):
+        if interaction.guild_id != int(os.environ.get("guild_id")):
+            return True
+        
         if interaction.channel.id not in [1114464141508345906, 727511733970665493]:
             raise WrongChannel("Only able to play in #out-of-context-game or #music-bot")
         return True

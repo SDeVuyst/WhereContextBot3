@@ -75,7 +75,6 @@ class Audio(commands.Cog, name="audio"):
     ])
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     @checks.cost_nword(5)
     @app_commands.describe(effect="Which effect to play")
@@ -143,7 +142,6 @@ class Audio(commands.Cog, name="audio"):
     ])
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     @commands.cooldown(rate=1, per=120)
     @checks.cost_nword(5)
@@ -222,7 +220,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="play", description="play a youtube video or playlist (use multiple times to add to queue)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     @app_commands.choices(in_front=[
         discord.app_commands.Choice(name="no", value=0),
@@ -349,7 +346,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="list", description="See the Queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def list(self, interaction):
         """List the videos in queue
@@ -386,7 +382,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="nowplaying", description="See the currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def nowplaying(self, interaction):
         """Which audio is now playing
@@ -423,7 +418,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="pause", description="Pause currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def pause(self, interaction):
         """ Pauses the playing audio
@@ -455,7 +449,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="resume", description="Resume currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def resume(self, interaction):
         """Resumes the paused audio
@@ -493,7 +486,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="loop", description="Loop the queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def loop(self, interaction):
         """ Loop the queue
@@ -530,7 +522,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="skip", description="Skip the currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     @app_commands.describe(aantal="How many tracks the bot should skip")
     async def skip(self, interaction, aantal:int=1):
@@ -570,7 +561,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="stop", description="Stop the listening session (this clears the queue!)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def stop(self, interaction):
         """ Stops the listening session & clears the queue
@@ -611,7 +601,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="join", description="bot joins voice channel", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def join(self, interaction):
         """Joins a vc
@@ -645,7 +634,6 @@ class Audio(commands.Cog, name="audio"):
     @app_commands.command(name="leave", description="bot leaves voice channel", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
-    @checks.in_correct_server()
     @checks.not_in_dm()
     async def leave(self, interaction):
         """leaves a vc
