@@ -227,9 +227,10 @@ async def on_member_remove(member):
 async def on_member_join(member):
     bot.logger.info(f"{member.id} joined the server!")
 
-    await auto.autoroles(bot, member)
-    await auto.autonick(bot, member)
-    
+    if member.guild.id == int(os.environ.get("guild_id")):
+        await auto.autoroles(bot, member)
+        await auto.autonick(bot, member)
+        
 
 @bot.event
 async def on_app_command_completion(interaction, command) -> None:
