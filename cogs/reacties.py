@@ -390,7 +390,7 @@ class Reacties(commands.Cog, name="reacties"):
             interaction (Interaction): Users Interaction
             choices (app_commands.Choice[int]): Choices of possible reactions
         """
-        messages = [f"retarded ass mening nr. {random.randint(194892084, 294892084)}"]
+        messages = [f"retarded ass opmerking nr. {random.randint(194892084, 294892084)}"]
         m = random.choice(messages) if choices.value == -1 else messages[choices.value]
        
         embed = discord.Embed(
