@@ -411,6 +411,35 @@ class General(commands.Cog, name="general"):
         await interaction.response.send_message(embed=embed)
 
 
+    @app_commands.command(name="status", description="Set the status of the bot for 5min (10🪙)", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    @checks.cost_nword(10)
+    @commands.cooldown(rate=1, per=300) # 1 per 5 minutes
+    @app_commands.describe(status="What do you want the status of the bot to be")
+    async def status(self, interaction, status: app_commands.Range[str, 1, 50]) -> None:
+        """Set the status of the bot
+
+        Args:
+            interaction (Interaction): Users Interaction
+            status (app_commands.Range[str, 1, 50]): status
+        """
+
+        await interaction.response.defer()
+
+        # set the status
+        self.bot.statusManual = datetime.now()
+        await self.bot.change_presence(activity=discord.Game(status))
+
+        embed = discord.Embed(
+            title="✅ Status changed!",
+            description=status,
+            color=self.bot.succesColor
+        )
+        # stuur het antwoord
+        await interaction.followup.send(embed=embed)
+
+
 
 
 async def setup(bot):

@@ -36,6 +36,8 @@ bot.succesColor = 0x39AC39
 bot.loaded = set()
 bot.unloaded = set()
 
+bot.statusManual = None
+
 def save_ids_func(cmds):
     """Saves the ids of commands
 
@@ -143,11 +145,21 @@ async def status_task() -> None:
     """
     Setup the game status task of the bot.
     """
-    amount = await db_manager.messages_in_ooc()
-    statuses = ["Ora et Labora", f"{amount} berichten in outofcontext", "met ba zijn gevoelens", "with Astolfo", "Minecraft", "with gible z'n ma", "with grom z'n ma", "🚨 Scanning for n-words 🚨"]
-    await bot.change_presence(activity=discord.Game(random.choice(statuses)))
 
+    # check if someone used the status command
+    if bot.statusManual is not None:
 
+        # longer than 5 min ago
+        time_diff = datetime.now() - bot.statusManual 
+        if time_diff.total_seconds() > 300:
+            bot.statusManual = None
+
+    if bot.statusManual is None:
+        amount = await db_manager.messages_in_ooc()
+        statuses = ["Ora et Labora", f"{amount} berichten in outofcontext", "met ba zijn gevoelens", "with Astolfo", "Minecraft", "with gible z'n ma", "with grom z'n ma", "🚨 Scanning for n-words 🚨"]
+        await bot.change_presence(activity=discord.Game(random.choice(statuses)))
+
+    
 @tasks.loop(seconds=10)
 async def check_remindme():
 
