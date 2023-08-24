@@ -411,7 +411,7 @@ class General(commands.Cog, name="general"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(name="status", description="Set the status of the bot for 5min (10🪙)", extras={'cog': 'general'})
+    @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @checks.cost_nword(10)

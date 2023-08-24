@@ -149,9 +149,9 @@ async def status_task() -> None:
     # check if someone used the status command
     if bot.statusManual is not None:
 
-        # longer than 5 min ago
+        # longer than 1 hour ago
         time_diff = datetime.now() - bot.statusManual 
-        if time_diff.total_seconds() > 300:
+        if time_diff.total_seconds() > 3600:
             bot.statusManual = None
 
     if bot.statusManual is None:
