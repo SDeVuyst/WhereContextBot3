@@ -98,6 +98,10 @@ Sends an invite to the main server.
 
 Set a reminder.
 
+#### /status
+
+Set the status of the bot for 1 hour.
+
 ### Out Of Context
 
 #### /context_debug - disabled
