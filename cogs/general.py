@@ -433,7 +433,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title="✅ Status changed!",
-            description=status,
+            description=f"Changed status to ```{status}```",
             color=self.bot.succesColor
         )
         # stuur het antwoord
