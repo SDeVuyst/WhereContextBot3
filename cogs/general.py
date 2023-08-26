@@ -77,7 +77,7 @@ class General(commands.Cog, name="general"):
 
             embed = discord.Embed(
                 title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"🔗 *[Invite bot](https://discord.com/api/oauth2/authorize?client_id=1113092675697123458&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)*\nAsk <@{int(admin[0])}> for more help.\n[Klik hier voor meer info](https://github.com/SDeVuyst/WhereContextbot3)\nSommige commands kosten N-Words, bv. voor een command dat 2 N-Words kost, staat er (2🪙) bij de beschrijving", 
+                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id=1113092675697123458&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3)\nSommige commands kosten N-Words, bv. voor een command dat 2 N-Words kost, staat er (2🪙) bij de beschrijving\nAsk <@{int(admin[0])}> for more help.\n", 
                 color=self.bot.defaultColor
             )
 
