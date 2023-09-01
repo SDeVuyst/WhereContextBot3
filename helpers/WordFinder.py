@@ -2,6 +2,7 @@ from . import db_manager
 import re
 import os
 from discord import Embed
+import random
 
 class WordFinder:
     def __init__(self) -> None:
@@ -11,6 +12,7 @@ class WordFinder:
     async def trigger_word(self, bot, message):
         await self.findNWord(bot, message)
         await self.find_yachja_word(bot, message)
+        await self.check_gif(bot, message)
 
  
     async def findNWord(self, bot, message):
@@ -53,3 +55,26 @@ class WordFinder:
             bot.logger.info(f"yachja trigger: {message.content}")
 
             await yachja.send(embed=embed)
+
+
+    async def check_gif(self, bot, message):
+
+        # author can send gifs
+        if message.author.name not in list(zip(*bot.gif_prohibited))[0]:
+            return
+        
+        responses = [
+            f"<@{message.author.id}> shatap lil bro", 
+            f"<@{message.author.id}> you are NOT him",
+            f"<@{message.author.id}> blud thinks he's funny",
+            f"<@{message.author.id}> imma touch you lil nigga",
+            f"<@{message.author.id}> it's on sight now",
+        ]
+
+        if len(message.attachements) > 0:
+            for attachement in message.attachements:
+                if ".gif" in attachement.filename.lower():
+
+                    # gif found
+                    await message.channel.send(random.choice(responses))
+                    await message.delete()

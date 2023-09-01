@@ -37,6 +37,7 @@ bot.loaded = set()
 bot.unloaded = set()
 
 bot.statusManual = None
+bot.gif_prohibited = []
 
 def save_ids_func(cmds):
     """Saves the ids of commands
@@ -159,7 +160,20 @@ async def status_task() -> None:
         statuses = ["Ora et Labora", f"{amount} berichten in outofcontext", "met ba zijn gevoelens", "with Astolfo", "Minecraft", "with gible z'n ma", "with grom z'n ma", "🚨 Scanning for n-words 🚨"]
         await bot.change_presence(activity=discord.Game(random.choice(statuses)))
 
+
+@tasks.loop(seconds=30)
+async def check_gif_unban():
+    ok_list = []
+    for user, t in bot.gif_prohibited:
+
+        # not longer than 1 hour ago
+        time_diff = datetime.now() - t
+        if time_diff.total_seconds() < 3600:
+            ok_list.append((user, t))
     
+    bot.gif_prohibited = ok_list
+
+
 @tasks.loop(seconds=10)
 async def check_remindme():
 

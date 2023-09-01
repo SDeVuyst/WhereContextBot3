@@ -419,10 +419,10 @@ class General(commands.Cog, name="general"):
 
 
     @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'general'})
+    @commands.cooldown(rate=1, per=300) # 1 per 5 minutes
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @checks.cost_nword(10)
-    @commands.cooldown(rate=1, per=300) # 1 per 5 minutes
     @app_commands.describe(status="What do you want the status of the bot to be")
     async def status(self, interaction, status: app_commands.Range[str, 1, 50]) -> None:
         """Set the status of the bot
@@ -447,6 +447,34 @@ class General(commands.Cog, name="general"):
         await interaction.followup.send(embed=embed)
 
 
+    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'general'})
+    # @commands.cooldown(rate=1, per=300) # 1 per 5 minutes
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    # @checks.cost_nword(125)
+    @app_commands.describe(user="Who to block")
+    async def anti_gif(self, interaction, user: discord.User) -> None:
+        """Prevent a user from using gifs for 1 hour
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (User): who to block
+        """
+
+        await interaction.response.defer()
+
+        # add user to block list
+        self.bot.gif_prohibited.append(
+            (user.name, datetime.now())
+        )
+
+        embed = discord.Embed(
+            title="✅ Done!",
+            description=f"<@{user.id}> is now banned from using gifs.",
+            color=self.bot.succesColor
+        )
+        # stuur het antwoord
+        await interaction.followup.send(embed=embed)
 
 
 async def setup(bot):
