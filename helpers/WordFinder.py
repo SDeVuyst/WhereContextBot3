@@ -7,7 +7,7 @@ class WordFinder:
     def __init__(self) -> None:
         pass
         
-        
+
     async def trigger_word(self, bot, message):
         await self.findNWord(bot, message)
         await self.find_yachja_word(bot, message)
@@ -30,7 +30,7 @@ class WordFinder:
     
 
 
-    async def find_yachja_word(bot, message):
+    async def find_yachja_word(self, bot, message):
     
         # message niet van yachja zelf
         if message.author.id == int(os.environ.get("yachja")):
