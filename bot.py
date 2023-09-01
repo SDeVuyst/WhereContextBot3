@@ -235,7 +235,7 @@ async def on_message(message: discord.Message) -> None:
         
 
 
-    await WordFinder.trigger_word(bot, message)
+    await WordFinder.WordFinder().trigger_word(bot, message)
     
     # await bot.process_commands(message)
 

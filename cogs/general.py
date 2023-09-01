@@ -448,7 +448,7 @@ class General(commands.Cog, name="general"):
 
 
     @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'general'})
-    # @commands.cooldown(rate=1, per=300) # 1 per 5 minutes
+    # @commands.cooldown(rate=1, per=30) # 1 per 30 sec
     @checks.not_blacklisted()
     @checks.not_in_dm()
     # @checks.cost_nword(125)
