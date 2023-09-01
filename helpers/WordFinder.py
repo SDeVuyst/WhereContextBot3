@@ -71,12 +71,12 @@ class WordFinder:
             f"<@{message.author.id}> it's on sight now",
         ]
 
-        # # gif via link
-        # if "gif" in message.content:
-        #     # gif found
-        #     await message.channel.send(random.choice(responses))
-        #     await message.delete()
-        #     return
+        # gif via link
+        if "gif" in message.content:
+            # gif found
+            await message.channel.send(random.choice(responses))
+            await message.delete()
+            return
         
         # gif via attachments
         if len(message.attachments) > 0:
