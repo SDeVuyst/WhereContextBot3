@@ -3,7 +3,6 @@ import discord
 async def autoroles(bot, member):
     # add member role
     member_role = discord.utils.get(member.guild.roles, id=753959093185675345)
-    bot.logger.info(f"adding member role")
     await member.add_roles(member_role)
 
     roles = {
@@ -28,13 +27,13 @@ async def autoroles(bot, member):
         for role_id in roles_to_add:
             try:
                 new_role = discord.utils.get(member.guild.roles, id=role_id)
-                bot.logger.info(f"adding {role_id}")
+                
                 await member.add_roles(new_role)
             except:
                 bot.logger.warning(f"role {role_id} not found")
 
         
-
+    bot.logger.info(f"Added autoroles")
     await member.send('Added your roles back!')
 
 

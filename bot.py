@@ -16,7 +16,7 @@ import psycopg2
 import discord
 from discord.ext import tasks
 from discord.ext.commands import Bot
-from helpers import db_manager, n_word_finder, auto, yachja_finder
+from helpers import WordFinder, db_manager, auto
 import exceptions
 
 from datetime import datetime, timedelta
@@ -221,8 +221,7 @@ async def on_message(message: discord.Message) -> None:
         
 
 
-    await n_word_finder.findNWord(bot, message)
-    await yachja_finder.find_word(bot, message)
+    await WordFinder.trigger_word(bot, message)
     
     # await bot.process_commands(message)
 
