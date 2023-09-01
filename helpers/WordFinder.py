@@ -60,7 +60,7 @@ class WordFinder:
     async def check_gif(self, bot, message):
 
         # author can send gifs
-        if message.author.name not in list(zip(*bot.gif_prohibited))[0]:
+        if message.author.name not in [i[0] for i in bot.gif_prohibited]:
             return
         
         responses = [
