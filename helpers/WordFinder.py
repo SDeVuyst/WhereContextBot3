@@ -81,7 +81,7 @@ class WordFinder:
         # gif via attachments
         if len(message.attachments) > 0:
             for attachment in message.attachments:
-                if ".gif" in attachment.filename.lower():
+                if "gif" in attachment.filename.lower():
                     await message.channel.send(random.choice(responses))
                     await message.delete()
                     return
