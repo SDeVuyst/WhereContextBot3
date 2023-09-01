@@ -28,7 +28,7 @@ class WordFinder:
         count = len(re.findall(pattern, content, flags=re.IGNORECASE))
         if count > 0:
             await db_manager.increment_or_add_nword(message.author.id, count)
-        bot.logger.info(f"{message.author.display_name} said nword {count} times: {message.content}")
+            bot.logger.info(f"{message.author.display_name} said nword {count} times: {message.content}")
     
 
 
@@ -71,10 +71,7 @@ class WordFinder:
             f"<@{message.author.id}> it's on sight now",
         ]
 
-        if len(message.attachements) > 0:
-            for attachement in message.attachements:
-                if ".gif" in attachement.filename.lower():
-
-                    # gif found
-                    await message.channel.send(random.choice(responses))
-                    await message.delete()
+        if ".gif" in message.content:
+            # gif found
+            await message.channel.send(random.choice(responses))
+            await message.delete()
