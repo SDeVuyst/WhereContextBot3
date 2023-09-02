@@ -477,5 +477,39 @@ class General(commands.Cog, name="general"):
         await interaction.followup.send(embed=embed)
 
 
+    @app_commands.command(name="impersonate", description="Send a message diguised as a user (10🪙)", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    # @checks.cost_nword(10)
+    @app_commands.describe(user="Who to impersonate")
+    @app_commands.describe(message="What to say")
+    async def impersonate(self, interaction, user: discord.User, message: str) -> None:
+        """Send a message diguised as a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (User): who to impersonate
+            messate (str): what to say
+        """
+
+        await interaction.response.defer()
+
+        # creeer webhook en stuur via die webhook impersonatie
+        webhook = await interaction.channel.create_webhook(name=user.name)
+        await webhook.send(
+            str(message), username=user.name, avatar_url=user.display_avatar.url, silent=True
+        )
+
+        await webhook.delete()
+
+        embed = discord.Embed(
+            title="✅ Done!",
+            description=f"😈",
+            color=self.bot.succesColor
+        )
+        # stuur het antwoord
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
+
 async def setup(bot):
     await bot.add_cog(General(bot))
