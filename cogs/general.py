@@ -495,7 +495,7 @@ class General(commands.Cog, name="general"):
         # creeer webhook en stuur via die webhook impersonatie
         webhook = await interaction.channel.create_webhook(name=user.name)
         await webhook.send(
-            str(message), username=user.name, avatar_url=user.display_avatar.url
+            str(message), username=user.display_name, avatar_url=user.display_avatar.url
         )
 
         await webhook.delete()
