@@ -7,7 +7,7 @@ from math import ceil
 import discord
 import asyncio
 import tempfile
-from helpers import checks, http, sptoyt, ytdl_helper
+from helpers import checks, http, sptoyt, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
 from strprogressbar import ProgressBar
@@ -115,6 +115,10 @@ class Audio(commands.Cog, name="audio"):
                 title=f"📻 played {effect.name}!",
                 color=self.bot.succesColor
             )
+
+            #update ncount
+            await db_manager.increment_or_add_nword(interaction.user.id, -5)
+
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
         # error
@@ -204,6 +208,10 @@ class Audio(commands.Cog, name="audio"):
                 title=f"🎤 Said ```{speech}``` in a {voice.name} voice!",
                 color=self.bot.succesColor
             )
+
+            #update ncount
+            await db_manager.increment_or_add_nword(interaction.user.id, -5)
+            
             await interaction.followup.send(embed=embed)
 
 

@@ -246,6 +246,9 @@ class General(commands.Cog, name="general"):
         admin = await self.bot.fetch_user(owner)
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
 
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -3)
+        
         # stuur confirmatie
         await interaction.response.send_message(content="✅ done.", ephemeral=True)
 
@@ -290,7 +293,9 @@ class General(commands.Cog, name="general"):
                 description=e,
                 color=self.bot.errorColor
             )
-        
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -3)
 
         # stuur het antwoord
         await interaction.followup.send(embed=embed)
@@ -336,6 +341,8 @@ class General(commands.Cog, name="general"):
                 color=self.bot.errorColor
             )
         
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -5)
 
         # stuur het antwoord
         await interaction.followup.send(embed=embed)
@@ -443,6 +450,10 @@ class General(commands.Cog, name="general"):
             description=f"Changed status to ```{status}```",
             color=self.bot.succesColor
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -10)
+        
         # stuur het antwoord
         await interaction.followup.send(embed=embed)
 
@@ -473,6 +484,10 @@ class General(commands.Cog, name="general"):
             description=f"<@{user.id}> is now banned from using gifs.",
             color=self.bot.succesColor
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -125)
+
         # stuur het antwoord
         await interaction.followup.send(embed=embed)
 
@@ -505,6 +520,9 @@ class General(commands.Cog, name="general"):
             description=f"😈",
             color=self.bot.succesColor
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -10)
         # stuur het antwoord
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

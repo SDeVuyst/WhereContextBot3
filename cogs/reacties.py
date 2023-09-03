@@ -4,7 +4,7 @@ from discord.ext import commands
 import os
 from discord import app_commands
 import discord
-from helpers import checks
+from helpers import checks, db_manager
 
 
 # Here we name the cog and create a new class for the cog.
@@ -22,6 +22,10 @@ class Reacties(commands.Cog, name="reacties"):
             interaction (Interaction): users interaction
         """
         file, embed = await self.get_reactie_embed("wholesquadlaughing.jpg", interaction.user.id, "Squad is laughing")
+        
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -1)
+
         await interaction.response.send_message(file=file, embed=embed)
 
 
@@ -36,6 +40,10 @@ class Reacties(commands.Cog, name="reacties"):
             interaction (Interaction): users interaction
         """
         file, embed = await self.get_reactie_embed("notfunny.jpg", interaction.user.id, "Not funny")
+        
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -1)
+
         await interaction.response.send_message(file=file, embed=embed)
 
 
@@ -50,6 +58,10 @@ class Reacties(commands.Cog, name="reacties"):
             interaction (Interaction): users interaction
         """
         file, embed = await self.get_reactie_embed("uthought.jpg", interaction.user.id, "U thought")
+        
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -1)
+
         await interaction.response.send_message(file=file, embed=embed)
  
 
@@ -107,6 +119,9 @@ class Reacties(commands.Cog, name="reacties"):
         Args:
             interaction (Interaction): users interaction
         """
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=self.get_muur_embed(
             "You only need 3 things in life, happiness and good weather", 
             "-Keleo (golden rule)"
@@ -127,6 +142,9 @@ class Reacties(commands.Cog, name="reacties"):
         Args:
             interaction (Interaction): users interaction
         """
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=self.get_muur_embed(
             "Jij laat je toch ook altijd doen hé", 
             "-jeroentje pompoentje"
@@ -147,6 +165,9 @@ class Reacties(commands.Cog, name="reacties"):
         Args:
             interaction (Interaction): users interaction
         """
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=self.get_muur_embed(
             "ik ken mijn limieten", 
             "-Yours truly"
@@ -167,6 +188,9 @@ class Reacties(commands.Cog, name="reacties"):
         Args:
             interaction (Interaction): users interaction
         """
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=self.get_muur_embed(
             "ik vertrouw je voor geen haar!!", 
             "-danny vande fucking veire"
@@ -187,6 +211,9 @@ class Reacties(commands.Cog, name="reacties"):
         Args:
             interaction (Interaction): users interaction
         """
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=self.get_muur_embed(
             "L bozo", 
             "-bozarius III"
@@ -237,6 +264,9 @@ class Reacties(commands.Cog, name="reacties"):
                 color=self.bot.defaultColor,
             )
 
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=embed)
 
 
@@ -269,6 +299,10 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=embed)
 
 
@@ -302,6 +336,10 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=embed)
 
 
@@ -334,6 +372,10 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=embed)
 
 
@@ -366,6 +408,10 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=embed)
 
 
@@ -397,6 +443,10 @@ class Reacties(commands.Cog, name="reacties"):
             title=m,
             color=self.bot.defaultColor,
         )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+
         await interaction.response.send_message(embed=embed)
 
 
@@ -432,6 +482,10 @@ class Reacties(commands.Cog, name="reacties"):
                 title=m,
                 color=self.bot.defaultColor,
             )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -2)
+        
         await interaction.response.send_message(embed=embed)
 
 

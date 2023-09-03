@@ -101,7 +101,7 @@ def cost_nword(cost: int) -> Callable[[T], T]:
         if exact_count < cost:
             raise MissingNwords(exact_count, cost)
         
-        # update nword count
-        return await db_manager.set_nword_count(interaction.user.id, exact_count-cost)
+        # user has enough nwords
+        return True
 
     return app_commands.check(predicate)
