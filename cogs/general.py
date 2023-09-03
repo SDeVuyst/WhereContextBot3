@@ -107,7 +107,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'general'})
     @has_permissions(ban_members=True)
-    @commands.cooldown(rate=1, per=180)
+    @app_commands.checks.cooldown(rate=1, per=180)
     @checks.in_correct_server()
     @checks.not_in_dm()
     @checks.not_blacklisted()
@@ -224,7 +224,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="dm", description="let the bot DM a user (3🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @commands.cooldown(rate=1, per=20)
+    @app_commands.checks.cooldown(rate=1, per=20)
     @checks.not_in_dm()
     @checks.cost_nword(3)
     @app_commands.describe(user="What user to DM")
@@ -254,7 +254,7 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="chat", description="Chat with the bot (3🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @commands.cooldown(rate=2, per=30)
+    @app_commands.checks.cooldown(rate=2, per=30)
     @checks.cost_nword(3)
     @app_commands.describe(prompt="Your question/conversation piece")
     async def chat(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
@@ -301,7 +301,7 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @checks.cost_nword(5)
-    @commands.cooldown(rate=5, per=120) # 3 per 10 minutes
+    @app_commands.checks.cooldown(rate=5, per=120) # 3 per 10 minutes
     @app_commands.describe(prompt="A detailed description of what to create")
     async def image(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
         """Create an image using Ai
@@ -419,7 +419,7 @@ class General(commands.Cog, name="general"):
 
 
     @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'general'})
-    @commands.cooldown(rate=1, per=300) # 1 per 5 minutes
+    @app_commands.checks.cooldown(rate=1, per=300) # 1 per 5 minutes
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @checks.cost_nword(10)
@@ -448,7 +448,7 @@ class General(commands.Cog, name="general"):
 
 
     @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'general'})
-    @commands.cooldown(rate=1, per=30) # 1 per 30 sec
+    @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @checks.cost_nword(125)

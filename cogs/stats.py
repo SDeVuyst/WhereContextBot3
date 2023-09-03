@@ -79,7 +79,7 @@ class Stats(commands.Cog, name="stats"):
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
-    @commands.cooldown(rate=1, per=10)
+    @app_commands.checks.cooldown(rate=1, per=10)
     async def stats_individual(self,interaction, user: discord.User) -> None:
         """Shows the individual stats for a user for a given command
 
@@ -185,7 +185,7 @@ class Stats(commands.Cog, name="stats"):
 
     @app_commands.command(name="leaderboard", description="Leaderboard of a command", extras={'cog': 'stats'})
     @checks.not_blacklisted()
-    @commands.cooldown(rate=1, per=10)
+    @app_commands.checks.cooldown(rate=1, per=10)
     async def leaderboard(self,interaction):
         """Shows the leaderboard for a command
 
@@ -276,7 +276,7 @@ class Stats(commands.Cog, name="stats"):
     @app_commands.describe(user="Which users' n-word count")
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @commands.cooldown(rate=1, per=10)
+    @app_commands.checks.cooldown(rate=1, per=10)
     async def nCount(self,interaction, user: discord.User):
         """How many times a user has said the nword
 

@@ -143,7 +143,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
-    @commands.cooldown(rate=1, per=120)
+    @app_commands.checks.cooldown(rate=1, per=120)
     @checks.cost_nword(5)
     @app_commands.describe(speech="What to say")
     @app_commands.describe(voice="Which voice to say your text in")
