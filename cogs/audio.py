@@ -6,6 +6,7 @@ from discord import app_commands
 from math import ceil
 import discord
 import asyncio
+import random
 import tempfile
 from helpers import checks, http, sptoyt, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
@@ -662,6 +663,29 @@ class Audio(commands.Cog, name="audio"):
         else:
             await interaction.response.send_message(embed=self.not_in_vc_embed)
 
+
+    @app_commands.command(name="shuffle", description="Shuffles the queue", extras={'cog': 'audio'})
+    @checks.not_blacklisted()
+    @checks.in_audio_command_channel()
+    @checks.not_in_dm()
+    async def shuffle(self, interaction):
+        """shuffles the queue
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+
+        vc = interaction.guild.voice_client
+        if vc.is_connected():
+            random.shuffle(self.queue)
+            embed = discord.Embed(
+                title=f"🔀 Shuffled!",
+                color=self.bot.succesColor
+            )
+            await interaction.response.send_message(embed=embed)
+
+        else:
+            await interaction.response.send_message(embed=self.not_in_vc_embed)
 
 
     async def play_next(self, interaction, first_player=False):
