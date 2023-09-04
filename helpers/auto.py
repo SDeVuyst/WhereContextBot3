@@ -6,8 +6,8 @@ async def autoroles(bot, member):
     await member.add_roles(member_role)
 
     roles = {
-        # yachja                   minecraft           cultured            perms               yachja
-        733845345225670686: [739212609248690248, 740301828071358738, 1119328394568548402],
+        # yachja                   perms,              minecraft           cultured            perms               yachja
+        733845345225670686: [756224050237538325, 739212609248690248, 740301828071358738, 1119328394568548402],
         # gible                    gent                minecraft
         559715606014984195: [1024341053786038332, 739212609248690248],
         # arno                     perms               homeless          sugardaddy          gent                minecraft         
@@ -40,7 +40,7 @@ async def autoroles(bot, member):
 async def autonick(bot, member):
     nicks = {
         # yachja
-        733845345225670686: "the flesh 🥩",
+        # 733845345225670686: "",
         # gible      
         559715606014984195: "smikkelkontje",     
         # arno        
