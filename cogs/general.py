@@ -544,7 +544,7 @@ class General(commands.Cog, name="general"):
             title=question, 
             color = self.bot.defaultColor, 
         )
-        poll_builder = await interaction.resonse.send_message(embed=embed)
+        poll_builder = await interaction.response.send_message(embed=embed)
 
         embed.set_footer(text=f'Poll ID: {poll_builder.id}')
 
