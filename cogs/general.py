@@ -574,19 +574,20 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
         # send modal
-        modal = AddResponseModal()
+        modal = AddResponseModal(self)
         await interaction.response.send_modal(modal)
-        response = await modal.wait()
+        wait_value = await modal.wait()
 
-        # save option
-        self.options.append(response.answer.value)
+        # get inputted value
+        if wait_value.value is not None:
+            self.options.append(wait_value.value)
 
         # add options to embed
         opts = '\n'.join(self.options)
         self.embed.remove_field(index=0)
         self.embed.add_field(name="Options", value=opts, inline=False)
 
-        # edit embed
+        # edit poll builder
         await self.poll_builder.edit(embed=self.embed, view=self)
 
 
@@ -599,23 +600,25 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
         
-        await self.poll_builder.edit('done')
+        await self.poll_builder.edit('finished')
 
 
 
 class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
-    def __init__(self):
+    def __init__(self, poll_builder):
+        self.poll_builder = poll_builder
         super().__init__(timeout=None)
         
 
-    answer = discord.ui.TextInput(
-        label='Option', 
-        required=True,
-        max_length=15
-    )
+        self.answer = discord.ui.TextInput(
+            label='Option', 
+            required=True,
+            max_length=15
+        )
 
     async def on_submit(self, interaction: discord.Interaction):
+        self.value = self.answer.value
         await interaction.response.send_message(f'Option added!', ephemeral=True)
         self.stop()
 
