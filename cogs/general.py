@@ -611,11 +611,11 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
         super().__init__(timeout=None)
         
 
-        self.answer = discord.ui.TextInput(
-            label='Option', 
-            required=True,
-            max_length=15
-        )
+    answer = discord.ui.TextInput(
+        label='Option', 
+        required=True,
+        max_length=15
+    )
 
     async def on_submit(self, interaction: discord.Interaction):
         self.value = self.answer.value
