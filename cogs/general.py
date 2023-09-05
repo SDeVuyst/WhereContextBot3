@@ -540,19 +540,16 @@ class General(commands.Cog, name="general"):
             options (str): possible answers
         """
 
-        await interaction.response.defer()
-
-
         embed = discord.Embed(
             title=question, 
             color = self.bot.defaultColor, 
         )
-        poll_builder = await interaction.followup.send(embed=embed)
+        poll_builder = await interaction.resonse.send_message(embed=embed)
 
         embed.set_footer(text=f'Poll ID: {poll_builder.id}')
 
         view = PollMenuBuilder(poll_builder, embed)
-        await poll_builder.edit(embed=embed, view=view)
+        await poll_builder.edit_message(embed=embed, view=view)
         
 
 # behandelt alle knoppen
@@ -588,7 +585,7 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.add_field(name="Options", value=opts, inline=False)
 
         # edit poll builder
-        await self.poll_builder.edit(embed=self.embed, view=self)
+        await self.poll_builder.edit_message(embed=self.embed, view=self)
 
 
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
@@ -600,7 +597,7 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
         
-        await self.poll_builder.edit('finished')
+        await self.poll_builder.edit_message('finished')
 
 
 
