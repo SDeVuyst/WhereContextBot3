@@ -532,7 +532,7 @@ class General(commands.Cog, name="general"):
     @checks.not_in_dm()
     @app_commands.describe(question="Title of your poll")
     @app_commands.describe(options="Possible answers")
-    async def poll(self, interaction, question: str, *options) -> None:
+    async def poll(self, interaction, question: str) -> None:
         """Create a poll
 
         Args:
@@ -543,26 +543,70 @@ class General(commands.Cog, name="general"):
 
         await interaction.response.defer()
 
-        reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
-
-        description = []
-        for x, option in enumerate(options):
-            description += f'\n {reactions[x]} *{option}*'
 
         embed = discord.Embed(
             title=question, 
             color = self.bot.defaultColor, 
-            description = ''.join(description))
+        )
+        poll_builder = await interaction.followup.send(embed=embed)
 
-        react_message = await interaction.followup.send(embed=embed)
+        embed.set_footer(text=f'Poll ID: {poll_builder.id}')
 
-        for reaction in reactions[:len(options)]:
-            await react_message.add_reaction(reaction)
-
-        embed.set_footer(text=f'Poll ID: {react_message.id}')
-
-        await react_message.edit(embed=embed)
+        view = PollMenuBuilder(embed)
+        await poll_builder.edit(embed=embed, view=view)
         
+
+# behandelt alle knoppen
+class PollMenuBuilder(discord.ui.View):
+    def __init__(self, embed):
+        self.embed = embed
+        self.options = []
+        super().__init__(timeout=None)
+        
+
+
+    @discord.ui.button(label="Add Option", emoji='📋', style=discord.ButtonStyle.blurple, disabled=False)
+    async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Add a possible answer
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+            button (discord.ui.Button): the button
+        """
+        modal = AddResponseModal(self)
+        m = await interaction.response.send_modal(modal)
+        await interaction.response.edit_message(embed=self.embed, view=self)
+
+
+    @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
+    async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Add a possible answer
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+            button (discord.ui.Button): the button
+        """
+        # todo
+        await interaction.response.edit_message(str(self.options))
+
+
+
+class AddResponseModal(discord.ui.Modal, title='Add Option'):
+
+    def __init__(self, poll_builder):
+        self.poll_builder = poll_builder
+        super().__init__(timeout=None)
+        
+
+    answer = discord.ui.TextInput(label='Option', 
+        style=discord.textStyle.short, 
+        required=True,
+        max_length=15
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        self.poll_builder.options.append(self.answer)
+        await interaction.response.send_message(f'Option added!', ephemeral=True)
 
 
 async def setup(bot):
