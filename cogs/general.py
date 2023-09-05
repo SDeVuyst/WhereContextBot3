@@ -527,5 +527,43 @@ class General(commands.Cog, name="general"):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
+    @app_commands.command(name="poll", description="Create a poll", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    @app_commands.describe(question="Title of your poll")
+    @app_commands.describe(options="Possible answers")
+    async def poll(self, interaction, question: str, *options: str) -> None:
+        """Create a poll
+
+        Args:
+            interaction (Interaction): Users interaction
+            question (str): TItle of poll
+            options (str): possible answers
+        """
+
+        await interaction.response.defer()
+
+        reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+
+        description = []
+        for x, option in enumerate(options):
+            description += f'\n {reactions[x]} *{option}*'
+
+        embed = discord.Embed(
+            title=question, 
+            color = self.bot.defaultColor, 
+            description = ''.join(description))
+
+        react_message = await interaction.followup.send(embed=embed)
+
+        for reaction in reactions[:len(options)]:
+            await react_message.add_reaction(reaction)
+
+        embed.set_footer(text=f'Poll ID: {react_message.id}')
+
+        await react_message.edit(embed=embed)
+        
+
+
 async def setup(bot):
     await bot.add_cog(General(bot))
