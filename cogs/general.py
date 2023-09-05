@@ -544,18 +544,16 @@ class General(commands.Cog, name="general"):
             title=question, 
             color = self.bot.defaultColor, 
         )
-        poll_builder = await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
-        embed.set_footer(text=f'Poll ID: {poll_builder.id}')
-
-        view = PollMenuBuilder(poll_builder, embed)
-        await poll_builder.edit_message(embed=embed, view=view)
+        view = PollMenuBuilder(interaction, embed)
+        await interaction.edit_message(embed=embed, view=view)
         
 
 # behandelt alle knoppen
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, poll_builder, embed):
-        self.poll_builder = poll_builder
+    def __init__(self, intera, embed):
+        self.intera = intera
         self.embed = embed
         self.options = []
         super().__init__(timeout=None)
@@ -585,7 +583,7 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.add_field(name="Options", value=opts, inline=False)
 
         # edit poll builder
-        await self.poll_builder.edit_message(embed=self.embed, view=self)
+        await interaction.edit_message(embed=self.embed, view=self)
 
 
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
@@ -597,7 +595,7 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
         
-        await self.poll_builder.edit_message('finished')
+        await interaction.edit_message('finished')
 
 
 
@@ -616,8 +614,8 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.value = self.answer.value
-        await interaction.response.send_message(f'Option added!', ephemeral=True)
-        self.stop()
+        await interaction.response.send_message(f'Option added! {self.value}', ephemeral=True)
+
 
 async def setup(bot):
     await bot.add_cog(General(bot))
