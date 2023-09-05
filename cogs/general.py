@@ -597,8 +597,8 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
         super().__init__(timeout=None)
         
 
-    answer = discord.ui.TextInput(label='Option', 
-        style=discord.textStyle.short, 
+    answer = discord.ui.TextInput(
+        label='Option', 
         required=True,
         max_length=15
     )
