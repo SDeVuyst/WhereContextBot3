@@ -551,13 +551,14 @@ class General(commands.Cog, name="general"):
 
         embed.set_footer(text=f'Poll ID: {poll_builder.id}')
 
-        view = PollMenuBuilder(embed)
+        view = PollMenuBuilder(poll_builder, embed)
         await poll_builder.edit(embed=embed, view=view)
         
 
 # behandelt alle knoppen
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, embed):
+    def __init__(self, poll_builder, embed):
+        self.poll_builder = poll_builder
         self.embed = embed
         self.options = []
         super().__init__(timeout=None)
@@ -572,9 +573,21 @@ class PollMenuBuilder(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
-        modal = AddResponseModal(self)
-        m = await interaction.response.send_modal(modal)
-        await interaction.response.edit_message(embed=self.embed, view=self)
+        # send modal
+        modal = AddResponseModal()
+        await interaction.response.send_modal(modal)
+        response = await modal.wait()
+
+        # save option
+        self.options.append(response.answer.value)
+
+        # add options to embed
+        opts = '\n'.join(self.options)
+        self.embed.remove_field(index=0)
+        self.embed.add_field(name="Options", value=opts, inline=False)
+
+        # edit embed
+        await self.poll_builder.edit(embed=self.embed, view=self)
 
 
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
@@ -585,15 +598,14 @@ class PollMenuBuilder(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
-        # todo
-        await interaction.response.edit_message(str(self.options))
+        
+        await self.poll_builder.edit('done')
 
 
 
 class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
-    def __init__(self, poll_builder):
-        self.poll_builder = poll_builder
+    def __init__(self):
         super().__init__(timeout=None)
         
 
@@ -604,9 +616,8 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
     )
 
     async def on_submit(self, interaction: discord.Interaction):
-        self.poll_builder.options.append(self.answer)
         await interaction.response.send_message(f'Option added!', ephemeral=True)
-
+        self.stop()
 
 async def setup(bot):
     await bot.add_cog(General(bot))
