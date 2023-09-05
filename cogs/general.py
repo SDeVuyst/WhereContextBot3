@@ -531,7 +531,6 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @app_commands.describe(question="Title of your poll")
-    @app_commands.describe(options="Possible answers")
     async def poll(self, interaction, question: str) -> None:
         """Create a poll
 
