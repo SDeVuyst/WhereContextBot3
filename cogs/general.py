@@ -598,11 +598,13 @@ class PollMenuBuilder(discord.ui.View):
         for b in self.children:
             # enable finish button if 2 or more options
             if len(self.options) >= 2:
-                b.disabled = b.label == "Finish"
+                if b.label == "Finish":
+                    b.disabled = False
 
             # disable button if 9 options
             if len(self.options) >= 9:
-                b.disabled = b.label == "Add Option"
+                if b.label == "Add Option":
+                    b.disabled = True
             
 
     @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
@@ -653,7 +655,7 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.title = self.title
 
         # edit original message
-        msg = await interaction.original_response()
+        msg = await interaction.message()
         await msg.edit(embed=self.embed, view=None)
 
         # add reactions
@@ -672,11 +674,10 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
 
-        # edit original message
-        msg = await interaction.original_response()
-        await msg.delete()
+        # delete original message
+        await interaction.message.delete()
 
-        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
+        # await interaction.response.send_message('❌ Stopped!', ephemeral=True)
 
         
 
