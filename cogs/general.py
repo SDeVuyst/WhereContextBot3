@@ -652,9 +652,6 @@ class PollMenuBuilder(discord.ui.View):
 
         self.embed.remove_field(index=0)
 
-        # invisible field for more space
-        self.embed.add_field(name = chr(173), value = chr(173))
-
         # result field
         self.embed.add_field(
             name='**🏁 Results**',
@@ -662,7 +659,11 @@ class PollMenuBuilder(discord.ui.View):
             inline=False
         )
 
-        self.embed.title = self.title
+        self.embed.title = f'***{self.title}***'
+        # todo
+        self.embed.set_thumbnail(
+            url="https://quickchart.io/chart?c={type:'pie',data:{{datasets:[{{data:[{}]}}]}}}}".format(','.join([1 for _ in range(len(self.options))]))
+        )
 
         # edit original message
         msg = interaction.message
