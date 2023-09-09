@@ -591,9 +591,8 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.add_field(name="📋 Options", value=opts, inline=False)
 
         # edit poll builder
-        # msg = await interaction.original_response()
-        # await msg.edit(embed=self.embed, view=self)
-        await interaction.response.edit_message(embed=self.embed, view=self)
+        msg = await interaction.original_response()
+        await msg.edit(embed=self.embed, view=self)
         
         # disable button if 9 options
         if len(self.options) >= 9:
@@ -633,6 +632,8 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
 
+        await interaction.response.send_message('Sending poll!')
+
         vals = ''
         for i in range(len(self.options)):
             vals += f'**{self.reactions[i]}: 0 votes - 0%**\n'
@@ -665,10 +666,11 @@ class PollMenuBuilder(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
+        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
 
         # edit original message
         msg = await interaction.original_response()
-        await msg.edit("❌ Stopped!", ephemeral=True)
+        await msg.delete()
 
         self.stop()
 
