@@ -543,16 +543,17 @@ class General(commands.Cog, name="general"):
         embed = discord.Embed(
             title=question, 
             color = self.bot.defaultColor,
-            timestamp=datetime.datetime.utcnow()
+            timestamp=datetime.utcnow()
         )
         embed.set_footer(text=f"Poll started by <@{interaction.user.id}>")
+        embed.set_thumbnail(url=str(interaction.user.avatar.url))
         await interaction.response.send_message(embed=embed)
 
         view = PollMenuBuilder(embed)
         await interaction.edit_original_response(embed=embed, view=view)
         
 
-# behandelt alle knoppen
+# behandelt alle knoppen van poll builder
 class PollMenuBuilder(discord.ui.View):
     def __init__(self, embed):
         self.embed = embed
