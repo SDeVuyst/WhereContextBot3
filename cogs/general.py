@@ -549,16 +549,16 @@ class General(commands.Cog, name="general"):
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
         await interaction.response.send_message(embed=embed)
 
-        view = PollMenuBuilder(question, embed, interaction.user)
+        view = PollMenuBuilder(question, embed, interaction.user.id)
         await interaction.edit_original_response(embed=embed, view=view)
         
 
 
 # behandelt alle knoppen van poll builder
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, title, embed, author):
+    def __init__(self, title, embed, author_id):
         self.title = title
-        self.author = author
+        self.author_id = author_id
         self.embed = embed
         self.description = None
         self.options = []
@@ -656,9 +656,26 @@ class PollMenuBuilder(discord.ui.View):
             await msg.add_reaction(self.reactions[i])
 
 
+    @discord.ui.button(label="Stop", emoji='❌', style=discord.ButtonStyle.danger, disabled=False)
+    async def stop(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Stop building poll
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+            button (discord.ui.Button): the button
+        """
+
+        # edit original message
+        msg = await interaction.original_response()
+        await msg.edit("❌ Stopped!", ephemeral=True)
+
+
+        self.stop()
+
+
     async def interaction_check(self, interaction: discord.Interaction):
-        if interaction.user != self.author or str(interaction.user.id) in list(os.environ.get("owners").split(",")):
-            await interaction.response.send_message('shatap lil bro, you are not him')
+        if interaction.user.id != self.author_id or str(interaction.user.id) in list(os.environ.get("owners").split(",")):
+            await interaction.response.send_message('shatap lil bro, you are not him', ephemeral=True)
             return False
         return True
 
