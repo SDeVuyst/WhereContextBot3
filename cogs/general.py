@@ -587,7 +587,7 @@ class PollMenuBuilder(discord.ui.View):
         
         # add options to embed
         opts = '\n'.join(f'**{index+1}: {val}**' for index, val in enumerate(self.options))
-        self.embed.remove_field(index=0)
+        self.embed.remove_field(index=1)
         self.embed.add_field(name="📋 Options", value=opts, inline=False)
 
         # edit poll builder
@@ -645,8 +645,6 @@ class PollMenuBuilder(discord.ui.View):
 
         self.embed.title = self.title
 
-        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
-
         # edit original message
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=None)
@@ -655,8 +653,10 @@ class PollMenuBuilder(discord.ui.View):
         for i in range(len(self.options)):
             await msg.add_reaction(self.reactions[i])
 
+        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
 
-    @discord.ui.button(label="Stop", emoji='❌', style=discord.ButtonStyle.danger, disabled=False)
+
+    @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
     async def stop(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Stop building poll
 
@@ -668,7 +668,6 @@ class PollMenuBuilder(discord.ui.View):
         # edit original message
         msg = await interaction.original_response()
         await msg.edit("❌ Stopped!", ephemeral=True)
-
 
         self.stop()
 
