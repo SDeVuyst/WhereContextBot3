@@ -605,7 +605,7 @@ class PollMenuBuilder(discord.ui.View):
         # edit poll builder
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=self)
-        
+
 
     @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_description(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -655,7 +655,7 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.title = self.title
 
         # edit original message
-        msg = await interaction.message
+        msg = interaction.message
         await msg.edit(embed=self.embed, view=None)
 
         # add reactions
