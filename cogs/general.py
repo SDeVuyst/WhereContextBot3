@@ -586,9 +586,9 @@ class PollMenuBuilder(discord.ui.View):
 
         
         # add options to embed
-        opts = '\n'.join(f'**{self.reactions[index]}: {val}**' for index, val in enumerate(self.options))
+        opts = '\u200b' +'\n'.join(f'**{self.reactions[index]}: {val}**' for index, val in enumerate(self.options))
         self.embed.remove_field(index=1)
-        self.embed.add_field(name="📋 Options", value=opts, inline=False)
+        self.embed.add_field(name="**📋 Options**", value=opts, inline=False)
         
         
         for b in self.children:
@@ -607,7 +607,7 @@ class PollMenuBuilder(discord.ui.View):
         await msg.edit(embed=self.embed, view=self)
 
 
-    @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
+    @discord.ui.button(label="Add Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_description(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Add/change description of poll
 
@@ -624,10 +624,15 @@ class PollMenuBuilder(discord.ui.View):
 
         # set description to embed
         self.embed.description = self.description
+        
+        # change button label
+        button.label = "Change Description"
 
         # edit poll builder
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=self)
+
+        
 
 
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=True)
@@ -641,13 +646,18 @@ class PollMenuBuilder(discord.ui.View):
 
         # await interaction.response.send_message('Sending poll!')
 
-        vals = ''
+        vals = '\u200b'
         for i in range(len(self.options)):
             vals += f'**{self.reactions[i]}: 0 votes - 0%**\n'
 
+        self.embed.remove_field(index=0)
+
+        # invisible field for more space
+        self.embed.add_field(name = chr(173), value = chr(173))
+
         # result field
         self.embed.add_field(
-            name='🏁 Results',
+            name='**🏁 Results**',
             value=vals,
             inline=False
         )
@@ -662,7 +672,8 @@ class PollMenuBuilder(discord.ui.View):
         for i in range(len(self.options)):
             await msg.add_reaction(self.reactions[i])
 
-        # await interaction.response.send_message(f'Poll is live!', ephemeral=True)
+        # send confirmation
+        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
 
 
     @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
