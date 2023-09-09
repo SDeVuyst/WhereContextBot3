@@ -661,8 +661,9 @@ class PollMenuBuilder(discord.ui.View):
 
         self.embed.title = f'***{self.title}***'
         # todo
+        ops = ','.join([f"'{o}'" for o in self.options])
         self.embed.set_thumbnail(
-            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:[{','.join(['1' for _ in range(len(self.options))])}]}}],labels:[{','.join(self.options)}]}}}}"
+            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:[{','.join(['1' for _ in range(len(self.options))])}]}}],labels:[{ops}]}}}}"
         )         
 
         # edit original message
