@@ -586,13 +586,14 @@ class PollMenuBuilder(discord.ui.View):
 
         
         # add options to embed
-        opts = '\n'.join(f'**{index+1}: {val}**' for index, val in enumerate(self.options))
+        opts = '\n'.join(f'**{self.reactions[index]}: {val}**' for index, val in enumerate(self.options))
         self.embed.remove_field(index=1)
         self.embed.add_field(name="📋 Options", value=opts, inline=False)
 
         # edit poll builder
-        msg = await interaction.original_response()
-        await msg.edit(embed=self.embed, view=self)
+        # msg = await interaction.original_response()
+        # await msg.edit(embed=self.embed, view=self)
+        await interaction.response.edit_message(embed=self.embed, view=self)
         
         # disable button if 9 options
         if len(self.options) >= 9:
