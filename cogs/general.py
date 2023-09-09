@@ -546,13 +546,13 @@ class General(commands.Cog, name="general"):
         )
         await interaction.response.send_message(embed=embed)
 
-        view = PollMenuBuilder(interaction, embed)
+        view = PollMenuBuilder(embed)
         await interaction.edit_original_response(embed=embed, view=view)
         
 
 # behandelt alle knoppen
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, intera, embed):
+    def __init__(self, embed):
         self.embed = embed
         self.options = []
         super().__init__(timeout=None)
@@ -577,12 +577,13 @@ class PollMenuBuilder(discord.ui.View):
         
         # add options to embed
         opts = '\n'.join(f'{index}: {val}' for index, val in enumerate(self.options))
-        self.bot.logger.info(opts)
+        print(opts)
         self.embed.remove_field(index=0)
         self.embed.add_field(name="Options", value=opts, inline=False)
 
         # edit poll builder
-        await interaction.edit_original_response(embed=self.embed, view=self)
+        msg = await interaction.original_response()
+        await msg.edit(embed=self.embed, view=self)
 
 
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
