@@ -542,8 +542,10 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title=question, 
-            color = self.bot.defaultColor, 
+            color = self.bot.defaultColor,
+            timestamp=datetime.datetime.utcnow()
         )
+        embed.set_footer(text=f"Poll started by <@{interaction.user.id}>")
         await interaction.response.send_message(embed=embed)
 
         view = PollMenuBuilder(embed)
@@ -576,8 +578,7 @@ class PollMenuBuilder(discord.ui.View):
 
         
         # add options to embed
-        opts = '\n'.join(f'{index}: {val}' for index, val in enumerate(self.options))
-        print(opts)
+        opts = '\n'.join(f'**{index+1}: {val}**' for index, val in enumerate(self.options))
         self.embed.remove_field(index=0)
         self.embed.add_field(name="Options", value=opts, inline=False)
 
@@ -588,14 +589,27 @@ class PollMenuBuilder(discord.ui.View):
 
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
-        """Add a possible answer
+        """Finish building the poll
 
         Args:
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
-        
-        await interaction.edit_original_response('finished')
+
+        vals = ''
+        for index in len(self.options):
+            vals += f'**{index+1}: 0 votes - 0%**'
+
+        # result field
+        self.embed.add_field(
+            name='Results',
+            value=vals,
+            inline=False
+        )
+
+        # edit original message
+        msg = await interaction.original_response()
+        await msg.edit(embed=self.embed, view=None)
 
 
 
@@ -613,7 +627,7 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.options.append(self.answer.value)
-        await interaction.response.send_message(f'Option added! \n ```{self.answer.value}```', ephemeral=True)
+        await interaction.response.send_message(f'Option added! ```{self.answer.value}```', ephemeral=True)
 
 
 async def setup(bot):
