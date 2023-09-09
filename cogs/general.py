@@ -662,7 +662,7 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.title = f'***{self.title}***'
         # todo
         self.embed.set_thumbnail(
-            url="https://quickchart.io/chart?c={type:'pie',data:{{datasets:[{{data:[{}]}}]}}}}".format(','.join([1 for _ in range(len(self.options))]))
+            url="https://quickchart.io/chart?c={type:'pie',data:{{datasets:[{{data:[{}]}}]}}}}".format(','.join(['1' for _ in range(len(self.options))]))
         )
 
         # edit original message
