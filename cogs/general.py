@@ -674,7 +674,7 @@ class PollMenuBuilder(discord.ui.View):
 
 
     async def interaction_check(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author_id or str(interaction.user.id) in list(os.environ.get("owners").split(",")):
+        if interaction.user.id != self.author_id and str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
             await interaction.response.send_message('shatap lil bro, you are not him', ephemeral=True)
             return False
         return True
