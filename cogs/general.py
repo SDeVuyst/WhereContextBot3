@@ -541,24 +541,30 @@ class General(commands.Cog, name="general"):
         """
 
         embed = discord.Embed(
-            title=question, 
+            title=f'Build your poll!', 
             color = self.bot.defaultColor,
             timestamp=datetime.utcnow()
         )
+        embed.add_field(name='❓ Question', value=question, inline=False)
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
         await interaction.response.send_message(embed=embed)
 
-        view = PollMenuBuilder(embed)
+        view = PollMenuBuilder(question, embed, interaction.user)
         await interaction.edit_original_response(embed=embed, view=view)
         
 
+
 # behandelt alle knoppen van poll builder
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, embed):
+    def __init__(self, title, embed, author):
+        self.title = title
+        self.author = author
         self.embed = embed
         self.description = None
         self.options = []
-        super().__init__(timeout=None)
+
+        self.reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+        super().__init__(timeout=500)
         
 
 
@@ -570,6 +576,7 @@ class PollMenuBuilder(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
+
         # send modal
         modal = AddResponseModal(self)
         await interaction.response.send_modal(modal)
@@ -581,11 +588,16 @@ class PollMenuBuilder(discord.ui.View):
         # add options to embed
         opts = '\n'.join(f'**{index+1}: {val}**' for index, val in enumerate(self.options))
         self.embed.remove_field(index=0)
-        self.embed.add_field(name="Options", value=opts, inline=False)
+        self.embed.add_field(name="📋 Options", value=opts, inline=False)
 
         # edit poll builder
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=self)
+        
+        # disable button if 9 options
+        if len(self.options) >= 9:
+            for b in self.children:
+                b.disabled = b.label == "Add Option"
 
 
     @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
@@ -622,20 +634,35 @@ class PollMenuBuilder(discord.ui.View):
 
         vals = ''
         for index in range(len(self.options)):
-            vals += f'**{index+1}: 0 votes - 0%**'
+            vals += f'**{index+1}: 0 votes - 0%**\n'
 
         # result field
         self.embed.add_field(
-            name='Results',
+            name='🏁 Results',
             value=vals,
             inline=False
         )
+
+        self.embed.title = self.title
+
+        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
 
         # edit original message
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=None)
 
+        # add reactions
+        for i in range(len(self.options)):
+            await msg.add_reaction(self.reactions[i])
 
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if interaction.author != self.author or str(interaction.user.id) in list(os.environ.get("owners").split(",")):
+            await interaction.response.send_message('shatap lil bro, you are not him')
+            return False
+        return True
+
+        
 
 class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
@@ -654,6 +681,7 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
         await interaction.response.send_message(f'Option added! ```{self.answer.value}```', ephemeral=True)
 
 
+
 class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
     def __init__(self, poll_builder):
@@ -669,6 +697,7 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.description = self.answer.value
         await interaction.response.send_message(f'Description set! ```{self.answer.value}```', ephemeral=True)
+
 
 
 async def setup(bot):
