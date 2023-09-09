@@ -541,11 +541,11 @@ class General(commands.Cog, name="general"):
         """
 
         embed = discord.Embed(
-            title=f'## Build your poll!', 
+            title=f'Build your poll!', 
             color = self.bot.defaultColor,
             timestamp=datetime.utcnow()
         )
-        embed.add_field(name='### ❓ Question', value=question, inline=False)
+        embed.add_field(name='❓ Question', value=question, inline=False)
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
         await interaction.response.send_message(embed=embed)
 
@@ -588,7 +588,7 @@ class PollMenuBuilder(discord.ui.View):
         # add options to embed
         opts = '\n'.join(f'**{self.reactions[index]}: {val}**' for index, val in enumerate(self.options))
         self.embed.remove_field(index=1)
-        self.embed.add_field(name="### **📋 Options**", value=opts + "\n\u200b", inline=False)
+        self.embed.add_field(name="**📋 Options**", value=opts + "\n\u200b", inline=False)
         
         
         for b in self.children:
@@ -644,8 +644,6 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
 
-        # await interaction.response.send_message('Sending poll!')
-
         vals = '\u200b'
         for i in range(len(self.options)):
             vals += f'**{self.reactions[i]}: 0 votes - 0%**\n'
@@ -654,12 +652,12 @@ class PollMenuBuilder(discord.ui.View):
 
         # result field
         self.embed.add_field(
-            name='### **🏁 Results**',
+            name='**🏁 Results**',
             value=vals,
             inline=False
         )
 
-        self.embed.title = f'## ***{self.title}***'
+        self.embed.title = f'***{self.title}***'
         ops = ','.join([f"'{o}'" for o in self.options])
         self.embed.set_thumbnail(
             url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:[{','.join(['1' for _ in range(len(self.options))])}]}}],labels:[{ops}]}}}}"
