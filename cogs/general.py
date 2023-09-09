@@ -545,8 +545,7 @@ class General(commands.Cog, name="general"):
             color = self.bot.defaultColor,
             timestamp=datetime.utcnow()
         )
-        embed.set_footer(text=f"Poll started by <@{interaction.user.id}>")
-        embed.set_thumbnail(url=str(interaction.user.avatar.url))
+        embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
         await interaction.response.send_message(embed=embed)
 
         view = PollMenuBuilder(embed)
@@ -557,13 +556,14 @@ class General(commands.Cog, name="general"):
 class PollMenuBuilder(discord.ui.View):
     def __init__(self, embed):
         self.embed = embed
+        self.description = None
         self.options = []
         super().__init__(timeout=None)
         
 
 
     @discord.ui.button(label="Add Option", emoji='📋', style=discord.ButtonStyle.blurple, disabled=False)
-    async def add(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def add_option(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Add a possible answer
 
         Args:
@@ -588,6 +588,29 @@ class PollMenuBuilder(discord.ui.View):
         await msg.edit(embed=self.embed, view=self)
 
 
+    @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
+    async def add_description(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Add/change description of poll
+
+        Args:
+            interaction (discord.Interaction): Users Interaction
+            button (discord.ui.Button): the button
+        """
+        # send modal
+        modal = AddDescriptionModal(self)
+        await interaction.response.send_modal(modal)
+
+        # wait till modal finishes
+        await modal.wait()
+
+        # set description to embed
+        self.embed.description = self.description
+
+        # edit poll builder
+        msg = await interaction.original_response()
+        await msg.edit(embed=self.embed, view=self)
+
+
     @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Finish building the poll
@@ -598,7 +621,7 @@ class PollMenuBuilder(discord.ui.View):
         """
 
         vals = ''
-        for index in len(self.options):
+        for index in range(len(self.options)):
             vals += f'**{index+1}: 0 votes - 0%**'
 
         # result field
@@ -629,6 +652,23 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.options.append(self.answer.value)
         await interaction.response.send_message(f'Option added! ```{self.answer.value}```', ephemeral=True)
+
+
+class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
+
+    def __init__(self, poll_builder):
+        self.poll_builder = poll_builder
+        super().__init__(timeout=None)
+
+    answer = discord.ui.TextInput(
+        label='Description', 
+        required=True,
+        max_length=75
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        self.poll_builder.description = self.answer.value
+        await interaction.response.send_message(f'Description set! ```{self.answer.value}```', ephemeral=True)
 
 
 async def setup(bot):
