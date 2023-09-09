@@ -589,10 +589,6 @@ class PollMenuBuilder(discord.ui.View):
         opts = '\n'.join(f'**{self.reactions[index]}: {val}**' for index, val in enumerate(self.options))
         self.embed.remove_field(index=1)
         self.embed.add_field(name="📋 Options", value=opts, inline=False)
-
-        # edit poll builder
-        msg = await interaction.original_response()
-        await msg.edit(embed=self.embed, view=self)
         
         
         for b in self.children:
@@ -605,7 +601,11 @@ class PollMenuBuilder(discord.ui.View):
             if len(self.options) >= 9:
                 if b.label == "Add Option":
                     b.disabled = True
-            
+        
+        # edit poll builder
+        msg = await interaction.original_response()
+        await msg.edit(embed=self.embed, view=self)
+        
 
     @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_description(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -655,7 +655,7 @@ class PollMenuBuilder(discord.ui.View):
         self.embed.title = self.title
 
         # edit original message
-        msg = await interaction.message()
+        msg = await interaction.message
         await msg.edit(embed=self.embed, view=None)
 
         # add reactions
@@ -677,7 +677,8 @@ class PollMenuBuilder(discord.ui.View):
         # delete original message
         await interaction.message.delete()
 
-        # await interaction.response.send_message('❌ Stopped!', ephemeral=True)
+        # send confirmation
+        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
 
         
 
