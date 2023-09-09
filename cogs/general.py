@@ -633,8 +633,8 @@ class PollMenuBuilder(discord.ui.View):
         """
 
         vals = ''
-        for index in range(len(self.options)):
-            vals += f'**{index+1}: 0 votes - 0%**\n'
+        for i in range(len(self.options)):
+            vals += f'**{self.reactions[i]}: 0 votes - 0%**\n'
 
         # result field
         self.embed.add_field(
@@ -657,7 +657,7 @@ class PollMenuBuilder(discord.ui.View):
 
 
     async def interaction_check(self, interaction: discord.Interaction):
-        if interaction.author != self.author or str(interaction.user.id) in list(os.environ.get("owners").split(",")):
+        if interaction.user != self.author or str(interaction.user.id) in list(os.environ.get("owners").split(",")):
             await interaction.response.send_message('shatap lil bro, you are not him')
             return False
         return True
