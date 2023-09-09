@@ -594,11 +594,16 @@ class PollMenuBuilder(discord.ui.View):
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=self)
         
-        # disable button if 9 options
-        if len(self.options) >= 9:
-            for b in self.children:
-                b.disabled = b.label == "Add Option"
+        
+        for b in self.children:
+            # enable finish button if 2 or more options
+            if len(self.options) >= 2:
+                b.disabled = b.label == "Finish"
 
+            # disable button if 9 options
+            if len(self.options) >= 9:
+                b.disabled = b.label == "Add Option"
+            
 
     @discord.ui.button(label="Add/Change Description", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_description(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -623,7 +628,7 @@ class PollMenuBuilder(discord.ui.View):
         await msg.edit(embed=self.embed, view=self)
 
 
-    @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=False)
+    @discord.ui.button(label="Finish", emoji='✅', style=discord.ButtonStyle.green, disabled=True)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Finish building the poll
 
@@ -632,7 +637,7 @@ class PollMenuBuilder(discord.ui.View):
             button (discord.ui.Button): the button
         """
 
-        await interaction.response.send_message('Sending poll!')
+        # await interaction.response.send_message('Sending poll!')
 
         vals = ''
         for i in range(len(self.options)):
@@ -655,7 +660,7 @@ class PollMenuBuilder(discord.ui.View):
         for i in range(len(self.options)):
             await msg.add_reaction(self.reactions[i])
 
-        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
+        # await interaction.response.send_message(f'Poll is live!', ephemeral=True)
 
 
     @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
@@ -666,13 +671,15 @@ class PollMenuBuilder(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
-        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
 
         # edit original message
         msg = await interaction.original_response()
         await msg.delete()
 
-        self.stop()
+        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
+
+        
+
 
 
     async def interaction_check(self, interaction: discord.Interaction):
