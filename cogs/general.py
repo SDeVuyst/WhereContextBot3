@@ -623,7 +623,7 @@ class PollMenuBuilder(discord.ui.View):
         await modal.wait()
 
         # set description to embed
-        self.embed.description = f"**self.description**"
+        self.embed.description = f"**{self.description}**"
         
         # change button label
         button.label = "Change Description"
