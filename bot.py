@@ -268,8 +268,10 @@ async def on_raw_reaction_add(payload):
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
             # remove 'placeholder'
+            reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
             # add new user reaction
             reactions[i].append(str(payload.user_id))
+            # fill previous 
 
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
@@ -277,13 +279,12 @@ async def on_raw_reaction_add(payload):
 
         # todo update message to show correct votes
         e = message.embeds[0]
-        ops = ["a", "b"]# todo
-        print(e.fields[0].value)
+        ops = repr(e.fields[0].value.replace("*", "").split("\n"))
 
         # update thumbnail
-        data = [str(len(sub)) for sub in reactions]
+        data = repr([str(len(sub)) for sub in reactions])
         e.set_thumbnail(
-            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:[{data}]}}],labels:[{ops}]}}}}"
+            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}"
         )
 
         # update the message with the edited embed
