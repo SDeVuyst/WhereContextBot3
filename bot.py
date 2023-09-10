@@ -271,7 +271,11 @@ async def on_raw_reaction_add(payload):
             reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
             # add new user reaction
             reactions[i].append(str(payload.user_id))
-            # fill previous 
+            # fill subarrays with placeholders
+            max_length = max([len(i) for i in reactions])
+            reactions = [sub + max_length-len(sub) * ['placeholder'] for sub in reactions]
+
+        bot.logger.info(reactions)
 
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
@@ -280,7 +284,7 @@ async def on_raw_reaction_add(payload):
         # todo update message to show correct votes
         e = message.embeds[0]
         ops = repr(e.fields[0].value.replace("*", "").split("\n"))
-
+        bot.logger.info(ops)
         # update thumbnail
         data = repr([str(len(sub)) for sub in reactions])
         e.set_thumbnail(
@@ -292,7 +296,6 @@ async def on_raw_reaction_add(payload):
 
         # delete the emoji reaction
         await message.remove_reaction(payload.emoji, user)
-        
         
         # todo delete
         bot.logger.info(reactions)
