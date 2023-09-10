@@ -243,10 +243,42 @@ async def on_message(message: discord.Message) -> None:
 @bot.event
 async def on_raw_reaction_add(payload):
     is_poll = await db_manager.is_poll(payload.message_id)
+    
     if is_poll:
         bot.logger.info(f"{payload.user_id} added {payload.emoji.name}")
+        emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+
+        channel = bot.get_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        user = bot.get_user(payload.user_id)
+        
+        # remove wrong emoji reactions
+        if payload.emoji.name not in emojis:
+            await message.remove_reaction(payload.emoji, user)
+
+        # get current reactions on poll
         reactions = await db_manager.get_poll_reactions(payload.message_id)
         reactions = reactions[0][0]
+
+        # todo delete
+        bot.logger.info(reactions)
+
+        i = emojis.index(payload.emoji.name)
+
+        # initial bot reaction
+        if reactions[i][0] == "placeholder":
+            reactions[i] = ['1113092675697123458']
+
+        # new reaction
+        elif str(payload.user_id) not in reactions[i]:
+            # remove all previous reactions from user
+            reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
+            # add new user reaction
+            reactions[i].append(str(payload.user_id))
+
+        # todo update db with the new information
+
+        # todo delete
         bot.logger.info(reactions)
 
 
