@@ -61,7 +61,7 @@ class Track():
         else:
             s = Search(input)
             yt = s.results()[0]
-
+            print(yt)
             self.url = yt.videoId
             self.title = yt.title
             self.author = yt.author 
