@@ -775,10 +775,11 @@ class Audio(commands.Cog, name="audio"):
                     else:
                         time_diff = datetime.now() - start_time
 
-                    if tr.length is None:
-                        total = int(time_diff.total_seconds() * 2) +1
-
-                    bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
+                    if tr.length is not None:
+                        bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
+                    else:
+                        bardata = ProgressBar(0, 20, 18)
+                    
                     first_desc = embed.description.replace('⏸️ **Paused!**\n', '').split('\n')[0]
                     embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.total_seconds())} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}"
                 
