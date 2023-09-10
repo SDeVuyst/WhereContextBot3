@@ -245,7 +245,8 @@ async def on_raw_reaction_add(payload):
     is_poll = await db_manager.is_poll(payload.message_id)
     if is_poll:
         bot.logger.info(f"{payload.user_id} added {payload.emoji.name}")
-        reactions = await db_manager.get_poll_reactions(payload.message_id)[0][0]
+        reactions = await db_manager.get_poll_reactions(payload.message_id)
+        reactions = reactions[0][0]
         bot.logger.info(reactions)
 
 
@@ -253,7 +254,6 @@ async def on_raw_reaction_add(payload):
 async def on_member_remove(member):
     bot.logger.info(f"increased ban count of {member.id}")
     await db_manager.increment_or_add_ban_count(member.id, 1)
-
 
 
 @bot.event
