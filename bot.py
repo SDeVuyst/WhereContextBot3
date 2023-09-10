@@ -275,7 +275,7 @@ async def on_raw_reaction_add(payload):
             reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
             bot.logger.info(reactions)
             # remove 'placeholder'
-            reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
+            reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
             bot.logger.info(reactions)
             # add new user reaction
             reactions[i].append(str(payload.user_id))
@@ -297,7 +297,7 @@ async def on_raw_reaction_add(payload):
         e = message.embeds[0]
 
         # remove placeholders
-        reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
+        reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
         data = repr([str(len(sub)) for sub in reactions])
         
         # update thumbnail
@@ -503,4 +503,3 @@ async def load_cogs() -> None:
 init_db()
 asyncio.run(load_cogs())
 bot.run(os.environ.get("token"))
-
