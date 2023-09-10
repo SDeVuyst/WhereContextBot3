@@ -283,7 +283,7 @@ async def on_raw_reaction_add(payload):
 
         # todo update message to show correct votes
         e = message.embeds[0]
-        ops = repr(e.fields[0].value.replace("*", "").split("\n").pop())
+        ops = repr(e.fields[0].value.replace("*", "").split("\n")[:-1])
         bot.logger.info(ops)
         # update thumbnail
         data = repr([str(len(sub)) for sub in reactions])
