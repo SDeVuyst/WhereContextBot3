@@ -639,3 +639,18 @@ async def get_poll_reactions(message_id) -> list:
             
     except Exception as err:
         return [-1, err]
+    
+
+async def set_poll_reactions(message_id, reactions):
+    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE polls SET reactions=%s WHERE message_id=%s", (reactions, str(message_id),)
+                )
+                con.commit()
+                return True
+
+        except:
+            return False

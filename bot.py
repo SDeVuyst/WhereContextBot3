@@ -245,7 +245,7 @@ async def on_raw_reaction_add(payload):
     is_poll = await db_manager.is_poll(payload.message_id)
     if is_poll:
         bot.logger.info(f"{payload.user_id} added {payload.emoji.name}")
-        reactions = await db_manager.get_poll_reactions(payload.message_id)
+        reactions = await db_manager.get_poll_reactions(payload.message_id)[0][0]
         bot.logger.info(reactions)
 
 
