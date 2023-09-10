@@ -327,7 +327,7 @@ class Owner(commands.Cog, name="owner"):
 
         Args:
             interaction (Interaction): Users interaction
-            user (discord.User): WHich user to remove
+            user (discord.User): Which user to remove
         """
         user_id = user.id
         if not await db_manager.is_blacklisted(user_id):
@@ -356,6 +356,38 @@ class Owner(commands.Cog, name="owner"):
         )
         await interaction.response.send_message(embed=embed)
 
+
+    @app_commands.command(
+        name="pollremove",
+        description="Remove an active poll (admin only)",
+        extras={'cog': 'owner'}
+    )
+
+    @checks.is_owner()
+    async def pollremove(self, interaction, message_id: str) -> None:
+        """Remove an active poll
+
+        Args:
+            interaction (Interaction): Users interaction
+            message_id (str): id of message
+        """
+
+        total = await db_manager.delete_poll(message_id)
+
+        #error
+        if total == -1:
+            embed = discord.Embed(
+                description=f"Er is iets misgegaan.", color=self.bot.errorColor
+            )
+            await interaction.response.send_message(embed=embed)
+            return
+        
+        # alles ok
+        embed = discord.Embed(
+            description=f"Done",
+            color=self.bot.succesColor,
+        )
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot):
