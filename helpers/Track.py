@@ -60,9 +60,9 @@ class Track():
         # not a url, search on youtube
         else:
             s = Search(input)
-            yt = s.results()[0]
+            yt = s.results[0]
             print(yt)
-            self.url = yt.videoId
+            self.url = yt.watch_url
             self.title = yt.title
             self.author = yt.author 
             self.length = yt.length

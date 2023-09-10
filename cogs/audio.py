@@ -775,7 +775,7 @@ class Audio(commands.Cog, name="audio"):
                         time_diff = datetime.now() - start_time
 
                     if tr.length is None:
-                        total = time_diff.total_seconds() * 2
+                        total = int(time_diff.total_seconds() * 2)
 
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.replace('⏸️ **Paused!**\n', '').split('\n')[0]
