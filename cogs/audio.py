@@ -1,10 +1,7 @@
 
 import subprocess
-import requests
-from bs4 import BeautifulSoup
 from discord.ext import commands
 import os
-import re
 from discord import app_commands
 from math import ceil
 import discord
@@ -13,7 +10,7 @@ import random
 import tempfile
 from helpers import Track, checks, http, sptoyt, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
-from pytube import Playlist, YouTube, extract
+from pytube import Playlist
 from strprogressbar import ProgressBar
 from datetime import datetime
 
