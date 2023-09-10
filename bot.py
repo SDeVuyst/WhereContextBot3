@@ -263,8 +263,12 @@ async def on_raw_reaction_add(payload):
 
         i = emojis.index(payload.emoji.name)
 
+        # bots initial reactions
+        if str(payload.user_id) == '1113092675697123458':
+            pass
+
         # new reaction
-        if str(payload.user_id) not in reactions[i]:
+        elif str(payload.user_id) not in reactions[i]:
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
             # remove 'placeholder'
@@ -275,23 +279,23 @@ async def on_raw_reaction_add(payload):
             max_length = max([len(i) for i in reactions])
             reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
 
-        bot.logger.info(reactions)
+        
 
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
+        bot.logger.info(string_reactions)
         await db_manager.set_poll_reactions(payload.message_id, string_reactions)
 
         # delete the emoji reaction
-        await message.remove_reaction(payload.emoji, user)
-        
-        # todo delete
-        bot.logger.info(reactions)
-        
+        if str(payload.user_id) != '1113092675697123458':
+            await message.remove_reaction(payload.emoji, user)
+
         # todo update message to show correct votes
         e = message.embeds[0]
         ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
         ops = repr([o[4:] for o in ops])
         bot.logger.info(ops)
+        
         # update thumbnail
         # remove placeholders
         reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
