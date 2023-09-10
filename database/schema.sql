@@ -37,3 +37,9 @@ CREATE TABLE IF NOT EXISTS reminders (
   subject varchar(100) NOT NULL,
   time varchar(25) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS polls (
+  id SERIAL PRIMARY KEY,
+  message_id varchar(20) NOT NULL,
+  reactions varchar(20)[][]
+);

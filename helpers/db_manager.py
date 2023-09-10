@@ -586,3 +586,24 @@ async def delete_reminder(id):
     except Exception as err:
         print(err)
         return False
+    
+
+
+async def is_poll(message_id) -> bool:
+    """
+    This function will check if a message id is a poll.
+
+    """
+        
+    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM polls WHERE message_id=%s", (str(message_id),)
+                )
+                result = cursor.fetchall()
+                return len(result) > 0
+        # Als er iets misgaat, zeggen we dat command al bestaat
+        except:
+            return True

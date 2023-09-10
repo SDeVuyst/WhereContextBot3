@@ -240,6 +240,12 @@ async def on_message(message: discord.Message) -> None:
     # await bot.process_commands(message)
 
 
+@bot.event
+async def on_raw_reaction_add(payload):
+    is_poll = db_manager.is_poll(payload.message_id)
+    if is_poll:
+        bot.logger.info(f"{payload.user_id} added {payload.emoji.name}")
+
 
 @bot.event
 async def on_member_remove(member):
