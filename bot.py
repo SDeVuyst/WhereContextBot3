@@ -272,7 +272,7 @@ async def on_raw_reaction_add(payload):
         # new reaction
         elif str(payload.user_id) not in reactions[i]:
             # remove all previous reactions from user
-            reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
+            reactions = [[ subelt for subelt in elt if subelt not in [str(payload.user_id), f"'{payload.user_id}'"] ] for elt in reactions] 
             bot.logger.info(reactions)
             # remove 'placeholder'
             reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
