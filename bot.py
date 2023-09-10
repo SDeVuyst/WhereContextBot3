@@ -245,13 +245,15 @@ async def on_raw_reaction_add(payload):
     is_poll = await db_manager.is_poll(payload.message_id)
     
     if is_poll:
-        bot.logger.info(f"{payload.user_id} added {payload.emoji.name}")
+        
         emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 
         channel = bot.get_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
         user = bot.get_user(payload.user_id)
         
+        bot.logger.info(f"{user.display_name} voted {payload.emoji.name}")
+
         # remove wrong emoji reactions
         if payload.emoji.name not in emojis:
             await message.remove_reaction(payload.emoji, user)
@@ -271,18 +273,20 @@ async def on_raw_reaction_add(payload):
         elif str(payload.user_id) not in reactions[i]:
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
+            bot.logger.info(reactions)
             # remove 'placeholder'
             reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
+            bot.logger.info(reactions)
             # add new user reaction
             reactions[i].append(str(payload.user_id))
+            bot.logger.info(reactions)
             # fill subarrays with placeholders
             max_length = max([len(i) for i in reactions])
             reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
-
+            bot.logger.info(reactions)
 
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
-        bot.logger.info(string_reactions)
         await db_manager.set_poll_reactions(payload.message_id, string_reactions)
 
         # delete the emoji reaction
