@@ -281,6 +281,7 @@ async def on_raw_reaction_add(payload):
             max_length = max([len(i) for i in reactions])
             reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
 
+
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
         await db_manager.set_poll_reactions(payload.message_id, string_reactions)
@@ -289,7 +290,7 @@ async def on_raw_reaction_add(payload):
         if str(payload.user_id) != '1113092675697123458':
             await message.remove_reaction(payload.emoji, user)
 
-        
+
         e = message.embeds[0]
         # remove placeholders
         reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
@@ -299,7 +300,8 @@ async def on_raw_reaction_add(payload):
         total = sum(vals)
         field = '\u200b'
         for i in range(len(vals)):
-            field += f'**{emojis[i]}: {vals[i]} votes - {vals[i]/total:.0%}**\n' # TODO
+            perc = 0 if total == 0 else vals[i]/total
+            field += f'**{emojis[i]}: {vals[i]} votes - {perc:.0%}**\n' # TODO
         
         e.remove_field(index=1)
         e.add_field(
