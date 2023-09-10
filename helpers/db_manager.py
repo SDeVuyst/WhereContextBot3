@@ -652,5 +652,6 @@ async def set_poll_reactions(message_id, reactions):
                 con.commit()
                 return True
 
-        except:
+        except Exception as e:
+            print(e)
             return False
