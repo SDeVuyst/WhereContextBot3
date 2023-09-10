@@ -255,29 +255,37 @@ async def on_raw_reaction_add(payload):
         # remove wrong emoji reactions
         if payload.emoji.name not in emojis:
             await message.remove_reaction(payload.emoji, user)
-
+            return 
+        
         # get current reactions on poll
         reactions = await db_manager.get_poll_reactions(payload.message_id)
         reactions = reactions[0][0]
 
-        # todo delete
-        bot.logger.info(reactions)
-
         i = emojis.index(payload.emoji.name)
 
-        # initial bot reaction
-        if reactions[i][0] == "placeholder":
-            reactions[i] = ['1113092675697123458']
-
         # new reaction
-        elif str(payload.user_id) not in reactions[i]:
+        if str(payload.user_id) not in reactions[i]:
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt != str(payload.user_id) ] for elt in reactions] 
             # add new user reaction
             reactions[i].append(str(payload.user_id))
 
-        # todo update db with the new information
+        # update db with the new information
+        string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
+        await db_manager.set_poll_reactions(payload.message_id, string_reactions)
 
+        # todo update message to show correct votes
+        e = message.embeds[0]
+        ops = ["a", "b"]# todo
+
+        # update thumbnail
+        data = [str(len(sub)) for sub in reactions]
+        e.set_thumbnail(
+            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:[{data}]}}],labels:[{ops}]}}}}"
+        )
+        # delete the emoji reaction
+        await message.remove_reaction(payload.emoji, user)
+        
         # todo delete
         bot.logger.info(reactions)
 
