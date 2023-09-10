@@ -283,10 +283,13 @@ async def on_raw_reaction_add(payload):
 
         # todo update message to show correct votes
         e = message.embeds[0]
-        ops = repr(e.fields[0].value.replace("*", "").split("\n"))
+        ops = repr(e.fields[0].value.replace("*", "").split("\n").pop())
         bot.logger.info(ops)
         # update thumbnail
         data = repr([str(len(sub)) for sub in reactions])
+        # todo delete
+        print(f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}")
+        
         e.set_thumbnail(
             url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}"
         )
