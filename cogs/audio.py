@@ -1,14 +1,17 @@
 
 import subprocess
+import requests
+from bs4 import BeautifulSoup
 from discord.ext import commands
 import os
+import re
 from discord import app_commands
 from math import ceil
 import discord
 import asyncio
 import random
 import tempfile
-from helpers import checks, http, sptoyt, ytdl_helper, db_manager
+from helpers import Track, checks, http, sptoyt, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
 from pytube import Playlist, YouTube, extract
 from strprogressbar import ProgressBar
@@ -132,7 +135,6 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
-
     @app_commands.command(name="tts", description="Text to Speech (5🪙)", extras={'cog': 'audio'})
     @app_commands.choices(voice=[
         discord.app_commands.Choice(name="Alexa", value="alexa"),
@@ -225,7 +227,6 @@ class Audio(commands.Cog, name="audio"):
             await interaction.followup.send(embed=embed)
 
 
-
     @app_commands.command(name="play", description="play a youtube video or playlist (use multiple times to add to queue)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -234,9 +235,9 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="no", value=0),
         discord.app_commands.Choice(name="yes", value=1),   
     ])
-    @app_commands.describe(url="The url of the video or playlist you want to play (Youtube or Spotify)")
+    @app_commands.describe(track="The track you want to play")
     @app_commands.describe(in_front="Whether the track should be in the front of the queue or in the back")
-    async def play(self, interaction, url: str, in_front: discord.app_commands.Choice[int]=0):
+    async def play(self, interaction, track: str, in_front: discord.app_commands.Choice[int]=0):
         """ Play audio from a video
 
         Args:
@@ -267,28 +268,28 @@ class Audio(commands.Cog, name="audio"):
         
         try:
 
-            # youtube playlist
-            if url.find("list=") != -1 or url.find("open.spotify.com/playlist") != -1:
+            # youtube/spotify playlist
+            if track.find("list=") != -1 or track.find("open.spotify.com/playlist") != -1:
 
                     # krijg afzonderlijke urls van videos in playlist 
                     # voeg de urls toe aan queue
                     desc = ""
-                    if url.find("list=") != -1:
-                        vid_urls = Playlist(url)
+                    if track.find("list=") != -1:
+                        vid_urls = Playlist(track)
                     else:
                         spToYt = sptoyt.SpotifyToYT()
-                        vid_urls = spToYt.spotifyToYoutubeURLs(url)
+                        vid_urls = spToYt.spotifyToYoutubeURLs(track)
 
 
                     for i, vid_url in enumerate(vid_urls):
+                        tr = Track.Track(vid_url)
                         if in_front == 1:
-                            self.queue.insert(0, vid_url)
+                            self.queue.insert(0, tr)
                         else:
-                            self.queue.append(vid_url)
-                        yt = YouTube(vid_url)
+                            self.queue.append(tr)
 
                         if i<10:
-                            desc += f"{i+1}: [{yt.title}]({vid_url}) by {yt.author}\n\n"
+                            desc += f"{i+1}: [{tr.title}]({tr.url}) by {tr.author}\n\n"
 
                     embed = discord.Embed(
                         title=f"🎶 Added to Queue!",
@@ -301,37 +302,30 @@ class Audio(commands.Cog, name="audio"):
                         await self.play_next(interaction)
                         return
 
-            # enkele video
+            # enkele yt/spotify/soundcloud track
             else:
-                # check als url spotify track is of yt vid
-                if url.find("open.spotify.com/track") != -1:
-                    spToYt = sptoyt.SpotifyToYT()
-                    url = spToYt.spotifyToYoutubeURLs(url)
-                
-                yt = YouTube(url)
+                tr = Track.Track(track)
                 
                 # voeg lied aan queue toe
                 if in_front == 1:
-                    self.queue.insert(0, url)
+                    self.queue.insert(0, tr)
                 else:
-                    self.queue.append(url)
+                    self.queue.append(tr)
                 
                 # stuur confirmatie dat lied is toegevoegd
                 if vc.is_playing():
-                    
+
                     embed = discord.Embed(
                         title=f"🎵 Added to Queue",
-                        description=f"[{yt.title}]({url}) by {yt.author}",
+                        description=f"[{tr.title}]({tr.url}) by {tr.author}",
                         color=self.bot.defaultColor
                     )
-
-                    try:
-                        vid_id = extract.video_id(url)
+                    
+                    # set thumbnail
+                    if tr.track_type is not Track.TrackType.SOUNDCLOUD:
                         embed.set_thumbnail(
-                            url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
+                            url=tr.image
                         )
-                    except:
-                        pass
 
 
                     await interaction.followup.send(embed=embed)
@@ -344,12 +338,11 @@ class Audio(commands.Cog, name="audio"):
             self.bot.logger.error(e)
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
-                description=f"ben je zeker dat dit een geldige url is?\n{url}\n{e}",
+                description=f"ben je zeker dat dit een geldige input is?\n{track}\n{e}",
                 color=self.bot.errorColor
             )
             await interaction.followup.send(embed=embed)
             return
-
 
 
     @app_commands.command(name="list", description="See the Queue", extras={'cog': 'audio'})
@@ -373,10 +366,9 @@ class Audio(commands.Cog, name="audio"):
         # toon lijst van videos in queue
         else:
             desc = ""
-            for i, url in enumerate(self.queue):
+            for i, tr in enumerate(self.queue):
                 if i<10:
-                    yt = YouTube(url)
-                    desc += f"{i+1}: [{yt.title}]({url}) by {yt.author}\n\n"
+                    desc += f"{i+1}: [{tr.title}]({tr.url}) by {tr.author}\n\n"
 
             embed = discord.Embed(
                 title=f"📝 Queue",
@@ -385,7 +377,6 @@ class Audio(commands.Cog, name="audio"):
             )
 
         await interaction.response.send_message(embed=embed)
-
 
 
     @app_commands.command(name="nowplaying", description="See the currently playing track", extras={'cog': 'audio'})
@@ -401,7 +392,7 @@ class Audio(commands.Cog, name="audio"):
 
         try:
             title="🎵 Now playing" if self.track_playing is not None else "❌ Nothing is playing"
-            desc = f"[{self.track_playing}]({self.track_playing_url})" if self.track_playing is not None else None
+            desc = f"[{self.track_playing.title}]({self.track_playing.url})" if self.track_playing is not None else None
         except:
             title="❌ Nothing is playing"
             desc = None
@@ -413,15 +404,13 @@ class Audio(commands.Cog, name="audio"):
         )
 
         try:
-            vid_id = extract.video_id(self.track_playing_url)
             embed.set_thumbnail(
-                url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
+                url=self.track_playing.image
             )
         except:
             pass
 
         await interaction.response.send_message(embed=embed)
-      
 
 
     @app_commands.command(name="pause", description="Pause currently playing track", extras={'cog': 'audio'})
@@ -454,7 +443,6 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=self.not_playing_embed)
       
         
-
     @app_commands.command(name="resume", description="Resume currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -512,8 +500,8 @@ class Audio(commands.Cog, name="audio"):
         if voice_client.is_playing():
 
             # currently playing track should also be included in the loop
-            if (self.queue or [None])[-1] != self.track_playing_url:
-                self.queue.append(self.track_playing_url)
+            if (self.queue or [None])[-1] != self.track_playing:
+                self.queue.append(self.track_playing)
 
             # turn looping on/off
             self.looping = not self.looping
@@ -525,7 +513,6 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message(embed=self.not_playing_embed)
-
 
 
     @app_commands.command(name="skip", description="Skip the currently playing track", extras={'cog': 'audio'})
@@ -566,7 +553,6 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=self.not_playing_embed)
 
 
-
     @app_commands.command(name="stop", description="Stop the listening session (this clears the queue!)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -603,8 +589,6 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=self.not_playing_embed)
 
         self.track_playing = None
-        self.track_playing_url = None
-
 
 
     @app_commands.command(name="join", description="bot joins voice channel", extras={'cog': 'audio'})
@@ -638,7 +622,6 @@ class Audio(commands.Cog, name="audio"):
             
         await interaction.response.send_message(embed=embed)
     
-        
 
     @app_commands.command(name="leave", description="bot leaves voice channel", extras={'cog': 'audio'})
     @checks.not_blacklisted()
@@ -700,17 +683,16 @@ class Audio(commands.Cog, name="audio"):
         
         if len(self.queue) == 0: return
 
-        # krijg volgende url
-        url = self.queue.pop(0)
+        # krijg volgende track
+        tr = self.queue.pop(0)
 
         # voeg url terug toe aan queue als loop aanstaat
         if self.looping:
-            self.queue.append(url)
+            self.queue.append(tr)
 
-        yt = YouTube(url)
         # video mag max 15 min duren
         try:
-            if yt.length > 900:
+            if tr.length is not None and tr.length > 900:
                 embed = discord.Embed(
                     title=f"Video must be less than 15 minutes long.",
                     color=self.bot.errorColor
@@ -721,16 +703,17 @@ class Audio(commands.Cog, name="audio"):
                     await interaction.channel.send(embed=embed)
                 await self.play_next(interaction)
                 return
+            
         except Exception as e:
             self.bot.logger.warning(e)
             pass
         
         # maak temp file aan via url
-        filename = await ytdl_helper.YTDLSource.from_url(url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
+        filename = await ytdl_helper.YTDLSource.from_url(tr.url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
         if filename is None:
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
-                description=f"ben je zeker dat dit een geldige url is?\n{url}",
+                description=f"ben je zeker dat dit een geldige url is?\n{tr.url}",
                 color=self.bot.errorColor
             )
             if first_player:
@@ -743,8 +726,7 @@ class Audio(commands.Cog, name="audio"):
             # speel de temp file af
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
 
-            self.track_playing = f"{yt.title} by {yt.author}"
-            self.track_playing_url = url
+            self.track_playing = tr
 
             # creeer een progress bar
             total = 20
@@ -755,14 +737,13 @@ class Audio(commands.Cog, name="audio"):
             # confirmatie
             embed = discord.Embed(
                 title=f"🎵 Playing music!",
-                description=f"[{yt.title}]({url}) by {yt.author}\n{bardata} - {self.format_seconds_to_mmss(0)} / {self.format_seconds_to_mmss(yt.length)}",
+                description=f"[{tr.title}]({tr.url}) by {tr.author}\n{bardata} - {self.format_seconds_to_mmss(0)} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}",
                 color=self.bot.succesColor
             )
 
             try:
-                vid_id = extract.video_id(self.track_playing_url)
                 embed.set_thumbnail(
-                    url=f"http://img.youtube.com/vi/{vid_id}/0.jpg"
+                    url=tr.image
                 )
             except:
                 pass
@@ -773,7 +754,7 @@ class Audio(commands.Cog, name="audio"):
             else:
                 playing_message = await interaction.channel.send(embed=embed)
 
-            total = yt.length
+            total = tr.length
             start_time = datetime.now()
             time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
@@ -787,9 +768,12 @@ class Audio(commands.Cog, name="audio"):
                     else:
                         time_diff = datetime.now() - start_time
 
+                    if tr.length is None:
+                        total = time_diff.total_seconds * 2
+
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.replace('⏸️ **Paused!**\n', '').split('\n')[0]
-                    embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {self.format_seconds_to_mmss(yt.length)}"
+                    embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}"
                 
                 try:
                     await playing_message.edit(embed=embed)
@@ -803,7 +787,7 @@ class Audio(commands.Cog, name="audio"):
             # ten laatste zetten we de progress bar op de laatste seconde
             bardata = ProgressBar(total, total, 18)
             first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
-            formatted_length = self.format_seconds_to_mmss(yt.length)
+            formatted_length = '?' if tr.length is None else self.format_seconds_to_mmss(tr.length)
             embed.description = f"{first_desc}\n{bardata} - {formatted_length} / {formatted_length}"
             await playing_message.edit(embed=embed)
 
@@ -818,6 +802,7 @@ class Audio(commands.Cog, name="audio"):
         return "%02i:%02i" % (minutes, seconds)
 
 
+    
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
 async def setup(bot):
     await bot.add_cog(Audio(bot))
