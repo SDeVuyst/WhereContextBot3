@@ -279,7 +279,6 @@ async def on_raw_reaction_add(payload):
             max_length = max([len(i) for i in reactions])
             reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
 
-        
 
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
@@ -292,18 +291,15 @@ async def on_raw_reaction_add(payload):
 
         # todo update message to show correct votes
         e = message.embeds[0]
-        # ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
-        # ops = repr([o[4:] for o in ops])
-        # bot.logger.info(ops)
 
-        
         # remove placeholders
         reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
         data = repr([str(len(sub)) for sub in reactions])
         
         # update thumbnail
-        url = f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}]}}}}".replace(' ', '')
-        print(url)
+        ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
+        ops = repr([o[4:] for o in ops])
+        url = f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}".replace(' ', '')
         e.set_thumbnail(
             url=url
         )
