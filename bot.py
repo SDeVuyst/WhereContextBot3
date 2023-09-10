@@ -281,10 +281,16 @@ async def on_raw_reaction_add(payload):
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
         await db_manager.set_poll_reactions(payload.message_id, string_reactions)
 
+        # delete the emoji reaction
+        await message.remove_reaction(payload.emoji, user)
+        
+        # todo delete
+        bot.logger.info(reactions)
+        
         # todo update message to show correct votes
         e = message.embeds[0]
         ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
-        ops = repr([o[2:] for o in ops])
+        ops = repr([o[4:] for o in ops])
         bot.logger.info(ops)
         # update thumbnail
         # remove placeholders
@@ -300,11 +306,7 @@ async def on_raw_reaction_add(payload):
         # update the message with the edited embed
         await message.edit(embed=e)
 
-        # delete the emoji reaction
-        await message.remove_reaction(payload.emoji, user)
         
-        # todo delete
-        bot.logger.info(reactions)
 
 
 @bot.event
