@@ -1,7 +1,6 @@
 from enum import Enum
 from helpers import sptoyt
 from pytube import extract, YouTube, Search
-from bs4 import BeautifulSoup
 
 import re
 import requests
