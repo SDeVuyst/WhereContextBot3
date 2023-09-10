@@ -302,7 +302,7 @@ class Audio(commands.Cog, name="audio"):
             # soundcloud playlists are not supported
             elif track.find("https://soundcloud.com") != -1 and track.find("/sets") != -1:
                 embed = discord.Embed(
-                    title=f"SoundCloud playlists are not supported!",
+                    title=f"SoundCloud playlists are not (yet) supported!",
                     color=self.bot.errorColor
                 )
                 await interaction.followup.send(embed=embed)
@@ -328,11 +328,12 @@ class Audio(commands.Cog, name="audio"):
                     )
                     
                     # set thumbnail
-                    if tr.track_type is not Track.TrackType.SOUNDCLOUD:
+                    try:
                         embed.set_thumbnail(
                             url=tr.image
                         )
-
+                    except:
+                        pass
 
                     await interaction.followup.send(embed=embed)
                     return
@@ -779,7 +780,7 @@ class Audio(commands.Cog, name="audio"):
 
                     bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
                     first_desc = embed.description.replace('⏸️ **Paused!**\n', '').split('\n')[0]
-                    embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.seconds)} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}"
+                    embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.total_seconds())} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}"
                 
                 try:
                     await playing_message.edit(embed=embed)
@@ -789,13 +790,6 @@ class Audio(commands.Cog, name="audio"):
 
                 # hoeveel keer de progress bar w geupdate
                 await asyncio.sleep(time_delay)
-
-            # ten laatste zetten we de progress bar op de laatste seconde
-            bardata = ProgressBar(total, total, 18)
-            first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
-            formatted_length = '?' if tr.length is None else self.format_seconds_to_mmss(tr.length)
-            embed.description = f"{first_desc}\n{bardata} - {formatted_length} / {formatted_length}"
-            await playing_message.edit(embed=embed)
 
             # tijdstippen hebben we niet meer nodig
             self.pause_time = None
