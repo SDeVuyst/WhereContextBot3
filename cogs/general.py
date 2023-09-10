@@ -666,6 +666,10 @@ class PollMenuBuilder(discord.ui.View):
         # edit original message
         msg = interaction.message
         await msg.edit(embed=self.embed, view=None)
+        
+        # save poll to db
+        rcts = ('{' + (len(self.options) * '{"placeholder"}') + '}').replace("}{", "},{")
+        await db_manager.create_poll(msg.id, rcts)
 
         # add reactions
         for i in range(len(self.options)):

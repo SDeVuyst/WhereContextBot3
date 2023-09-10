@@ -607,3 +607,21 @@ async def is_poll(message_id) -> bool:
         # Als er iets misgaat, zeggen we dat command al bestaat
         except:
             return True
+        
+
+async def create_poll(message_id, reactions):
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                        "INSERT INTO polls (message_id, reactions) VALUES (%s, %s)",
+                        (str(message_id), reactions)
+                    )
+                    
+                con.commit()
+                return True
+            
+    except Exception as err:
+        print(err)
+        return False
