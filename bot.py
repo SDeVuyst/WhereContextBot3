@@ -273,7 +273,7 @@ async def on_raw_reaction_add(payload):
             reactions[i].append(str(payload.user_id))
             # fill subarrays with placeholders
             max_length = max([len(i) for i in reactions])
-            reactions = [sub + max_length-len(sub) * ['placeholder'] for sub in reactions]
+            reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
 
         bot.logger.info(reactions)
 
