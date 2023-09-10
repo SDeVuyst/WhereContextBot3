@@ -273,17 +273,13 @@ async def on_raw_reaction_add(payload):
         elif str(payload.user_id) not in reactions[i]:
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt not in [str(payload.user_id), f"'{payload.user_id}'"] ] for elt in reactions] 
-            bot.logger.info(reactions)
             # remove 'placeholder'
             reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
-            bot.logger.info(reactions)
             # add new user reaction
             reactions[i].append(str(payload.user_id))
-            bot.logger.info(reactions)
             # fill subarrays with placeholders
             max_length = max([len(i) for i in reactions])
             reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
-            bot.logger.info(reactions)
 
         # update db with the new information
         string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
@@ -293,14 +289,27 @@ async def on_raw_reaction_add(payload):
         if str(payload.user_id) != '1113092675697123458':
             await message.remove_reaction(payload.emoji, user)
 
-        # todo update message to show correct votes
+        
         e = message.embeds[0]
-
         # remove placeholders
         reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
-        data = repr([str(len(sub)) for sub in reactions])
+        
+        # update message to show correct votes
+        vals = [len(sub) for sub in reactions]
+        total = sum(vals)
+        field = '\u200b'
+        for i in range(len(vals)):
+            field += f'**{emojis[i]}: {vals[i]} votes - {vals[i]/total:.0%}**\n' # TODO
+        
+        e.remove_field(index=1)
+        e.add_field(
+            name='**🏁 Results**',
+            value=field,
+            inline=False
+        )
         
         # update thumbnail
+        data = repr([str(len(sub)) for sub in reactions])
         ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
         ops = repr([o[4:] for o in ops])
         url = f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}".replace(' ', '')

@@ -384,7 +384,7 @@ class Owner(commands.Cog, name="owner"):
         
         # alles ok
         embed = discord.Embed(
-            description=f"Done",
+            description=f"✅ Done",
             color=self.bot.succesColor,
         )
         await interaction.response.send_message(embed=embed)
