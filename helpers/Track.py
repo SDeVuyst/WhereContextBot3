@@ -10,6 +10,7 @@ class TrackType(Enum):
     SPOTIFY = 1
     YOUTUBE = 2
     SOUNDCLOUD = 3
+    UNKNOWN = 4
 
 
 class Track():
@@ -32,6 +33,10 @@ class Track():
             self.url = input
             self.track_type = TrackType.SOUNDCLOUD
 
+        # not a url, look it up on youtube later
+        else:
+            self.track_type = TrackType.UNKNOWN
+
 
         # set title, author, image & length of track
         if self.track_type is TrackType.YOUTUBE or self.track_type is TrackType.SPOTIFY:
@@ -43,8 +48,8 @@ class Track():
             self.length = yt.length
         
         elif self.track_type is TrackType.SOUNDCLOUD:
-            pattern = r"https://soundcloud.com/([^/]+)/([^/]+)"
-            self.author, self.title = re.search(pattern, self.url).groups
+            pattern = r"https:\/\/soundcloud.com\/([^\/]+)/([^\/]+)"
+            self.author, self.title = re.search(pattern, self.url).groups()
 
             response = requests.get(self.url)
             soup = BeautifulSoup(response.content, 'html.parser')

@@ -299,6 +299,15 @@ class Audio(commands.Cog, name="audio"):
                         await self.play_next(interaction)
                         return
 
+            # soundcloud playlists are not supported
+            elif track.find("https://soundcloud.com") != -1 and track.find("/sets") != -1:
+                embed = discord.Embed(
+                    title=f"SoundCloud playlists are not supported!",
+                    color=self.bot.errorColor
+                )
+                await interaction.response.send_message(embed=embed)
+                return
+            
             # enkele yt/spotify/soundcloud track
             else:
                 tr = Track.Track(track)
