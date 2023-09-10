@@ -655,3 +655,21 @@ async def set_poll_reactions(message_id, reactions):
         except Exception as e:
             print(e)
             return False
+        
+        
+async def delete_poll(message_id):
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                        "DELETE FROM polls WHERE message_id=%s",
+                        (str(message_id),)
+                    )
+                    
+                con.commit()
+                return True
+            
+    except Exception as err:
+        print(err)
+        return False

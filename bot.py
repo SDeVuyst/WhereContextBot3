@@ -291,10 +291,10 @@ async def on_raw_reaction_add(payload):
         reactions = [[ subelt for subelt in elt if subelt != 'placeholder' ] for elt in reactions] 
         data = repr([str(len(sub)) for sub in reactions])
         # todo delete
-        print(f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}")
+        print(f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}]}}}}")
         
         e.set_thumbnail(
-            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}"
+            url=f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}]}}}}"
         )
 
         # update the message with the edited embed
