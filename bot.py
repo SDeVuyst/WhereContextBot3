@@ -265,12 +265,8 @@ async def on_raw_reaction_add(payload):
 
         i = emojis.index(payload.emoji.name)
 
-        # bots initial reactions
-        if str(payload.user_id) == '1113092675697123458':
-            pass
-
-        # new reaction
-        elif str(payload.user_id) not in reactions[i]:
+        # new reaction                                      not bot initial reaction
+        if str(payload.user_id) not in reactions[i] and str(payload.user_id) != '1113092675697123458':
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt not in [str(payload.user_id), f"'{payload.user_id}'"] ] for elt in reactions] 
             # remove 'placeholder'
