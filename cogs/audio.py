@@ -305,7 +305,7 @@ class Audio(commands.Cog, name="audio"):
                     title=f"SoundCloud playlists are not supported!",
                     color=self.bot.errorColor
                 )
-                await interaction.response.send_message(embed=embed)
+                await interaction.followup.send(embed=embed)
                 return
             
             # enkele yt/spotify/soundcloud track

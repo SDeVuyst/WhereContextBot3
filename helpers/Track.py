@@ -50,10 +50,8 @@ class Track():
         elif self.track_type is TrackType.SOUNDCLOUD:
             pattern = r"https:\/\/soundcloud.com\/([^\/]+)/([^\/]+)"
             self.author, self.title = re.search(pattern, self.url).groups()
-
-            response = requests.get(self.url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            self.image=soup.find('meta', {'property': 'og:image'})['content']
+            self.title = self.title.split('?si')[0]
+            self.image='https://play-lh.googleusercontent.com/6FoFUmywGeblaF0iUTWb4EdH2SvXeOU_bgXQFRGhHTRiMWVlG8sAVN-BqjlWUJh3GR3a'
             
             self.length = None # niet mogelijk om te vinden
 
@@ -61,12 +59,12 @@ class Track():
         else:
             s = Search(input)
             yt = s.results[0]
-            print(yt)
+
             self.url = yt.watch_url
             self.title = yt.title
             self.author = yt.author 
             self.length = yt.length
-        
+            self.image = f"http://img.youtube.com/vi/{extract.video_id(self.url)}/0.jpg"
             self.track_type = TrackType.YOUTUBE
 
 
