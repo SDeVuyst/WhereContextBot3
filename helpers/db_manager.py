@@ -625,3 +625,17 @@ async def create_poll(message_id, reactions):
     except Exception as err:
         print(err)
         return False
+    
+
+async def get_poll_reactions(message_id) -> list:
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT reactions FROM polls where message_id=%s", (str(message_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]

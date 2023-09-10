@@ -242,9 +242,11 @@ async def on_message(message: discord.Message) -> None:
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    is_poll = db_manager.is_poll(payload.message_id)
+    is_poll = await db_manager.is_poll(payload.message_id)
     if is_poll:
         bot.logger.info(f"{payload.user_id} added {payload.emoji.name}")
+        reactions = await db_manager.get_poll_reactions(payload.message.id)
+        bot.logger.info(reactions)
 
 
 @bot.event
