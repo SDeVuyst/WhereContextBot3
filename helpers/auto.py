@@ -6,8 +6,8 @@ async def autoroles(bot, member):
     await member.add_roles(member_role)
 
     roles = {
-        # yachja                   perms,              minecraft           cultured            perms               yachja
-        733845345225670686: [756224050237538325, 739212609248690248, 740301828071358738, 1119328394568548402],
+        # yachja                   perms,              minecraft           cultured            perms               waifu bot
+        733845345225670686: [756224050237538325, 739212609248690248, 740301828071358738, 1119328394568548402, 778688939623710770],
         # gible                    gent                minecraft
         559715606014984195: [1024341053786038332, 739212609248690248],
         # arno                     perms               homeless          sugardaddy          gent                minecraft         
