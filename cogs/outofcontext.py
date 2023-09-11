@@ -400,7 +400,7 @@ class Menu(discord.ui.View):
             b.disabled = False
 
 
-    @discord.ui.button(label="Previous", emoji='◀️', style=discord.ButtonStyle.green, disabled=True)
+    @discord.ui.button(label="Previous", style=discord.ButtonStyle.green, disabled=True)
     async def previous(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Goes to the previous message
 
@@ -422,7 +422,7 @@ class Menu(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view = self if showView else None)
 
 
-    @discord.ui.button(label="Next", emoji='▶️', style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Next", style=discord.ButtonStyle.green)
     async def next(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Goes to the next message
 
@@ -446,7 +446,7 @@ class Menu(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view = self if sendView else None)
 
 
-    @discord.ui.button(label="Remove", emoji='✖️', style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Remove", style=discord.ButtonStyle.red)
     async def remove(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Removes message from the game
 
@@ -474,7 +474,7 @@ class Menu(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=self)
 
 
-    @discord.ui.button(label="Quit", emoji='❌', style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Quit", style=discord.ButtonStyle.blurple)
     async def quit(self, interaction: discord.Interaction, button: discord.ui.Button):
         """Exit the game
 
