@@ -530,13 +530,17 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="poll", description="Create a poll", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
+    @app_commands.choices(anoniem=[
+        discord.app_commands.Choice(name="Yes", value=True),
+        discord.app_commands.Choice(name="No", value=False),
+    ])
     @app_commands.describe(question="Title of your poll")
-    async def poll(self, interaction, question: str) -> None:
+    async def poll(self, interaction, question: str, anoniem: discord.app_commands.Choice[bool]) -> None:
         """Create a poll
 
         Args:
             interaction (Interaction): Users interaction
-            question (str): TItle of poll
+            question (str): Title of poll
             options (str): possible answers
         """
 
@@ -549,14 +553,15 @@ class General(commands.Cog, name="general"):
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
         await interaction.response.send_message(embed=embed)
 
-        view = PollMenuBuilder(question, embed, interaction.user.id)
+        view = PollMenuBuilder(question, embed, interaction.user.id, anoniem.value)
         await interaction.edit_original_response(embed=embed, view=view)
         
 
 
 # behandelt alle knoppen van poll builder
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, title, embed, author_id):
+    def __init__(self, title, embed, author_id, anonymous):
+        self.anonymous = anonymous
         self.title = title
         self.author_id = author_id
         self.embed = embed
@@ -661,7 +666,7 @@ class PollMenuBuilder(discord.ui.View):
 
         # edit original message
         msg = interaction.message
-        await msg.edit(embed=self.embed, view=None)
+        await msg.edit(embed=self.embed, view=PollResultView() if self.anonymous else None)
         
         # save poll to db
         rcts = ('{' + (len(self.options) * '{"placeholder"}') + '}').replace("}{", "},{")
@@ -690,9 +695,6 @@ class PollMenuBuilder(discord.ui.View):
         # send confirmation
         await interaction.response.send_message('❌ Stopped!', ephemeral=True)
 
-        
-
-
 
     async def interaction_check(self, interaction: discord.Interaction):
         if interaction.user.id != self.author_id and str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
@@ -700,7 +702,38 @@ class PollMenuBuilder(discord.ui.View):
             return False
         return True
 
+
+# view to show results of poll (if not anonymous)
+class PollResultView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
         
+
+    @discord.ui.button(label="See votes", emoji='🗳️', style=discord.ButtonStyle.blurple, disabled=False)
+    async def votes(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # get votes from db
+        reactions = await db_manager.get_poll_reactions(interaction.message.id)
+        reactions = reactions[0][0]
+
+        # create embed
+        embed = discord.Embed(
+            title="🗳️ Votes",
+            color=self.bot.defaultColor
+        )
+
+        numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+
+        for i, react in enumerate(reactions):
+            embed.add_field(
+                name=f'**{numbers[i]}**',
+                value=repr(react),
+                inline=True
+            )
+
+        # respond
+        interaction.response.send(embed=embed, ephemeral=True)
+
+
 
 class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
