@@ -735,9 +735,9 @@ class PollResultView(discord.ui.View):
                 # generate description per reaction
                 desc = ''
                 for r in react:
-                    react = react.replace("'", "")
+                    r = r.replace("'", "")
                     if len(r) > 0:
-                        desc += f'\n<@{int(react)}>'
+                        desc += f'\n<@{int(r)}>'
                     else:
                         desc +='No votes yet'
 
