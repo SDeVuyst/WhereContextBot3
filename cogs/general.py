@@ -531,11 +531,11 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @app_commands.choices(anoniem=[
-        discord.app_commands.Choice(name="Yes", value=True),
-        discord.app_commands.Choice(name="No", value=False),
+        discord.app_commands.Choice(name="Yes", value=1),
+        discord.app_commands.Choice(name="No", value=0),
     ])
     @app_commands.describe(question="Title of your poll")
-    async def poll(self, interaction, question: str, anoniem: discord.app_commands.Choice[bool]) -> None:
+    async def poll(self, interaction, question: str, anoniem: discord.app_commands.Choice[int]) -> None:
         """Create a poll
 
         Args:
