@@ -736,10 +736,8 @@ class Audio(commands.Cog, name="audio"):
             self.track_playing = tr
 
             # creeer een progress bar
-            total = 20
-            current = 0
             # First two arguments are mandatory
-            bardata = ProgressBar(current, total, 18)
+            bardata = ProgressBar(0, 20, 18)
 
             # confirmatie
             embed = discord.Embed(
@@ -761,7 +759,6 @@ class Audio(commands.Cog, name="audio"):
             else:
                 playing_message = await interaction.channel.send(embed=embed)
 
-            total = tr.length
             start_time = datetime.now()
             time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
@@ -776,7 +773,7 @@ class Audio(commands.Cog, name="audio"):
                         time_diff = datetime.now() - start_time
 
                     if tr.length is not None:
-                        bardata = ProgressBar(ceil(time_diff.total_seconds()), total, 18)
+                        bardata = ProgressBar(ceil(time_diff.total_seconds()), tr.length, 18)
                     else:
                         bardata = ProgressBar(0, 20, 18)
                     
@@ -791,6 +788,12 @@ class Audio(commands.Cog, name="audio"):
 
                 # hoeveel keer de progress bar w geupdate
                 await asyncio.sleep(time_delay)
+
+            # ten laatste zetten we de progress bar op de laatste seconde
+            bardata = ProgressBar(20, 20, 18)
+            first_desc = embed.description.split('\n')[0].replace('⏸️ **Paused!**', '')
+            embed.description = f"{first_desc}\n{bardata} - {self.format_seconds_to_mmss(time_diff.total_seconds())} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}"
+            await playing_message.edit(embed=embed)
 
             # tijdstippen hebben we niet meer nodig
             self.pause_time = None
