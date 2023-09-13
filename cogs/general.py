@@ -732,10 +732,18 @@ class PollResultView(discord.ui.View):
         
         else:
             for i, react in enumerate(reactions):
-                desc = '\n'.join(f"<@{react}>")
+                # generate description per reaction
+                desc = ''
+                for r in react:
+                    react = react.replace("'", "")
+                    if len(r) > 0:
+                        desc += f'\n<@{int(react)}>'
+                    else:
+                        desc +='No votes yet'
+
                 embed.add_field(
                     name=f'**{numbers[i]}**',
-                    value=desc if len(desc) > 0 else 'No votes yet',
+                    value=desc,
                     inline=True
                 )
 
