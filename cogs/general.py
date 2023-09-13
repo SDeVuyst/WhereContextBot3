@@ -713,9 +713,13 @@ class PollResultView(discord.ui.View):
 
     @discord.ui.button(label="See votes", emoji='🗳️', style=discord.ButtonStyle.blurple, disabled=False)
     async def votes(self, interaction: discord.Interaction, button: discord.ui.Button):
+        active_poll = True
         # get votes from db
-        reactions = await db_manager.get_poll_reactions(interaction.message.id)
-        reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
+        try:
+            reactions = await db_manager.get_poll_reactions(interaction.message.id)
+            reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
+        except:
+            return interaction.response.send_message("poll is not active...")
 
         # create embed
         embed = discord.Embed(
@@ -736,14 +740,11 @@ class PollResultView(discord.ui.View):
                 desc = ''
                 for r in react:
                     r = r.replace("'", "")
-                    if len(r) > 0:
-                        desc += f'\n<@{int(r)}>'
-                    else:
-                        desc +='No votes yet'
+                    desc += f'\n<@{int(r)}>'
 
                 embed.add_field(
                     name=f'**{numbers[i]}**',
-                    value=desc,
+                    value=desc if len(desc) > 0 else 'No votes yet',
                     inline=True
                 )
 
