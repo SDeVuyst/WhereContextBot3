@@ -553,19 +553,20 @@ class General(commands.Cog, name="general"):
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
         await interaction.response.send_message(embed=embed)
 
-        view = PollMenuBuilder(question, embed, interaction.user.id, anoniem.value)
+        view = PollMenuBuilder(question, embed, interaction.user.id, anoniem.value, self.bot)
         await interaction.edit_original_response(embed=embed, view=view)
         
 
 
 # behandelt alle knoppen van poll builder
 class PollMenuBuilder(discord.ui.View):
-    def __init__(self, title, embed, author_id, anonymous):
+    def __init__(self, title, embed, author_id, anonymous, bot):
         self.anonymous = anonymous
         self.title = title
         self.author_id = author_id
         self.embed = embed
         self.description = None
+        self.bot = bot
         self.options = []
 
         self.reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
@@ -666,7 +667,7 @@ class PollMenuBuilder(discord.ui.View):
 
         # edit original message
         msg = interaction.message
-        await msg.edit(embed=self.embed, view=PollResultView() if self.anonymous else None)
+        await msg.edit(embed=self.embed, view=PollResultView(self.bot) if not self.anonymous else None)
         
         # save poll to db
         rcts = ('{' + (len(self.options) * '{"placeholder"}') + '}').replace("}{", "},{")
@@ -705,7 +706,8 @@ class PollMenuBuilder(discord.ui.View):
 
 # view to show results of poll (if not anonymous)
 class PollResultView(discord.ui.View):
-    def __init__(self):
+    def __init__(self, bot):
+        self.bot = bot
         super().__init__(timeout=None)
         
 
