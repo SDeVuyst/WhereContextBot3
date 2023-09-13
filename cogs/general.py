@@ -740,7 +740,7 @@ class PollResultView(discord.ui.View):
                 )
 
         # respond
-        interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 
