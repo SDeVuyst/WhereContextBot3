@@ -14,7 +14,7 @@ Plays a chosen text-to-speech message in voice chat in a chosen voice. Costs 5 n
 
 #### /play
 
-Plays the audio of a YouTube or Spotify track/playlist in voice chat.
+Plays youtube, spotify or soundcloud in voice chat.
 
 #### /list
 
@@ -100,7 +100,19 @@ Set a reminder.
 
 #### /status
 
-Set the status of the bot for 1 hour.
+Set the status of the bot for 1 hour. Costs 10 nwords to use
+
+#### /anti_gif
+
+Prevent a user from using gifs for 1 hour. Costs 125 nwords to use
+
+#### /impersonate
+
+Bot will impersonate a user and send something of your choice. Costs 10 nwords to use
+
+#### /poll
+
+Create a poll
 
 ### Out Of Context
 
