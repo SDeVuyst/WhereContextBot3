@@ -64,7 +64,7 @@ async def autoroles(bot, member):
     }
     
 
-    if member.id in roles:
+    if member.id in members:
 
         # voeg autoroles toe
         for role in members.get(member.id):
@@ -75,8 +75,9 @@ async def autoroles(bot, member):
                 bot.logger.warning(f"role {role} not found")
 
         
-    bot.logger.info(f"Added autoroles")
-    await member.send('Added your roles back!')
+        bot.logger.info(f"Added autoroles")
+        await member.send('Added your roles back!')
+
 
 
 async def autonick(bot, member):
