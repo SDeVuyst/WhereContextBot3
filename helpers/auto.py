@@ -6,31 +6,73 @@ async def autoroles(bot, member):
     await member.add_roles(member_role)
 
     roles = {
-        # yachja                   perms,              minecraft           cultured            perms               waifu bot
-        733845345225670686: [756224050237538325, 739212609248690248, 740301828071358738, 1119328394568548402, 778688939623710770],
-        # gible                    gent                minecraft
-        559715606014984195: [1024341053786038332, 739212609248690248],
-        # arno                     perms               homeless          sugardaddy          gent                minecraft         
-        273503117348306944: [756224050237538325, 801146953470967809, 827108224485294100, 1024341053786038332, 739212609248690248],
-        # pingy                    knie                 fortnut           spooderman          genshin             waifu bot             gent                minecraft           cultured            cringe             titanfood           perms
-        464400950702899211: [1129051258657968208, 946064405597138994, 918990342840275035, 817107290708639774, 778688939623710770, 1024341053786038332, 739212609248690248,740301828071358738, 836973694630887455, 787665548506955776, 756224050237538325],
-        # solos                indian tech god           gent              spooderman           wcb3                minecraft       not cultured         owner               perms               meng              cummaster
-        462932133170774036: [1079432980038172805, 1024341053786038332, 918990342840275035, 1119600252228489296, 739212609248690248, 805130046414127126, 799385460677804043, 756224050237538325, 777956016033103872, 851467556040474624]
+        "perms": 756224050237538325,
+        "techgod": 1079432980038172805,
+        "gent": 1024341053786038332,
+        "fakonepiece": 970418792012325008,
+        "fortnut": 946064405597138994,
+        "spooderman": 918990342840275035,
+        "genshin": 817107290708639774,
+        "waifubot": 778688939623710770,
+        "wcb3": 1119600252228489296,
+        "retarded": 738782795673108572,
+        "minecraft": 739212609248690248,
+        "notcultured": 805130046414127126,
+        "cultured": 740301828071358738,
+        "homeless": 801146953470967809,
+        "cringe": 836973694630887455,
+        "degeneratevandejaar": 864947578554023986,
+        "owner": 799385460677804043,
+        "titanfood": 787665548506955776,
+        "sugardaddy": 827108224485294100,
+        "perms": 756224050237538325,
+        "yachja": 1119328394568548402,
+        "knie": 1129051258657968208,
+        "cummaster": 851467556040474624,
+        "meng": 777956016033103872,
+        "mongwongs": 1146529770297888961
     }
 
+    members = {
+        # solos
+        462932133170774036: ["mongwongs", "meng", "cummaster", "owner", "notcultured", "perms", "techgod", "gent", "spooderman", "wcb3", "minecraft"],
+        # broodman
+        733845345225670686: ["mongwongs", "yachja", "cultured", "perms", "gent", "spooderman", "waifubot", "minecraft"],
+        # arion
+        334371900170043402: ["mongwongs", "meng", "cultured", "perms", "techgod", "fortnut", "spooderman", "minecraft"],
+        # pingy
+        464400950702899211: ["mongwongs", "knie", "titanfood", "cringe", "cultured", "perms", "gent", "fortnut", "spooderman", "genshin", "waifubot", "minecraft"],
+        # ba
+        222415043550117888: ["mongwongs", "meng", "cummaster", "titanfood", "cultured", "perms", "gent", "fortnut", "spooderman", "genshin", "waifubot", "minecraft"],
+        # nootje
+        273503117348306944: ["mongwongs", "sugardaddy", "homeless", "notcultured", "perms", "gent", "minecraft"],
+        # zeb
+        756527409876041859: ["titanfood", "degeneratevandejaar", "cringe", "notcultured", "fakonepiece", "spooderman", "genshin", "waifubot", "retarded", "minecraft"],
+        # lendar
+        527916521754722315: ["mongwongs", "meng", "cummaster", "cultured", "perms", "gent", "waifubot", "minecraft"],
+        # xander
+        548544519793016861: ["titanfood", "cultured", "gent", "waifubot", "minecraft"],
+        # gible
+        559715606014984195: ["mongwongs", "notcultured", "gent", "minecraft"],
+        # meng
+        512256261459542019: ["mongwongs", "meng", "cummaster", "cultured", "perms", "gent", "genshin", "minecraft"],
+        # wouter
+        453136562885099531: ["cultured"],
+        # zyfo
+        494508091283603462: ["mongwongs", "notcultured", "perms", "techgod", "minecraft"],
+
+    }
     
 
     if member.id in roles:
 
         # voeg autoroles toe
-        roles_to_add = roles.get(member.id)
-        for role_id in roles_to_add:
+        for role in members.get(member.id):
             try:
-                new_role = discord.utils.get(member.guild.roles, id=role_id)
-                
+                new_role = discord.utils.get(member.guild.roles, id=roles.get(role))
                 await member.add_roles(new_role)
             except:
-                bot.logger.warning(f"role {role_id} not found")
+                bot.logger.warning(f"role {role} not found")
 
         
     bot.logger.info(f"Added autoroles")
@@ -47,8 +89,11 @@ async def autonick(bot, member):
         # 273503117348306944: "",
         # pingy                 
         # 464400950702899211: "",
-        # # solos             
+        # solos             
         462932133170774036: "kanye east",
+        # ba
+        222415043550117888: "ba"
+
     }
 
     if member.id in nicks:
