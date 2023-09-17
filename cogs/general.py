@@ -213,10 +213,9 @@ class General(commands.Cog, name="general"):
         embed = discord.Embed(
             title=title,
             description=desc,
-            color=kleur,
-            timestamp=datetime.utcnow()
+            color=kleur
         )
-        
+
         embed.set_thumbnail(
             url=os.environ.get('countdown_url')
         )
