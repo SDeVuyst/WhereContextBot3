@@ -397,9 +397,8 @@ class Owner(commands.Cog, name="owner"):
         description="Unban a user (500🪙)",
         extras={'cog': 'owner'}
     )
-    @checks.is_owner()
     @checks.not_blacklisted()
-    # @checks.cost_nword(500)
+    @checks.cost_nword(500)
     async def unban(self, interaction) -> None:
         """Unban a user
 
@@ -408,8 +407,10 @@ class Owner(commands.Cog, name="owner"):
         """
         guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
         bans = [entry async for entry in guild.bans(limit=25)]
-
-        await interaction.response.send_message(view=UnbanView(bans, self.bot))
+        if len(bans) > 0:
+            await interaction.response.send_message(view=UnbanView(bans, self.bot))
+        else:
+            await interaction.response.send_message("No banned users.")
 
 
 
