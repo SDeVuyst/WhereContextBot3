@@ -7,6 +7,7 @@ Version: 5.5.0
 """
 
 import discord
+import os
 from discord import app_commands
 from discord.ext import commands
 
@@ -388,6 +389,49 @@ class Owner(commands.Cog, name="owner"):
             color=self.bot.succesColor,
         )
         await interaction.response.send_message(embed=embed)
+
+
+
+    @app_commands.command(
+        name="unban",
+        description="Unban a user (500🪙)",
+        extras={'cog': 'owner'}
+    )
+    @checks.is_owner()
+    @checks.not_blacklisted()
+    # @checks.cost_nword(500)
+    async def unban(self, interaction) -> None:
+        """Unban a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
+        bans = [entry async for entry in guild.bans(limit=25)]
+
+        interaction.response.send_message(view=UnbanView(bans, self.bot))
+
+
+
+class UnbanView(discord.ui.View):
+    def __init__(self, bans, bot):
+        super().__init__()
+        self.add_item(UnbanDropdown(bans, bot))
+
+
+class UnbanDropdown(discord.ui.Select):
+    def __init__(self, bans, bot):
+        self.bot = bot
+        options = [discord.SelectOption(label=ban.user.global_name, value=str(ban.user.id)) for ban in bans]
+        super().__init__(placeholder="Pick a user to unban", options=options, min_values=1, max_values=1)
+
+    async def callback(self, interaction):
+        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
+        user = await self.bot.fetch_user(int(self.values[0]))
+
+        await guild.unban(user)
+
+        await interaction.response.send_message(f"{user} is now unbanned")
 
 
 async def setup(bot):
