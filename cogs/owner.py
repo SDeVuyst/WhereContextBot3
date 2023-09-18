@@ -409,7 +409,7 @@ class Owner(commands.Cog, name="owner"):
         guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
         bans = [entry async for entry in guild.bans(limit=25)]
 
-        interaction.response.send_message(view=UnbanView(bans, self.bot))
+        await interaction.response.send_message(view=UnbanView(bans, self.bot))
 
 
 
