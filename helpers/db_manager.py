@@ -673,3 +673,18 @@ async def delete_poll(message_id):
     except Exception as err:
         print(err)
         return False
+
+
+async def get_message_ids_poll():
+    try:
+        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT message_id FROM polls"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        print(err)
+        return [[[]]]

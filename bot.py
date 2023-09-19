@@ -21,6 +21,8 @@ import exceptions
 
 from datetime import datetime, timedelta
 
+from cogs.general import PollResultView
+
 intents = discord.Intents.all()
 
 bot = Bot(
@@ -485,6 +487,16 @@ async def on_tree_error(interaction, error):
 
 
 bot.tree.on_error = on_tree_error
+
+async def setup_hook():
+    ids = await db_manager.get_message_ids_poll()
+    bot.logger.info(ids)
+    ids = ids[0]
+    bot.logger.info(ids)
+    for id in ids:
+        bot.add_view(PollResultView(), message_id=int(id))
+
+bot.setup_hook = setup_hook
 
 
 async def load_cogs() -> None:
