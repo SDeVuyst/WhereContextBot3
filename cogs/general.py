@@ -715,7 +715,7 @@ class PollResultView(discord.ui.View):
         super().__init__(timeout=None)
         
 
-    @discord.ui.button(label="See votes", emoji='🗳️', style=discord.ButtonStyle.blurple, disabled=False)
+    @discord.ui.button(label="See votes",custom_id="votes-button", emoji='🗳️', style=discord.ButtonStyle.blurple, disabled=False)
     async def votes(self, interaction: discord.Interaction, button: discord.ui.Button):
         active_poll = True
         # get votes from db

@@ -491,10 +491,10 @@ bot.tree.on_error = on_tree_error
 async def setup_hook():
     ids = await db_manager.get_message_ids_poll()
     bot.logger.info(ids)
-    ids = ids[0]
+    ids = [id[0] for id in ids]
     bot.logger.info(ids)
     for id in ids:
-        bot.add_view(PollResultView(), message_id=int(id))
+        bot.add_view(PollResultView(bot), message_id=int(id))
 
 bot.setup_hook = setup_hook
 
