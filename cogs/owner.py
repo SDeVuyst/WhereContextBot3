@@ -412,6 +412,10 @@ class Owner(commands.Cog, name="owner"):
         else:
             await interaction.response.send_message("No banned users.")
 
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -500)
+        
+
 
 
 class UnbanView(discord.ui.View):
