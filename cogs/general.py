@@ -671,7 +671,9 @@ class PollMenuBuilder(discord.ui.View):
 
         # edit original message
         msg = interaction.message
-        await msg.edit(embed=self.embed, view=PollResultView(self.bot) if not self.anonymous else None)
+        view = discord.ui.View(timeout=None)
+        view.add_item(DynamicVotesButton(interaction.user.id))
+        await msg.edit(embed=self.embed, view=view if not self.anonymous else None)
         
         # save poll to db
         rcts = ('{' + (len(self.options) * '{"placeholder"}') + '}').replace("}{", "},{")
@@ -708,16 +710,30 @@ class PollMenuBuilder(discord.ui.View):
         return True
 
 
-# view to show results of poll (if not anonymous)
-class PollResultView(discord.ui.View):
-    def __init__(self, bot):
-        self.bot = bot
-        super().__init__(timeout=None)
-        
 
-    @discord.ui.button(label="See votes",custom_id="votes-button", emoji='🗳️', style=discord.ButtonStyle.blurple, disabled=False)
-    async def votes(self, interaction: discord.Interaction, button: discord.ui.Button):
-        active_poll = True
+class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'button:user:(?P<id>[0-9]+)'):
+    def __init__(self, user_id: int) -> None:
+        super().__init__(
+            discord.ui.Button(
+                label='See votes',
+                style=discord.ButtonStyle.blurple,
+                custom_id=f'button:user:{user_id}',
+                emoji='🗳️',
+            )
+        )
+        self.user_id: int = user_id
+
+    # This is called when the button is clicked and the custom_id matches the template.
+    @classmethod
+    async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
+        user_id = int(match['id'])
+        return cls(user_id)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        # anyone can view
+        return True
+
+    async def callback(self, interaction: discord.Interaction) -> None:
         # get votes from db
         try:
             reactions = await db_manager.get_poll_reactions(interaction.message.id)
