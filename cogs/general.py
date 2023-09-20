@@ -740,7 +740,7 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
             reactions = await db_manager.get_poll_reactions(interaction.message.id)
             reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
         except:
-            return interaction.response.send_message("poll is not active...")
+            return await interaction.response.send_message("poll is not active...")
 
         # create embed
         embed = discord.Embed(
