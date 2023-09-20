@@ -1,4 +1,4 @@
-python>=3.8
+python
 discord.py
 psycopg2
 yt_dlp
