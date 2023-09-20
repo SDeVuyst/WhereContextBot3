@@ -1,5 +1,5 @@
 git
-https://github.com/Rapptz/discord.py@latest
+https://github.com/rapptz/discord.py#egg=discord.py[voice]
 psycopg2
 yt_dlp
 PyNaCl==1.4.0
