@@ -1,5 +1,5 @@
-git
-https://github.com/rapptz/discord.py
+python>=3.8
+discord.py
 psycopg2
 yt_dlp
 PyNaCl==1.4.0
