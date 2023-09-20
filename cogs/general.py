@@ -745,7 +745,7 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
         # create embed
         embed = discord.Embed(
             title="🗳️ Votes",
-            color=self.bot.defaultColor
+            color=0xF4900D
         )
 
         numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
