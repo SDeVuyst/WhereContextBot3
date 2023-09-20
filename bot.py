@@ -489,15 +489,10 @@ async def on_tree_error(interaction, error):
 bot.tree.on_error = on_tree_error
 
 
-async def setup_hook(self) -> None:
-    # Register the persistent view for listening here.
-    # Note that this does not send the view to any message.
-    # In order to do this you need to first send a message with the View, which is shown below.
-    # If you have the message_id you can also pass it as a keyword argument, but for this example
-    # we don't have one.
+async def setup_hook() -> None:
 
     # For dynamic items, we must register the classes instead of the views.
-    self.add_dynamic_items(DynamicVotesButton)
+    bot.add_dynamic_items(DynamicVotesButton)
 
 bot.setup_hook = setup_hook
 
