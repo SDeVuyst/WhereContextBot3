@@ -37,7 +37,7 @@ async def autoroles(bot, member):
         # solos
         462932133170774036: ["mongwongs", "meng", "cummaster", "owner", "notcultured", "perms", "techgod", "gent", "spooderman", "wcb3", "minecraft"],
         # broodman
-        733845345225670686: ["mongwongs", "yachja", "cultured", "perms", "gent", "spooderman", "waifubot", "minecraft"],
+        733845345225670686: ["gent", "mongwongs", "yachja", "cultured", "perms", "gent", "spooderman", "waifubot", "minecraft"],
         # arion
         334371900170043402: ["mongwongs", "meng", "cultured", "perms", "techgod", "fortnut", "spooderman", "minecraft"],
         # pingy
