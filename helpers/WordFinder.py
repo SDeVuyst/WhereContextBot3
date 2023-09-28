@@ -13,6 +13,7 @@ class WordFinder:
         await self.findNWord(bot, message)
         await self.find_yachja_word(bot, message)
         await self.check_gif(bot, message)
+        await self.check_gf(bot, message)
 
  
     async def findNWord(self, bot, message):
@@ -83,3 +84,13 @@ class WordFinder:
             await message.channel.send(random.choice(responses))
             await message.delete()
             return
+        
+
+    async def check_gf(self, bot, message):
+        content = message.content.replace("\n", " ").lower()
+        triggers = ["danae", "danea"]
+        responses = ["pedo ass mf", ":skull:", 'pre-order :sob:']
+
+        # check for a trigger in the message
+        if any(trigger in content for trigger in triggers):
+            await message.reply(random.choice(responses))
