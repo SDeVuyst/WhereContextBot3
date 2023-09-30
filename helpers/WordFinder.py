@@ -40,7 +40,7 @@ class WordFinder:
             return
         
         content = message.content.replace("\n", " ").lower()
-        triggers = ["one piece", "one peak", "peak", "luffy"]
+        triggers = ["one piece", "peak", "luffy"]
 
         # check for a trigger in the message
         if any(trigger in content for trigger in triggers):

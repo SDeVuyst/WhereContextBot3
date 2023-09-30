@@ -414,6 +414,33 @@ class Owner(commands.Cog, name="owner"):
 
         #update ncount
         await db_manager.increment_or_add_nword(interaction.user.id, -500)
+
+
+    
+    @app_commands.command(
+        name="nickname",
+        description="Set the nickname of a user",
+        extras={'cog': 'owner'}
+    )
+    @checks.not_blacklisted()
+    @app_commands.describe(user="Which user")
+    @app_commands.describe(nickname="What nickname")
+    async def nickname(self, interaction, user: discord.User, nickname: str) -> None:
+        """Set the nickname of a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user
+            nickname (str): what nickname
+        """
+        try:
+            await user.edit(nick=nickname)
+            await interaction.response.send_message("Done")
+
+        except Exception as e:
+            await interaction.response.send_message("Something went wrong")
+
+
         
 
 
@@ -436,7 +463,9 @@ class UnbanDropdown(discord.ui.Select):
 
         await guild.unban(user)
 
-        await interaction.response.send_message(f"{user} is now unbanned")
+        await interaction.message.edit(f"{user} is now unbanned")
+        await interaction.response.defer()
+        self.stop()
 
 
 async def setup(bot):
