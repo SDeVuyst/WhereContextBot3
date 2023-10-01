@@ -89,7 +89,7 @@ class WordFinder:
     async def check_gf(self, bot, message):
         content = message.content.replace("\n", " ").lower()
         triggers = ["danae", "danea", "danaë"]
-        responses = ["<@222415043550117888> pedo ass mf", '<@222415043550117888> pre-ordered :sob:', "<@222415043550117888> bro going to jail :sob::sob:", "<@222415043550117888> early investor :skull:"]
+        responses = ["<@222415043550117888> pedo ass mf", '<@222415043550117888> pre-ordered :sob:', "<@222415043550117888> bro going to jail :sob::sob:", "<@222415043550117888> early investor :skull:", "https://i.imgur.com/Qtjijog.gif"]
 
         # check for a trigger in the message
         if any(trigger in content for trigger in triggers):
