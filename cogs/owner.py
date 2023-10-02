@@ -410,7 +410,10 @@ class Owner(commands.Cog, name="owner"):
         if len(bans) > 0:
             await interaction.response.send_message(view=UnbanView(bans, self.bot))
         else:
-            await interaction.response.send_message("No banned users.")
+            embed = discord.Embed(
+                description=f"No banned users..", color=self.bot.defaultColor
+            )
+            await interaction.response.send_message(embed=embed)
 
         #update ncount
         await db_manager.increment_or_add_nword(interaction.user.id, -500)
@@ -435,10 +438,20 @@ class Owner(commands.Cog, name="owner"):
         """
         try:
             await user.edit(nick=nickname)
-            await interaction.response.send_message("Done")
+            embed = discord.Embed(
+                title='✅ Done',
+                description=f"{user} is now called {nickname}",
+                color=self.bot.succesColor
+            )
+            await interaction.response.send_message(embed=embed)
 
         except Exception as e:
-            await interaction.response.send_message("Something went wrong")
+            embed = discord.Embed(
+                title=f"Er is iets misgegaan.",
+                description=e,
+                color=self.bot.errorColor
+            )
+            await interaction.response.send_message(embed=embed)
 
 
         
@@ -462,8 +475,12 @@ class UnbanDropdown(discord.ui.Select):
         user = await self.bot.fetch_user(int(self.values[0]))
 
         await guild.unban(user)
-
-        await interaction.message.edit(f"{user} is now unbanned")
+        embed = discord.Embed(
+            title='✅ Done',
+            description=f"{user} is now unbanned",
+            color=self.bot.succesColor,
+        )
+        await interaction.message.edit(embed=embed)
         await interaction.response.defer()
         self.stop()
 

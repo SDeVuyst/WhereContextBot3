@@ -182,8 +182,19 @@ Add a user to the blacklist.
 
 Remove a user from the blacklist.
 
-### Reacties
+#### /pollremove
 
+Remove an active poll.
+
+#### /unban
+
+Unban a user. Costs 500 nwords to use.
+
+#### /nickname
+
+Set the nickname of a user
+
+### Reacties
 
 #### /wholesquadlaughing
 
