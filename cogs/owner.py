@@ -480,7 +480,7 @@ class UnbanDropdown(discord.ui.Select):
             description=f"{user} is now unbanned",
             color=self.bot.succesColor,
         )
-        await interaction.message.edit(embed=embed)
+        await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()
         self.stop()
 
