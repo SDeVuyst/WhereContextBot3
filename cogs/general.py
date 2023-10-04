@@ -261,7 +261,6 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="chat", description="Chat with the bot (3🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @checks.not_in_dm()
     @app_commands.checks.cooldown(rate=2, per=30)
     @checks.cost_nword(3)
     @app_commands.describe(prompt="Your question/conversation piece")
@@ -309,7 +308,6 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="image", description="Create an image (5🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @checks.not_in_dm()
     @checks.cost_nword(5)
     @app_commands.checks.cooldown(rate=5, per=120) # 3 per 10 minutes
     @app_commands.describe(prompt="A detailed description of what to create")
