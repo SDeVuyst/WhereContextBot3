@@ -83,7 +83,7 @@ async def autoroles(bot, member):
 async def autonick(bot, member):
     nicks = {
         # yachja
-        # 733845345225670686: "",
+        733845345225670686: "surfs up is goated",
         # gible      
         559715606014984195: "smikkelkontje",     
         # arno        
