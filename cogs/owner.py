@@ -398,6 +398,7 @@ class Owner(commands.Cog, name="owner"):
         extras={'cog': 'owner'}
     )
     @checks.not_blacklisted()
+    @app_commands.checks.cooldown(rate=2, per=3600)
     @checks.cost_nword(500)
     async def unban(self, interaction) -> None:
         """Unban a user
