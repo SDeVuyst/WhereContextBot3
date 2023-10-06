@@ -89,7 +89,8 @@ class WordFinder:
     async def check_gf(self, bot, message):
         content = message.content.replace("\n", " ").lower()
         triggers = ["danae", "danea", "danaë"]
-        responses = ["<@222415043550117888> pedo ass mf", '<@222415043550117888> pre-ordered :sob:', "<@222415043550117888> bro going to jail :sob::sob:", "<@222415043550117888> early investor :skull:", "https://i.imgur.com/Qtjijog.gif", "https://imgur.com/a/vybyj9s", "https://cdn.discordapp.com/attachments/1114464141508345906/1159560172558098452/61keJhuI4HS._AC_UF10001000_QL80_.jpg?ex=65317790&is=651f0290&hm=be37960b453805393dc9a84464a2db1b261c62e2e3e309998ed4633778c84ede&"]
+        responses = ["<@222415043550117888> pedo ass mf", '<@222415043550117888> pre-ordered :sob:', "<@222415043550117888> bro going to jail :sob::sob:", "<@222415043550117888> early investor :skull:", "https://i.imgur.com/Qtjijog.gif", "https://imgur.com/a/vybyj9s", "https://cdn.discordapp.com/attachments/1114464141508345906/1159560172558098452/61keJhuI4HS._AC_UF10001000_QL80_.jpg?ex=65317790&is=651f0290&hm=be37960b453805393dc9a84464a2db1b261c62e2e3e309998ed4633778c84ede&", '"How do you make a little girl cry twice in a row? You wipe the blood off your cock on her teddybear before you leave." -<@222415043550117888>', 'What do you do after you lick the smoothest pussy in the world?
+Put the diaper back on. -<@222415043550117888>']
 
         # check for a trigger in the message
         if any(trigger in content for trigger in triggers):
