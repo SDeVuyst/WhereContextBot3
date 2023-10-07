@@ -93,4 +93,4 @@ class WordFinder:
 
         # check for a trigger in the message
         if any(trigger in content for trigger in triggers):
-            await message.reply(random.choice(responses))
+            await message.reply(random.choice(responses), silent=True)
