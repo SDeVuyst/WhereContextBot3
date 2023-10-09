@@ -149,6 +149,8 @@ class Stats(commands.Cog, name="stats"):
             # krijg count bericht uit db
             leaderb = await db_manager.get_leaderboard(command)
 
+        self.bot.logger.info(leaderb)
+        
         # Geen berichten
         if len(leaderb) == 0:
             embed = discord.Embed(
