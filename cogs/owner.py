@@ -483,7 +483,6 @@ class UnbanDropdown(discord.ui.Select):
         )
         await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()
-        self.stop()
 
 
 async def setup(bot):
