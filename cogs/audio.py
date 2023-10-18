@@ -760,7 +760,6 @@ class Audio(commands.Cog, name="audio"):
                 playing_message = await interaction.channel.send(embed=embed)
 
             start_time = datetime.now()
-            time_delay = float(os.environ.get("time_delay"))
             while vc.is_playing() or vc.is_paused():
                 if vc.is_paused():
                     embed.description = "⏸️ **Paused!**\n" + embed.description.replace('⏸️ **Paused!**\n', '')
@@ -787,7 +786,7 @@ class Audio(commands.Cog, name="audio"):
                     self.bot.logger.warning(e)
 
                 # hoeveel keer de progress bar w geupdate
-                await asyncio.sleep(time_delay)
+                await asyncio.sleep(0.7)
 
             # ten laatste zetten we de progress bar op de laatste seconde
             bardata = ProgressBar(20, 20, 18)

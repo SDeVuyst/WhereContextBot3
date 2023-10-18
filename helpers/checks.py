@@ -24,7 +24,7 @@ def is_owner() -> Callable[[T], T]:
     """
 
     async def predicate(interaction) -> bool:
-        if str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
+        if str(interaction.user.id) not in list(os.environ.get("OWNERS").split(",")):
             raise UserNotOwner
         return True
 
@@ -47,7 +47,7 @@ def not_blacklisted() -> Callable[[T], T]:
 def in_audio_command_channel() -> Callable[[T], T]:
 
     async def predicate(interaction):
-        if interaction.guild_id != int(os.environ.get("guild_id")):
+        if interaction.guild_id != int(os.environ.get("GUILD_ID")):
             return True
         
         if interaction.channel.id not in [1114464141508345906, 727511733970665493]:
@@ -61,7 +61,7 @@ def in_correct_server() -> Callable[[T], T]:
 
     async def predicate(interaction):
 
-        if interaction.guild_id not in [int(os.environ.get("guild_id")),] and not isinstance(interaction.channel, discord.channel.DMChannel):
+        if interaction.guild_id not in [int(os.environ.get("GUILD_ID")),] and not isinstance(interaction.channel, discord.channel.DMChannel):
             raise WrongChannel("You are only able to use this command in the main server, use /invite to get an invite")
         return True
     

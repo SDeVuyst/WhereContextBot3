@@ -146,3 +146,5 @@ cython_debug/
 # Log file
 discord.log
 .vscode/settings.json
+
+database/postgres_data/

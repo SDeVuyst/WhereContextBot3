@@ -406,7 +406,7 @@ class Owner(commands.Cog, name="owner"):
         Args:
             interaction (Interaction): Users Interaction
         """
-        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         bans = [entry async for entry in guild.bans(limit=25)]
         if len(bans) > 0:
             await interaction.response.send_message(view=UnbanView(bans, self.bot))
@@ -472,7 +472,7 @@ class UnbanDropdown(discord.ui.Select):
         super().__init__(placeholder="Pick a user to unban", options=options, min_values=1, max_values=1)
 
     async def callback(self, interaction):
-        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         user = await self.bot.fetch_user(int(self.values[0]))
 
         await guild.unban(user)

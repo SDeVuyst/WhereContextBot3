@@ -23,7 +23,7 @@ from reactionmenu import ViewMenu, ViewSelect, ViewButton
 from helpers import checks, db_manager
 
 
-openai.api_key = os.environ.get("openaisecret")
+openai.api_key = os.environ.get("OPENAI_SECRET")
 
 
 class General(commands.Cog, name="general"):
@@ -43,7 +43,7 @@ class General(commands.Cog, name="general"):
             None: Nothing
         """
 
-        admin = list(os.environ.get("owners").split(","))
+        admin = list(os.environ.get("OWNERS").split(","))
 
         menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
@@ -121,7 +121,7 @@ class General(commands.Cog, name="general"):
 
         # kick grom
         try:
-            gromID = int(os.environ.get("grom"))
+            gromID = int(os.environ.get("GROM"))
             grom = await interaction.guild.fetch_member(gromID)
             await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
         # grom kick error
@@ -187,7 +187,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('countdown_title')}", extras={'cog': 'general'})
+    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('COUNTDOWN_TITLE')}", extras={'cog': 'general'})
     @checks.not_blacklisted()
     async def countdown(self, interaction) -> None:
         """Countdown till agiven moment in time
@@ -196,15 +196,15 @@ class General(commands.Cog, name="general"):
             interaction (Interaction): Users Interaction
         """
 
-        deadline = datetime.strptime(os.environ.get("countdown"), "%d/%m/%y %H:%M:%S")
+        deadline = datetime.strptime(os.environ.get("COUNTDOWN"), "%d/%m/%y %H:%M:%S")
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
-            title = f"⌛ Time till {os.environ.get('countdown_title')}"
-            desc = f"{os.environ.get('countdown_title')} IS NU UIT!"
+            title = f"⌛ Time till {os.environ.get('COUNTDOWN_TITLE')}"
+            desc = f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!"
             kleur = self.bot.succesColor
         else:
-            title = f"⏳ Time till {os.environ.get('countdown_title')}"
+            title = f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
@@ -218,7 +218,7 @@ class General(commands.Cog, name="general"):
         )
 
         embed.set_thumbnail(
-            url=os.environ.get('countdown_url')
+            url=os.environ.get('COUNTDOWN_URL')
         )
 
  
@@ -247,7 +247,7 @@ class General(commands.Cog, name="general"):
         await user.send(content=content)
 
         # stuur dm naar admin
-        owner = int(list(os.environ.get("owners").split(","))[0])
+        owner = int(list(os.environ.get("OWNERS").split(","))[0])
         admin = await self.bot.fetch_user(owner)
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
 
@@ -362,11 +362,11 @@ class General(commands.Cog, name="general"):
         """
         
         
-        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
-        channel = await guild.fetch_channel(int(os.environ.get("channel")))
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
+        channel = await guild.fetch_channel(int(os.environ.get("CHANNEL")))
 
         # unban the user
-        if os.environ.get("autounban") == "True":
+        if os.environ.get("AUTOUNBAN") == "True":
             try:
                 await guild.unban(interaction.user)
                 await interaction.user.send("I unbanned you.")
@@ -703,7 +703,7 @@ class PollMenuBuilder(discord.ui.View):
 
 
     async def interaction_check(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author_id and str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
+        if interaction.user.id != self.author_id and str(interaction.user.id) not in list(os.environ.get("OWNERS").split(",")):
             await interaction.response.send_message('shatap lil bro, you are not him', ephemeral=True)
             return False
         return True
@@ -724,7 +724,7 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
 
     # This is called when the button is clicked and the custom_id matches the template.
     @classmethod
-    async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
+    async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match, /):
         user_id = int(match['id'])
         return cls(user_id)
 

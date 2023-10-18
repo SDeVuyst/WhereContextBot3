@@ -113,7 +113,7 @@ bot.logger = logger
 
 def init_db():
     with psycopg2.connect(
-        os.environ.get("DATABASE_URL"), sslmode='require'
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
     ) as con:
         
         with con.cursor() as cursor:
@@ -228,7 +228,7 @@ async def on_message(message: discord.Message) -> None:
     
     if message.guild is None:
         # solos user object
-        owner = int(list(os.environ.get("owners").split(","))[0])
+        owner = int(list(os.environ.get("OWNERS").split(","))[0])
         user = await bot.fetch_user(owner)
         await user.send(content=f"{message.author.display_name} sent: {message.content}")
 
@@ -333,7 +333,7 @@ async def on_member_remove(member):
 async def on_member_join(member):
     bot.logger.info(f"{member.id} joined the server!")
 
-    if member.guild.id == int(os.environ.get("guild_id")):
+    if member.guild.id == int(os.environ.get("GUILD_ID")):
         await auto.autoroles(bot, member)
         await auto.autonick(bot, member)
         
@@ -519,4 +519,4 @@ async def load_cogs() -> None:
 
 init_db()
 asyncio.run(load_cogs())
-bot.run(os.environ.get("token"))
+bot.run(os.environ.get("TOKEN"))

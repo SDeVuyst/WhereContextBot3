@@ -16,7 +16,9 @@ async def get_blacklisted_users() -> list:
     :return: True if the user is blacklisted, False if not.
     """
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -36,7 +38,9 @@ async def is_blacklisted(user_id: int) -> bool:
     :return: True if the user is blacklisted, False if not.
     """
         
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -58,7 +62,9 @@ async def add_user_to_blacklist(user_id: int) -> int:
     """
 
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute("INSERT INTO blacklist(user_id) VALUES (%s)", (str(user_id),))
@@ -78,7 +84,9 @@ async def remove_user_from_blacklist(user_id: int) -> int:
     :param user_id: The ID of the user that should be removed from the blacklist.
     """
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute("DELETE FROM blacklist WHERE user_id=%s", (str(user_id),))
@@ -98,7 +106,9 @@ async def get_ooc_messages(limit: int) -> list:
     :param limit: The amount of randomy selected messages
     """
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 # random volgorde
@@ -123,7 +133,9 @@ async def get_ooc_message(id) -> list:
     :param limit: The amount of randomy selected messages
     """
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -143,7 +155,9 @@ async def is_in_ooc(message_id: int) -> bool:
     :return: True if the user is blacklisted, False if not.
     """
         
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -158,7 +172,9 @@ async def is_in_ooc(message_id: int) -> bool:
         
 
 async def increment_times_played(message_id):
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -183,7 +199,9 @@ async def add_message_to_ooc(message_id:int, added_by:int) -> int:
     """
 
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -205,7 +223,9 @@ async def remove_message_from_ooc(message_id: int) -> int:
     :param message_id: The ID of the message that should be removed from the game.
     """
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute("DELETE FROM context_message WHERE message_id=%s", (str(message_id),))
@@ -220,7 +240,9 @@ async def remove_message_from_ooc(message_id: int) -> int:
 
 async def messages_in_ooc():
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             with con.cursor() as cursor:
                 cursor.execute("SELECT COUNT(*) FROM context_message")
                 result = cursor.fetchone()
@@ -233,7 +255,9 @@ async def increment_or_add_nword(user_id: int, amount: int):
 
     alreadyExists = await is_in_ncounter(user_id)
 
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -262,7 +286,9 @@ async def is_in_ncounter(user_id: int) -> bool:
     :return: True if the user exists, False if not.
     """
         
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -278,7 +304,9 @@ async def is_in_ncounter(user_id: int) -> bool:
 
 async def get_nword_count(user_id) -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -292,7 +320,9 @@ async def get_nword_count(user_id) -> list:
 
 async def get_nword_leaderboard() -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -307,7 +337,9 @@ async def get_nword_leaderboard() -> list:
 async def set_nword_count(user_id, amount):
     alreadyExists = await is_in_ncounter(user_id)
 
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -335,7 +367,9 @@ async def is_in_command_count(user_id: int, command_name: str) -> bool:
 
     """
         
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -353,7 +387,9 @@ async def increment_or_add_command_count(user_id: int, command_name: str, amount
 
     alreadyExists = await is_in_command_count(user_id, command_name)
 
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -378,7 +414,9 @@ async def increment_or_add_command_count(user_id: int, command_name: str, amount
 async def set_command_count(command_name, user_id, amount):
     alreadyExists = await is_in_command_count(user_id, command_name)
 
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -402,7 +440,9 @@ async def set_command_count(command_name, user_id, amount):
 
 async def get_command_count(user_id, command_name) -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -418,7 +458,9 @@ async def get_command_count(user_id, command_name) -> list:
 
 async def get_leaderboard(command: str) -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -438,7 +480,9 @@ async def is_in_ban_count(user_id: int) -> bool:
 
     """
         
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -457,7 +501,9 @@ async def increment_or_add_ban_count(user_id: int, amount: int):
 
     alreadyExists = await is_in_ban_count(user_id)
 
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -482,7 +528,9 @@ async def increment_or_add_ban_count(user_id: int, amount: int):
 
 async def get_ban_count(user_id) -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -499,7 +547,9 @@ async def get_ban_count(user_id) -> list:
 async def set_ban_count(user_id, amount):
     alreadyExists = await is_in_ban_count(user_id)
 
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -523,7 +573,9 @@ async def set_ban_count(user_id, amount):
 
 async def get_ban_leaderboard() -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -538,7 +590,9 @@ async def get_ban_leaderboard() -> list:
 
 async def set_reminder(user_id, subject, time):
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -557,7 +611,9 @@ async def set_reminder(user_id, subject, time):
 
 async def get_reminders() -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -572,7 +628,9 @@ async def get_reminders() -> list:
 
 async def delete_reminder(id):
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -595,7 +653,9 @@ async def is_poll(message_id) -> bool:
 
     """
         
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -611,7 +671,9 @@ async def is_poll(message_id) -> bool:
 
 async def create_poll(message_id, reactions):
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -629,7 +691,9 @@ async def create_poll(message_id, reactions):
 
 async def get_poll_reactions(message_id) -> list:
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -642,7 +706,9 @@ async def get_poll_reactions(message_id) -> list:
     
 
 async def set_poll_reactions(message_id, reactions):
-    with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
         
         try:
             with con.cursor() as cursor:
@@ -659,7 +725,9 @@ async def set_poll_reactions(message_id, reactions):
         
 async def delete_poll(message_id):
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
@@ -677,7 +745,9 @@ async def delete_poll(message_id):
 
 async def get_message_ids_poll():
     try:
-        with psycopg2.connect(os.environ.get("DATABASE_URL"), sslmode='require') as con:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
             
             with con.cursor() as cursor:
                 cursor.execute(
