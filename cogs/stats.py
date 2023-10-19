@@ -59,6 +59,8 @@ class Stats(commands.Cog, name="stats"):
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
         elif command == "ncountCHECK":
             desc = f"<@{userid}> said the n-word ```{count[0][0]}``` times.**"
+        elif command == "danae":
+            desc = f"<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
         else:
             desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
 
@@ -174,6 +176,7 @@ class Stats(commands.Cog, name="stats"):
             desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
 
         command = "N-words said" if command == "ncountCHECK" else command
+        command = "danae trigger" if command == "danae" else command
 
         embed = discord.Embed(
             title=f"🏆 Leaderboard for {command}",
@@ -415,6 +418,9 @@ class CommandSelect(Select):
         
         elif selected_cog == "stats":
             commands.insert(0, ("N-Words said", "ncountCHECK"))
+
+        elif selected_cog == "general":
+            commands.insert(0, ("Danae trigger", "danae"))
 
 
         super().__init__(

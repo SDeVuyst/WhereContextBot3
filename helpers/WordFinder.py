@@ -94,3 +94,6 @@ class WordFinder:
         # check for a trigger in the message
         if any(trigger in content for trigger in triggers):
             await message.reply(random.choice(responses), silent=True)
+            # update db
+            await db_manager.increment_or_add_command_count(message.author.id, 'danae', 1)
+            bot.logger.info(f"danae trigger by {message.author.display_name}: {message.content}")
