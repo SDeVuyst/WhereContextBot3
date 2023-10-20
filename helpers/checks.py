@@ -105,3 +105,39 @@ def cost_nword(cost: int) -> Callable[[T], T]:
         return True
 
     return app_commands.check(predicate)
+
+
+
+def user_in_vc() -> Callable[[T], T]:
+
+    async def predicate(interaction):
+
+        if not interaction.user.voice:
+            raise UserNotInVC()
+        return True
+    
+    return app_commands.check(predicate)
+
+
+
+def bot_in_vc() -> Callable[[T], T]:
+
+    async def predicate(interaction):
+
+        if interaction.guild.voice_client is None:
+            raise BotNotInVC()
+        return True
+    
+    return app_commands.check(predicate)
+
+
+
+def bot_is_playing() -> Callable[[T], T]:
+
+    async def predicate(interaction):
+
+        if not interaction.guild.voice_client.is_playing():
+            raise BotNotPlaying()
+        return True
+    
+    return app_commands.check(predicate)

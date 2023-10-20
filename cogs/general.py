@@ -52,7 +52,7 @@ class General(commands.Cog, name="general"):
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
             "reacties": "💭 Reacties",
-            "owner": "👨‍🔧 Owner"
+            "admin": "👨‍🔧 Admin"
         }
 
         page_numbers = {}
@@ -133,56 +133,6 @@ class General(commands.Cog, name="general"):
             description="<@464400950702899211> has been kicked.",
             color=self.bot.errorColor
         )
-        await interaction.response.send_message(embed=embed)
-        
-
-
-    # @app_commands.command(name="ping", description="Check if the bot is alive", extras={'cog': 'general'})
-    # @checks.not_blacklisted()
-    # async def ping(self, interaction) -> None:
-    #     """Check if the bot is alive
-
-    #     Args:
-    #         interaction (Interaction): Users Interaction
-    #     """
-
-    #     embed = discord.Embed(
-    #         title="🏓 Pong!",
-    #         description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
-    #         color=self.bot.succesColor if (self.bot.latency * 1000) < 150 else self.bot.defaultColor
-    #     )
-
-    #     await interaction.response.send_message(embed=embed)
-
-
-
-    @app_commands.command(name="say", description="The bot will say anything you want", extras={'cog': 'general'})
-    @app_commands.describe(message="The message that should be repeated by the bot")
-    @checks.not_blacklisted()
-    async def say(self, interaction, *, message: str) -> None:
-        """Let the bot say anything you want
-
-        Args:
-            interaction (Interaction): Users Interaction
-            message (str): What the bot has to say
-        """
-
-        await interaction.response.send_message(message)
-
-
-
-    @app_commands.command(name="embed", description="The bot will say anything you want, but within embeds", extras={'cog': 'general'})
-    @app_commands.describe(message="The message that should be repeated by the bot")
-    @checks.not_blacklisted()
-    async def embed(self, interaction, *, message: str) -> None:
-        """Let the bot say anything you want, but in an embed
-
-        Args:
-            interaction (Interaction): Users Interaction
-            message (str): What the bot has to say
-        """
-
-        embed = discord.Embed(title=message, color=self.bot.defaultColor)
         await interaction.response.send_message(embed=embed)
 
 
@@ -349,33 +299,6 @@ class General(commands.Cog, name="general"):
 
         # stuur het antwoord
         await interaction.followup.send(embed=embed)
-
-
-
-    @app_commands.command(name="invite", description="Create an invite", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    async def invite(self, interaction) -> None:
-        """Send an invite to the main server
-
-        Args:
-            interaction (Interaction): Users Interaction
-        """
-        
-        
-        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
-        channel = await guild.fetch_channel(int(os.environ.get("CHANNEL")))
-
-        # unban the user
-        if os.environ.get("AUTOUNBAN") == "True":
-            try:
-                await guild.unban(interaction.user)
-                await interaction.user.send("I unbanned you.")
-            except:
-                pass
-
-        link = await channel.create_invite(max_age = 0, max_uses = 1)
-
-        await interaction.response.send_message(link)
 
 
 

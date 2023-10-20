@@ -475,6 +475,29 @@ async def on_tree_error(interaction, error):
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
+    elif isinstance(error, exceptions.UserNotInVC):
+        embed = discord.Embed(
+            title=f"🔇 You are not in a voice channel",
+            color=bot.errorColor
+        ) 
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    elif isinstance(error, exceptions.BotNotInVC):
+        embed = discord.Embed(
+            title=f"🔇 Bot is not in vc",
+            description="use /join to add bot to vc",
+            color=bot.errorColor
+        ) 
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    elif isinstance(error, exceptions.BotNotPlaying):
+        embed = discord.Embed(
+            title=f"🔇 The bot is not playing anything at the moment.",
+            description="Use /play to play a song or playlist",
+            color=bot.defaultColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+       
     else:
         embed = discord.Embed(
             title="Error!",

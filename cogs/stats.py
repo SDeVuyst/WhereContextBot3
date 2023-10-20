@@ -252,7 +252,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    @app_commands.command(name="changebancount", description="Change user ban count (owner only)", extras={'cog': 'stats'})
+    @app_commands.command(name="changebancount", description="Change user ban count (admin only)", extras={'cog': 'stats'})
     @checks.is_owner()   
     async def change_ban_count(self,interaction, user: discord.User, amount: int):
         """Changes the ban count of a user
@@ -363,7 +363,7 @@ class CommandView(View):
             SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
             SelectOption(label="Reacties", emoji="💭", value="reacties"),
-            SelectOption(label="Owner", emoji="👨‍🔧", value="owner")
+            SelectOption(label="Admin", emoji="👨‍🔧", value="admin")
         ]     
     )
     async def select_cog(self, interaction: Interaction, select_item : Select):
@@ -379,7 +379,7 @@ class CommandView(View):
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
             "reacties": "💭 Reacties",
-            "owner": "👨‍🔧 Owner"
+            "admin": "👨‍🔧 Admin"
         }
         self.children[0].disabled = True
         self.children[0].placeholder = formatted[select_item.values[0]]

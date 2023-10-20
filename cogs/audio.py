@@ -21,23 +21,6 @@ class Audio(commands.Cog, name="audio"):
     def __init__(self, bot):
         self.bot = bot
 
-        self.bot_not_in_vc_embed = discord.Embed(
-            title=f"🔇 Bot is not in vc",
-            description="use /join to add bot to vc",
-            color=self.bot.errorColor
-        ) 
-
-        self.not_playing_embed = discord.Embed(
-            title=f"🔇 The bot is not playing anything at the moment.",
-            description="Use /play to play a song or playlist",
-            color=self.bot.defaultColor
-        )
-
-        self.not_in_vc_embed = discord.Embed(
-            title=f"🔇 You are not in a voice channel",
-            color=self.bot.errorColor
-        ) 
-
         ytdl_format_options = {
             'format': 'bestaudio/best',
             'restrictfilenames': True,
@@ -77,6 +60,8 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
+    @checks.bot_in_vc()
     @checks.cost_nword(5)
     @app_commands.describe(effect="Which effect to play")
     async def soundboard(self, interaction, effect: discord.app_commands.Choice[str]):
@@ -86,18 +71,8 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): Users interaction
             effect (discord.app_commands.Choice[str]): Which effect to play
         """
-        # check als user in vc zit
-        if not interaction.user.voice:
-            await interaction.response.send_message(embed=self.not_in_vc_embed)
-            return
         try:
-
-            # check als bot in vc zit
             vc = interaction.guild.voice_client
-            if vc is None:
-                await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-                return
-
             # pauzeer reeds spelende audio
             if vc.is_playing():
                 vc.pause()
@@ -144,10 +119,12 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="PewDiePie", value="pewdiepie"),
         discord.app_commands.Choice(name="Hitler", value="hitler-rant"),
     ])
+    @app_commands.checks.cooldown(rate=1, per=120)
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
-    @app_commands.checks.cooldown(rate=1, per=120)
+    @checks.user_in_vc()
+    @checks.bot_in_vc()
     @checks.cost_nword(5)
     @app_commands.describe(speech="What to say")
     @app_commands.describe(voice="Which voice to say your text in")
@@ -158,22 +135,13 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): User Interaction
             speech (str): What to say
             voice (discord.app_commands.Choice[str]): Which voice
-        """
-        # check als user in vc zit
-        if not interaction.user.voice:
-            await interaction.response.send_message(embed=self.not_in_vc_embed)
-            return
-        
-        # check als bot in vc zit
-        vc = interaction.guild.voice_client
-        if vc is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return      
+        """ 
             
-
         await interaction.response.defer()
 
         try:
+            vc = interaction.guild.voice_client
+
             # creeer audio file 
             audio_data = await http.query_uberduck(speech, voice.value)
             with tempfile.NamedTemporaryFile(
@@ -228,6 +196,8 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
+    @checks.bot_in_vc()
     @app_commands.choices(in_front=[
         discord.app_commands.Choice(name="no", value=0),
         discord.app_commands.Choice(name="yes", value=1),   
@@ -242,18 +212,6 @@ class Audio(commands.Cog, name="audio"):
             url (str): url of youtube video/playlist or spotify playlist/song
             in_front (discord.app_commands.Choice[int]): If the audio has to be played now or put in queue
         """
-
-
-        # check dat user in vc zit
-        if not interaction.user.voice:
-            await interaction.response.send_message(embed=self.not_in_vc_embed)
-            return
-        
-        # check dat bot in vc zit
-        vc = interaction.guild.voice_client
-        if vc is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return  
         
         await interaction.response.defer()
 
@@ -264,6 +222,7 @@ class Audio(commands.Cog, name="audio"):
             pass
         
         try:
+            vc = interaction.guild.voice_client
 
             # youtube/spotify playlist
             if track.find("list=") != -1 or track.find("open.spotify.com/playlist") != -1:
@@ -424,6 +383,8 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.bot_in_vc()
+    @checks.bot_is_playing()
     async def pause(self, interaction):
         """ Pauses the playing audio
 
@@ -431,101 +392,83 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): Users Interaction
         """
 
-        # check als bot in vc zit
-        voice_client = interaction.guild.voice_client
-        if voice_client is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return  
-        
         # pauzeer
-        if voice_client.is_playing():
-            voice_client.pause()
-            self.pause_time = datetime.now()
-            embed = discord.Embed(
-                title=f"⏸️ Paused!",
-                color=self.bot.succesColor
-            )
-            await interaction.response.send_message(embed=embed)
-        else:
-            await interaction.response.send_message(embed=self.not_playing_embed)
+        interaction.guild.voice_client.pause()
+        self.pause_time = datetime.now()
+        embed = discord.Embed(
+            title=f"⏸️ Paused!",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed)
       
         
     @app_commands.command(name="resume", description="Resume currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.bot_in_vc()
+    @checks.bot_is_playing()
     async def resume(self, interaction):
         """Resumes the paused audio
 
         Args:
             interaction (Interaction): Users Interaction
         """
+        vc = interaction.guild.voice_client
 
-        # check als bot in vc zit
-        voice_client = interaction.guild.voice_client
-        if voice_client is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return  
-        
         # resume
-        if voice_client.is_paused():
-            # calculate pause delta
-            if not self.pause_delta:
-                self.pause_delta = datetime.now() - self.pause_time
-            else:
-                self.pause_delta += datetime.now() - self.pause_time
-            
-            self.pause_time = None
-
-            voice_client.resume()
-            embed = discord.Embed(
-                title=f"▶️ Resumed!",
-                color=self.bot.succesColor
-            )
-            await interaction.response.send_message(embed=embed)
+        # calculate pause delta
+        if not self.pause_delta:
+            self.pause_delta = datetime.now() - self.pause_time
         else:
-            await interaction.response.send_message(embed=self.not_playing_embed)
+            self.pause_delta += datetime.now() - self.pause_time
+        
+        self.pause_time = None
+
+        vc.resume()
+        embed = discord.Embed(
+            title=f"▶️ Resumed!",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(name="loop", description="Loop the queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
+    @checks.bot_in_vc()
+    @checks.bot_is_playing()
     async def loop(self, interaction):
         """ Loop the queue
 
         Args:
             interaction (Interaction): Users Interaction
         """
+        vc = interaction.guild.voice_client
 
-        # check als bot in vc zit
-        voice_client = interaction.guild.voice_client
-        if voice_client is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return  
-        
-        if voice_client.is_playing():
+        # currently playing track should also be included in the loop
+        if (self.queue or [None])[-1] != self.track_playing:
+            self.queue.append(self.track_playing)
 
-            # currently playing track should also be included in the loop
-            if (self.queue or [None])[-1] != self.track_playing:
-                self.queue.append(self.track_playing)
+        # turn looping on/off
+        self.looping = not self.looping
 
-            # turn looping on/off
-            self.looping = not self.looping
-
-            embed = discord.Embed(
-                title="🔁 Looping enabled!" if self.looping else "🔁 Looping disabled!",
-                color=self.bot.succesColor
-            )
-            await interaction.response.send_message(embed=embed)
-        else:
-            await interaction.response.send_message(embed=self.not_playing_embed)
+        embed = discord.Embed(
+            title="🔁 Looping enabled!" if self.looping else "🔁 Looping disabled!",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(name="skip", description="Skip the currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
+    @checks.bot_in_vc()
+    @checks.bot_is_playing()
     @app_commands.describe(aantal="How many tracks the bot should skip")
     async def skip(self, interaction, aantal:int=1):
         """Skips the currently playing audio
@@ -534,66 +477,47 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): Users Interaction
             aantal (int): amount of tracks to skip, defaults to 1
         """
-
-        # check als bot in vc zit
-        voice_client = interaction.guild.voice_client
-        if voice_client is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return  
-        
+        vc = interaction.guild.voice_client
         # skip
-        if voice_client.is_playing():
-            self.queue = self.queue[aantal-1:]
-            voice_client.stop()
+        self.queue = self.queue[aantal-1:]
+        vc.stop()
 
-            # tijdstippen hebben we niet meer nodig
-            self.pause_time = None
-            self.pause_delta = None
-            
-            embed = discord.Embed(
-                title=f"⏭️ Skipped!",
-                color=self.bot.succesColor
-            )
-            await interaction.response.send_message(embed=embed)
-
-        else:
-            await interaction.response.send_message(embed=self.not_playing_embed)
+        # tijdstippen hebben we niet meer nodig
+        self.pause_time = None
+        self.pause_delta = None
+        
+        embed = discord.Embed(
+            title=f"⏭️ Skipped!",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed)
 
 
     @app_commands.command(name="stop", description="Stop the listening session (this clears the queue!)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.bot_in_vc()
+    @checks.bot_is_playing()
     async def stop(self, interaction):
         """ Stops the listening session & clears the queue
 
         Args:
             interaction (Interaction): Users Interaction
         """
-
-        # check dat bot in vc zit
-        voice_client = interaction.guild.voice_client
-        if voice_client is None:
-            await interaction.response.send_message(embed=self.bot_not_in_vc_embed)
-            return  
+        vc = interaction.guild.voice_client
+        # maak queue leeg
+        self.queue = []
+        # tijdstippen hebben we niet meer nodig
+        self.pause_time = None
+        self.pause_delta = None
         
-        
-        if voice_client.is_playing():
-            # maak queue leeg
-            self.queue = []
-            # tijdstippen hebben we niet meer nodig
-            self.pause_time = None
-            self.pause_delta = None
-            
-            voice_client.stop()
-            embed = discord.Embed(
-                title=f"⏹️ Stopped!",
-                color=self.bot.defaultColor
-            )
-            await interaction.response.send_message(embed=embed)
-
-        else:
-            await interaction.response.send_message(embed=self.not_playing_embed)
+        vc.stop()
+        embed = discord.Embed(
+            title=f"⏹️ Stopped!",
+            color=self.bot.defaultColor
+        )
+        await interaction.response.send_message(embed=embed)
 
         self.track_playing = None
 
@@ -602,6 +526,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
     async def join(self, interaction):
         """Joins a vc
 
@@ -610,17 +535,13 @@ class Audio(commands.Cog, name="audio"):
         """
 
         try:
-            # user zit niet in vc
-            if not interaction.user.voice:
-                embed = self.not_in_vc_embed
-            else:
-                # join channel
-                channel = interaction.user.voice.channel
-                await channel.connect()
-                embed = discord.Embed(
-                    title=f"✅ Joined channel {channel.name}!",
-                    color=self.bot.succesColor
-                )
+            # join channel
+            channel = interaction.user.voice.channel
+            await channel.connect()
+            embed = discord.Embed(
+                title=f"✅ Joined channel {channel.name}!",
+                color=self.bot.succesColor
+            )
         except discord.ClientException:
             embed = discord.Embed(
                 title=f"🎧 Already in voice channel",
@@ -634,6 +555,7 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
     async def leave(self, interaction):
         """leaves a vc
 
@@ -650,14 +572,12 @@ class Audio(commands.Cog, name="audio"):
             )
             await interaction.response.send_message(embed=embed)
 
-        else:
-            await interaction.response.send_message(embed=self.not_in_vc_embed)
-
 
     @app_commands.command(name="shuffle", description="Shuffles the queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()
+    @checks.user_in_vc()
     async def shuffle(self, interaction):
         """shuffles the queue
 
@@ -673,9 +593,6 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
-
-        else:
-            await interaction.response.send_message(embed=self.not_in_vc_embed)
 
 
     async def play_next(self, interaction, first_player=False):
