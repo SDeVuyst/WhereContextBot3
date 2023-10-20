@@ -271,8 +271,6 @@ class CommandSelect(Select):
         elif selected_cog == "stats":
             commands.insert(0, ("N-Words said", "ncountCHECK"))
             commands.insert(0, ("Bans", "bancount"))
-
-        elif selected_cog == "general":
             commands.insert(0, ("Danae trigger", "danae"))
         
 
