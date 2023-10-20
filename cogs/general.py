@@ -61,7 +61,7 @@ class General(commands.Cog, name="general"):
 
             embed = discord.Embed(
                 title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id=1113092675697123458&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
+                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
                 color=self.bot.defaultColor
             )
 
@@ -325,13 +325,13 @@ class General(commands.Cog, name="general"):
 
         if t is None:
             embed = discord.Embed(
-                title="❌ Geen geldig tijdstip",
+                title="⏰ Geen geldig tijdstip",
                 description=f"{wanneer} is geen geldig tijdstip",
                 color=self.bot.errorColor
             )
         elif t < datetime.now():
             embed = discord.Embed(
-                title="❌ Geen geldig tijdstip",
+                title="⏰ Geen geldig tijdstip",
                 description=f"{wanneer} is in het verleden",
                 color=self.bot.errorColor
             )
@@ -606,7 +606,11 @@ class PollMenuBuilder(discord.ui.View):
             await msg.add_reaction(self.reactions[i])
 
         # send confirmation
-        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
+        embed = discord.Embed(
+            title="🗳️ Poll is live!",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
     @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
@@ -622,7 +626,11 @@ class PollMenuBuilder(discord.ui.View):
         await interaction.message.delete()
 
         # send confirmation
-        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
+        embed = discord.Embed(
+            title="🛑 Stopped!",
+            color=self.bot.defaultColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -709,7 +717,12 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.options.append(self.answer.value)
-        await interaction.response.send_message(f'Option added! ```{self.answer.value}```', ephemeral=True)
+        embed = discord.Embed(
+            title="💾 Option added!",
+            description=f'```{self.answer.value}```',
+            color=self.poll_builder.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 
@@ -727,7 +740,12 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.description = self.answer.value
-        await interaction.response.send_message(f'Description set! ```{self.answer.value}```', ephemeral=True)
+        embed = discord.Embed(
+            title="💾 Description set!",
+            description=f'```{self.answer.value}```',
+            color=self.poll_builder.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 

@@ -70,9 +70,20 @@ class BotNotInVC(app_commands.CheckFailure):
         self.message = message
         super().__init__(self.message)
 
+
 class BotNotPlaying(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but the bot is not playing audio.
+    """
+
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)
+
+
+class TimeoutCommand(app_commands.CheckFailure):
+    """
+    Thrown when a user has exceeded a time limit.
     """
 
     def __init__(self, message=""):

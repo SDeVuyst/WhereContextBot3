@@ -357,10 +357,10 @@ class Audio(commands.Cog, name="audio"):
         """
 
         try:
-            title="🎵 Now playing" if self.track_playing is not None else "❌ Nothing is playing"
+            title="🎵 Now playing" if self.track_playing is not None else "🎛️ Nothing is playing"
             desc = f"[{self.track_playing.title}]({self.track_playing.url})" if self.track_playing is not None else None
         except:
-            title="❌ Nothing is playing"
+            title="🎛️ Nothing is playing"
             desc = None
 
         embed = discord.Embed(

@@ -268,7 +268,7 @@ async def on_raw_reaction_add(payload):
         i = emojis.index(payload.emoji.name)
 
         # new reaction                                      not bot initial reaction
-        if str(payload.user_id) not in reactions[i] and str(payload.user_id) != '1113092675697123458':
+        if str(payload.user_id) not in reactions[i] and str(payload.user_id) != os.environ.get("APPLICATION_ID"):
             # remove all previous reactions from user
             reactions = [[ subelt for subelt in elt if subelt not in [str(payload.user_id), f"'{payload.user_id}'"] ] for elt in reactions] 
             # remove 'placeholder'
@@ -285,7 +285,7 @@ async def on_raw_reaction_add(payload):
         await db_manager.set_poll_reactions(payload.message_id, string_reactions)
 
         # delete the emoji reaction
-        if str(payload.user_id) != '1113092675697123458':
+        if str(payload.user_id) != os.environ.get("APPLICATION_ID"):
             await message.remove_reaction(payload.emoji, user)
 
 
@@ -331,7 +331,7 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_member_join(member):
-    bot.logger.info(f"{member.id} joined the server!")
+    bot.logger.info(f"{member.id} joined a server!")
 
     if member.guild.id == int(os.environ.get("GUILD_ID")):
         await auto.autoroles(bot, member)
@@ -399,7 +399,7 @@ async def on_tree_error(interaction, error):
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
         embed = discord.Embed(
-            description=f"**Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
+            description=f"⏲️ **Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
             color=bot.errorColor,
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -410,7 +410,7 @@ async def on_tree_error(interaction, error):
         the @checks.not_blacklisted() check in your command, or you can raise the error by yourself.
         """
         embed = discord.Embed(
-            description="You are blacklisted from using the bot!", color=bot.errorColor
+            description="🛑 You are blacklisted from using the bot!", color=bot.errorColor
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         if interaction.guild:
@@ -427,7 +427,7 @@ async def on_tree_error(interaction, error):
         Same as above, just for the @checks.is_owner() check.
         """
         embed = discord.Embed(
-            description="You are not the owner of the bot!", color=bot.errorColor
+            description="🛑 You are not the owner of the bot!", color=bot.errorColor
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
         if interaction.guild:
@@ -441,7 +441,7 @@ async def on_tree_error(interaction, error):
 
     elif isinstance(error, discord.app_commands.MissingPermissions):
         embed = discord.Embed(
-            description="You are missing the permission(s) `"
+            description="❌ You are missing the permission(s) `"
             + ", ".join(error.missing_permissions)
             + "` to execute this command!",
             color=bot.errorColor,
@@ -450,7 +450,7 @@ async def on_tree_error(interaction, error):
 
     elif isinstance(error, discord.app_commands.BotMissingPermissions):
         embed = discord.Embed(
-            description="I am missing the permission(s) `"
+            description="❌ I am missing the permission(s) `"
             + ", ".join(error.missing_permissions)
             + "` to fully perform this command!",
             color=bot.errorColor,
@@ -459,7 +459,7 @@ async def on_tree_error(interaction, error):
 
     elif isinstance(error, exceptions.WrongChannel):
         embed = discord.Embed(
-            title="Wrong channel!",
+            title="❌ Wrong channel!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
             color=bot.errorColor,
@@ -468,7 +468,7 @@ async def on_tree_error(interaction, error):
 
     elif isinstance(error, exceptions.MissingNwords):
         embed = discord.Embed(
-            title="You don't have enough N-words!",
+            title="🪙 You don't have enough N-words!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
             color=bot.errorColor,
@@ -497,10 +497,17 @@ async def on_tree_error(interaction, error):
             color=bot.defaultColor
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
-       
+    
+    elif isinstance(error, exceptions.TimeoutCommand):
+        embed = discord.Embed(
+            title="⏲️ You took too long!",
+            color=bot.errorColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
     else:
         embed = discord.Embed(
-            title="Error!",
+            title="❌ Error!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
             color=bot.errorColor,
