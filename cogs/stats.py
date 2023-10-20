@@ -35,7 +35,7 @@ class Stats(commands.Cog, name="stats"):
         await interaction.response.send_message(view=view)
         await view.wait()
         if view.chosen_command is None:
-            raise TimeoutCommand()
+            raise TimeoutCommand('Timeout in /leaderboard')
         
         embed = await self.get_leaderboard_embed(view.chosen_command)
         await interaction.edit_original_response(embed=embed, view=None)
@@ -61,7 +61,7 @@ class Stats(commands.Cog, name="stats"):
         await interaction.response.send_message(view=view)
         await view.wait()
         if view.chosen_command is None:
-            raise TimeoutCommand()
+            raise TimeoutCommand("Timeout in /stats_individual")
 
         
         embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
@@ -86,8 +86,6 @@ class Stats(commands.Cog, name="stats"):
         else:
             # krijg count bericht uit db
             leaderb = await db_manager.get_leaderboard(command)
-
-        self.bot.logger.info(leaderb)
         
         # Geen berichten
         if len(leaderb) == 0:
@@ -193,14 +191,14 @@ class Stats(commands.Cog, name="stats"):
 
 class CommandView(View):
     def __init__(self, bot) -> None:
-        super().__init__()
+        super().__init__(timeout=60)
         self.bot = bot
         self.feature_selector = None
 
     chosen_command = None
 
     @discord.ui.select(
-        placeholder="Kies een onderverdeling",
+        placeholder="Choose a subdivision",
         options = [
             SelectOption(label="Audio", emoji="🎙️", value="audio"),
             SelectOption(label="General", emoji="🤖", value="general"),
@@ -259,7 +257,8 @@ class CommandSelect(Select):
         commands = []
         for y in bot.tree.walk_commands():
             if y.extras.get('cog') == selected_cog:
-                commands.append((y.name, y.name))
+                name = f"/{y.name}" if not y.extras.get('prefix') else f"/{y.extras.get('prefix')} {y.name}"
+                commands.append((name, y.name))
 
         # stats die zelf geen command zijn
         if selected_cog == "outofcontext":

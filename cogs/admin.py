@@ -10,7 +10,6 @@ import discord
 import os
 from discord import app_commands
 from discord.ext import commands
-
 from helpers import checks, db_manager
 
 
@@ -18,7 +17,9 @@ class Admin(commands.Cog, name="admin"):
     def __init__(self, bot):
         self.bot = bot
 
-
+    conmand_cog_group = app_commands.Group(name="cog", description="Cog Group")
+    blacklist_group = app_commands.Group(name="blacklist", description="Blacklist Group")
+    
     @app_commands.command(
         name="sync",
         description="Synchronizes the slash commands (admin only)",
@@ -81,10 +82,10 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(
+    @conmand_cog_group.command(
         name="load",
         description="Load a cog (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @app_commands.describe(cog="The name of the cog to load")
     @checks.is_owner()
@@ -113,10 +114,10 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(
+    @conmand_cog_group.command(
         name="unload",
         description="Unloads a cog (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @app_commands.describe(cog="The name of the cog to unload")
     @checks.is_owner()
@@ -144,10 +145,10 @@ class Admin(commands.Cog, name="admin"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(
+    @conmand_cog_group.command(
         name="reload",
         description="Reloads a cog (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @app_commands.describe(cog="The name of the cog to reload")
     @checks.is_owner()
@@ -175,13 +176,13 @@ class Admin(commands.Cog, name="admin"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(
-        name="cogs",
+    @conmand_cog_group.command(
+        name="all",
         description="See loaded/unloaded cogs (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @checks.is_owner()
-    async def cogs(self, interaction) -> None:
+    async def all(self, interaction) -> None:
         """Shows which cogs are loaded/unloaded
 
         Args:
@@ -226,10 +227,10 @@ class Admin(commands.Cog, name="admin"):
         
 
 
-    @app_commands.command(
-        name="blacklistshow",
+    @blacklist_group.command(
+        name="show",
         description="Shows the list of all blacklisted users (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'blacklist'}
     )
     @checks.is_owner()
     async def blacklist_show(self, interaction) -> None:
@@ -271,10 +272,10 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(
-        name="blacklistadd",
+    @blacklist_group.command(
+        name="add",
         description="Lets you add a user from not being able to use the bot (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'blacklist'}
     )
     @app_commands.describe(user="The user that should be added to the blacklist")
     @checks.is_owner()
@@ -316,10 +317,10 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(
-        name="blacklistremove",
+    @blacklist_group.command(
+        name="remove",
         description="Lets you remove a user from not being able to use the bot (admin only)",
-        extras={'cog': 'admin'}
+        extras={'cog': 'admin', 'prefix': 'blacklist'}
     )
     @app_commands.describe(user="The user that should be removed from the blacklist.")
     @checks.is_owner()
@@ -354,39 +355,6 @@ class Admin(commands.Cog, name="admin"):
         )
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
-        )
-        await interaction.response.send_message(embed=embed)
-
-
-    @app_commands.command(
-        name="pollremove",
-        description="Remove an active poll (admin only)",
-        extras={'cog': 'admin'}
-    )
-
-    @checks.is_owner()
-    async def pollremove(self, interaction, message_id: str) -> None:
-        """Remove an active poll
-
-        Args:
-            interaction (Interaction): Users interaction
-            message_id (str): id of message
-        """
-
-        total = await db_manager.delete_poll(message_id)
-
-        #error
-        if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.", color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
-        
-        # alles ok
-        embed = discord.Embed(
-            description=f"✅ Done",
-            color=self.bot.succesColor,
         )
         await interaction.response.send_message(embed=embed)
 
@@ -480,9 +448,6 @@ class Admin(commands.Cog, name="admin"):
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
         await interaction.response.send_message(link)
-
-
-        
 
 
 

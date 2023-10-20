@@ -503,7 +503,7 @@ async def on_tree_error(interaction, error):
             title="⏲️ You took too long!",
             color=bot.errorColor
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
     else:
         embed = discord.Embed(
@@ -513,7 +513,6 @@ async def on_tree_error(interaction, error):
             color=bot.errorColor,
         )
         await interaction.response.send_message(embed=embed)
-        bot.logger.error(error)
 
 
 bot.tree.on_error = on_tree_error
