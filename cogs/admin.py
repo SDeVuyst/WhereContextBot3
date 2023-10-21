@@ -10,19 +10,20 @@ import discord
 import os
 from discord import app_commands
 from discord.ext import commands
-
 from helpers import checks, db_manager
 
 
-class Owner(commands.Cog, name="owner"):
+class Admin(commands.Cog, name="admin"):
     def __init__(self, bot):
         self.bot = bot
 
-
+    conmand_cog_group = app_commands.Group(name="cog", description="Cog Group")
+    blacklist_group = app_commands.Group(name="blacklist", description="Blacklist Group")
+    
     @app_commands.command(
         name="sync",
         description="Synchronizes the slash commands (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin'}
     )
     @app_commands.describe(scope="The scope of the sync.")
     @app_commands.choices(scope=[
@@ -81,10 +82,10 @@ class Owner(commands.Cog, name="owner"):
 
 
 
-    @app_commands.command(
+    @conmand_cog_group.command(
         name="load",
         description="Load a cog (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @app_commands.describe(cog="The name of the cog to load")
     @checks.is_owner()
@@ -113,10 +114,10 @@ class Owner(commands.Cog, name="owner"):
 
 
 
-    @app_commands.command(
+    @conmand_cog_group.command(
         name="unload",
         description="Unloads a cog (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @app_commands.describe(cog="The name of the cog to unload")
     @checks.is_owner()
@@ -144,10 +145,10 @@ class Owner(commands.Cog, name="owner"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(
+    @conmand_cog_group.command(
         name="reload",
         description="Reloads a cog (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @app_commands.describe(cog="The name of the cog to reload")
     @checks.is_owner()
@@ -175,13 +176,13 @@ class Owner(commands.Cog, name="owner"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(
-        name="cogs",
+    @conmand_cog_group.command(
+        name="all",
         description="See loaded/unloaded cogs (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'cog'}
     )
     @checks.is_owner()
-    async def cogs(self, interaction) -> None:
+    async def all(self, interaction) -> None:
         """Shows which cogs are loaded/unloaded
 
         Args:
@@ -209,7 +210,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="restart",
         description="Make the bot restart (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin'}
     )
     @checks.is_owner()
     async def restart(self, interaction) -> None:
@@ -226,10 +227,10 @@ class Owner(commands.Cog, name="owner"):
         
 
 
-    @app_commands.command(
-        name="blacklistshow",
+    @blacklist_group.command(
+        name="show",
         description="Shows the list of all blacklisted users (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'blacklist'}
     )
     @checks.is_owner()
     async def blacklist_show(self, interaction) -> None:
@@ -271,10 +272,10 @@ class Owner(commands.Cog, name="owner"):
 
 
 
-    @app_commands.command(
-        name="blacklistadd",
+    @blacklist_group.command(
+        name="add",
         description="Lets you add a user from not being able to use the bot (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'blacklist'}
     )
     @app_commands.describe(user="The user that should be added to the blacklist")
     @checks.is_owner()
@@ -316,10 +317,10 @@ class Owner(commands.Cog, name="owner"):
 
 
 
-    @app_commands.command(
-        name="blacklistremove",
+    @blacklist_group.command(
+        name="remove",
         description="Lets you remove a user from not being able to use the bot (admin only)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin', 'prefix': 'blacklist'}
     )
     @app_commands.describe(user="The user that should be removed from the blacklist.")
     @checks.is_owner()
@@ -358,44 +359,11 @@ class Owner(commands.Cog, name="owner"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(
-        name="pollremove",
-        description="Remove an active poll (admin only)",
-        extras={'cog': 'owner'}
-    )
-
-    @checks.is_owner()
-    async def pollremove(self, interaction, message_id: str) -> None:
-        """Remove an active poll
-
-        Args:
-            interaction (Interaction): Users interaction
-            message_id (str): id of message
-        """
-
-        total = await db_manager.delete_poll(message_id)
-
-        #error
-        if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.", color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
-        
-        # alles ok
-        embed = discord.Embed(
-            description=f"✅ Done",
-            color=self.bot.succesColor,
-        )
-        await interaction.response.send_message(embed=embed)
-
-
 
     @app_commands.command(
         name="unban",
         description="Unban a user (500🪙)",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin'}
     )
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=2, per=3600)
@@ -406,7 +374,7 @@ class Owner(commands.Cog, name="owner"):
         Args:
             interaction (Interaction): Users Interaction
         """
-        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         bans = [entry async for entry in guild.bans(limit=25)]
         if len(bans) > 0:
             await interaction.response.send_message(view=UnbanView(bans, self.bot))
@@ -424,7 +392,7 @@ class Owner(commands.Cog, name="owner"):
     @app_commands.command(
         name="nickname",
         description="Set the nickname of a user",
-        extras={'cog': 'owner'}
+        extras={'cog': 'admin'}
     )
     @checks.not_blacklisted()
     @app_commands.describe(user="Which user")
@@ -455,7 +423,31 @@ class Owner(commands.Cog, name="owner"):
             await interaction.response.send_message(embed=embed)
 
 
+
+    @app_commands.command(name="invite", description="Create an invite", extras={'cog': 'admin'})
+    @checks.not_blacklisted()
+    async def invite(self, interaction) -> None:
+        """Send an invite to the main server
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
         
+        
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
+        channel = await guild.fetch_channel(int(os.environ.get("CHANNEL")))
+
+        # unban the user
+        if os.environ.get("AUTOUNBAN") == "True":
+            try:
+                await guild.unban(interaction.user)
+                await interaction.user.send("I unbanned you.")
+            except:
+                pass
+
+        link = await channel.create_invite(max_age = 0, max_uses = 1)
+
+        await interaction.response.send_message(link)
 
 
 
@@ -472,7 +464,7 @@ class UnbanDropdown(discord.ui.Select):
         super().__init__(placeholder="Pick a user to unban", options=options, min_values=1, max_values=1)
 
     async def callback(self, interaction):
-        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         user = await self.bot.fetch_user(int(self.values[0]))
 
         await guild.unban(user)
@@ -484,6 +476,8 @@ class UnbanDropdown(discord.ui.Select):
         await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()
 
+    
+
 
 async def setup(bot):
-    await bot.add_cog(Owner(bot))
+    await bot.add_cog(Admin(bot))

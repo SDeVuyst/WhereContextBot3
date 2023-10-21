@@ -24,7 +24,7 @@ def is_owner() -> Callable[[T], T]:
     """
 
     async def predicate(interaction) -> bool:
-        if str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
+        if str(interaction.user.id) not in list(os.environ.get("OWNERS").split(",")):
             raise UserNotOwner
         return True
 
@@ -47,7 +47,7 @@ def not_blacklisted() -> Callable[[T], T]:
 def in_audio_command_channel() -> Callable[[T], T]:
 
     async def predicate(interaction):
-        if interaction.guild_id != int(os.environ.get("guild_id")):
+        if interaction.guild_id != int(os.environ.get("GUILD_ID")):
             return True
         
         if interaction.channel.id not in [1114464141508345906, 727511733970665493]:
@@ -61,7 +61,7 @@ def in_correct_server() -> Callable[[T], T]:
 
     async def predicate(interaction):
 
-        if interaction.guild_id not in [int(os.environ.get("guild_id")),] and not isinstance(interaction.channel, discord.channel.DMChannel):
+        if interaction.guild_id not in [int(os.environ.get("GUILD_ID")),] and not isinstance(interaction.channel, discord.channel.DMChannel):
             raise WrongChannel("You are only able to use this command in the main server, use /invite to get an invite")
         return True
     
@@ -104,4 +104,40 @@ def cost_nword(cost: int) -> Callable[[T], T]:
         # user has enough nwords
         return True
 
+    return app_commands.check(predicate)
+
+
+
+def user_in_vc() -> Callable[[T], T]:
+
+    async def predicate(interaction):
+
+        if not interaction.user.voice:
+            raise UserNotInVC()
+        return True
+    
+    return app_commands.check(predicate)
+
+
+
+def bot_in_vc() -> Callable[[T], T]:
+
+    async def predicate(interaction):
+
+        if interaction.guild.voice_client is None:
+            raise BotNotInVC()
+        return True
+    
+    return app_commands.check(predicate)
+
+
+
+def bot_is_playing() -> Callable[[T], T]:
+
+    async def predicate(interaction):
+
+        if not interaction.guild.voice_client.is_playing():
+            raise BotNotPlaying()
+        return True
+    
     return app_commands.check(predicate)

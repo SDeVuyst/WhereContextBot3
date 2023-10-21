@@ -8,8 +8,8 @@ import os
 
 # Your Uberduck API key and API secret.
 # You can create a new key and secret at https://app.uberduck.ai/account/manage
-API_KEY = os.environ.get("uberduckapi")
-API_SECRET = os.environ.get("uberducksecret")
+API_KEY = os.environ.get("UBERDUCK_TOKEN")
+API_SECRET = os.environ.get("UBERDUCK_SECRET")
 API_ROOT = "https://api.uberduck.ai"
 
 

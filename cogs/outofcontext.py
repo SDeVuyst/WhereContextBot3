@@ -174,7 +174,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         """
 
         # haal bericht op van discord
-        m = await guild.get_channel(int(os.environ.get("channel"))).fetch_message(id)
+        m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
         desc = f"[Go to message]({m.jump_url})" if len(m.content) == 0 else f"**{m.content}**\n[Go to message]({m.jump_url})"
         embed = discord.Embed(
             title="**Out of Context**", 
@@ -275,7 +275,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
             )
             return embed
         
-        m = await guild.get_channel(int(os.environ.get("channel"))).fetch_message(id)
+        m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
         
         # alles oke
         embed = discord.Embed(
@@ -299,7 +299,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         submitted_id = message.author.id
 
         # check als message uit OOC komt
-        if message.channel.id != int(os.environ.get('channel')):
+        if message.channel.id != int(os.environ.get('CHANNEL')):
             embed = discord.Embed(
                 description="Bericht moet in #out-of-context staan!",
                 color=self.bot.errorColor,
@@ -369,7 +369,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
             )
             return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
         
-        m = await interaction.guild.get_channel(int(os.environ.get("channel"))).fetch_message(id)
+        m = await interaction.guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
         
         # alles oke
         embed = discord.Embed(
@@ -504,7 +504,7 @@ class Menu(discord.ui.View):
         """
 
         try:
-            is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("owners").split(","))
+            is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
             # stuur dm naar user als niet author is
             if not is_possible:
                 await interaction.user.send('nt')

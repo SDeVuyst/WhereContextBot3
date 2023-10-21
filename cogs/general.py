@@ -23,7 +23,7 @@ from reactionmenu import ViewMenu, ViewSelect, ViewButton
 from helpers import checks, db_manager
 
 
-openai.api_key = os.environ.get("openaisecret")
+openai.api_key = os.environ.get("OPENAI_SECRET")
 
 
 class General(commands.Cog, name="general"):
@@ -43,7 +43,7 @@ class General(commands.Cog, name="general"):
             None: Nothing
         """
 
-        admin = list(os.environ.get("owners").split(","))
+        admin = list(os.environ.get("OWNERS").split(","))
 
         menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
@@ -52,7 +52,7 @@ class General(commands.Cog, name="general"):
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
             "reacties": "💭 Reacties",
-            "owner": "👨‍🔧 Owner"
+            "admin": "👨‍🔧 Admin"
         }
 
         page_numbers = {}
@@ -61,7 +61,7 @@ class General(commands.Cog, name="general"):
 
             embed = discord.Embed(
                 title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id=1113092675697123458&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
+                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
                 color=self.bot.defaultColor
             )
 
@@ -121,7 +121,7 @@ class General(commands.Cog, name="general"):
 
         # kick grom
         try:
-            gromID = int(os.environ.get("grom"))
+            gromID = int(os.environ.get("GROM"))
             grom = await interaction.guild.fetch_member(gromID)
             await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
         # grom kick error
@@ -134,60 +134,10 @@ class General(commands.Cog, name="general"):
             color=self.bot.errorColor
         )
         await interaction.response.send_message(embed=embed)
-        
-
-
-    # @app_commands.command(name="ping", description="Check if the bot is alive", extras={'cog': 'general'})
-    # @checks.not_blacklisted()
-    # async def ping(self, interaction) -> None:
-    #     """Check if the bot is alive
-
-    #     Args:
-    #         interaction (Interaction): Users Interaction
-    #     """
-
-    #     embed = discord.Embed(
-    #         title="🏓 Pong!",
-    #         description=f"The bot latency is {round(self.bot.latency * 1000)}ms.",
-    #         color=self.bot.succesColor if (self.bot.latency * 1000) < 150 else self.bot.defaultColor
-    #     )
-
-    #     await interaction.response.send_message(embed=embed)
 
 
 
-    @app_commands.command(name="say", description="The bot will say anything you want", extras={'cog': 'general'})
-    @app_commands.describe(message="The message that should be repeated by the bot")
-    @checks.not_blacklisted()
-    async def say(self, interaction, *, message: str) -> None:
-        """Let the bot say anything you want
-
-        Args:
-            interaction (Interaction): Users Interaction
-            message (str): What the bot has to say
-        """
-
-        await interaction.response.send_message(message)
-
-
-
-    @app_commands.command(name="embed", description="The bot will say anything you want, but within embeds", extras={'cog': 'general'})
-    @app_commands.describe(message="The message that should be repeated by the bot")
-    @checks.not_blacklisted()
-    async def embed(self, interaction, *, message: str) -> None:
-        """Let the bot say anything you want, but in an embed
-
-        Args:
-            interaction (Interaction): Users Interaction
-            message (str): What the bot has to say
-        """
-
-        embed = discord.Embed(title=message, color=self.bot.defaultColor)
-        await interaction.response.send_message(embed=embed)
-
-
-
-    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('countdown_title')}", extras={'cog': 'general'})
+    @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('COUNTDOWN_TITLE')}", extras={'cog': 'general'})
     @checks.not_blacklisted()
     async def countdown(self, interaction) -> None:
         """Countdown till agiven moment in time
@@ -196,15 +146,15 @@ class General(commands.Cog, name="general"):
             interaction (Interaction): Users Interaction
         """
 
-        deadline = datetime.strptime(os.environ.get("countdown"), "%d/%m/%y %H:%M:%S")
+        deadline = datetime.strptime(os.environ.get("COUNTDOWN"), "%d/%m/%y %H:%M:%S")
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
-            title = f"⌛ Time till {os.environ.get('countdown_title')}"
-            desc = f"{os.environ.get('countdown_title')} IS NU UIT!"
+            title = f"⌛ Time till {os.environ.get('COUNTDOWN_TITLE')}"
+            desc = f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!"
             kleur = self.bot.succesColor
         else:
-            title = f"⏳ Time till {os.environ.get('countdown_title')}"
+            title = f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
@@ -218,7 +168,7 @@ class General(commands.Cog, name="general"):
         )
 
         embed.set_thumbnail(
-            url=os.environ.get('countdown_url')
+            url=os.environ.get('COUNTDOWN_URL')
         )
 
  
@@ -247,7 +197,7 @@ class General(commands.Cog, name="general"):
         await user.send(content=content)
 
         # stuur dm naar admin
-        owner = int(list(os.environ.get("owners").split(","))[0])
+        owner = int(list(os.environ.get("OWNERS").split(","))[0])
         admin = await self.bot.fetch_user(owner)
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
 
@@ -352,33 +302,6 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="invite", description="Create an invite", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    async def invite(self, interaction) -> None:
-        """Send an invite to the main server
-
-        Args:
-            interaction (Interaction): Users Interaction
-        """
-        
-        
-        guild = await self.bot.fetch_guild(int(os.environ.get("guild_id")))
-        channel = await guild.fetch_channel(int(os.environ.get("channel")))
-
-        # unban the user
-        if os.environ.get("autounban") == "True":
-            try:
-                await guild.unban(interaction.user)
-                await interaction.user.send("I unbanned you.")
-            except:
-                pass
-
-        link = await channel.create_invite(max_age = 0, max_uses = 1)
-
-        await interaction.response.send_message(link)
-
-
-
     @app_commands.command(name="remindme", description="Remind me of an event", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @app_commands.describe(wanneer="When should the bot send you a reminder")
@@ -402,13 +325,13 @@ class General(commands.Cog, name="general"):
 
         if t is None:
             embed = discord.Embed(
-                title="❌ Geen geldig tijdstip",
+                title="⏰ Geen geldig tijdstip",
                 description=f"{wanneer} is geen geldig tijdstip",
                 color=self.bot.errorColor
             )
         elif t < datetime.now():
             embed = discord.Embed(
-                title="❌ Geen geldig tijdstip",
+                title="⏰ Geen geldig tijdstip",
                 description=f"{wanneer} is in het verleden",
                 color=self.bot.errorColor
             )
@@ -683,7 +606,11 @@ class PollMenuBuilder(discord.ui.View):
             await msg.add_reaction(self.reactions[i])
 
         # send confirmation
-        await interaction.response.send_message(f'Poll is live!', ephemeral=True)
+        embed = discord.Embed(
+            title="🗳️ Poll is live!",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
     @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
@@ -699,11 +626,15 @@ class PollMenuBuilder(discord.ui.View):
         await interaction.message.delete()
 
         # send confirmation
-        await interaction.response.send_message('❌ Stopped!', ephemeral=True)
+        embed = discord.Embed(
+            title="🛑 Stopped!",
+            color=self.bot.defaultColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
     async def interaction_check(self, interaction: discord.Interaction):
-        if interaction.user.id != self.author_id and str(interaction.user.id) not in list(os.environ.get("owners").split(",")):
+        if interaction.user.id != self.author_id and str(interaction.user.id) not in list(os.environ.get("OWNERS").split(",")):
             await interaction.response.send_message('shatap lil bro, you are not him', ephemeral=True)
             return False
         return True
@@ -724,7 +655,7 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
 
     # This is called when the button is clicked and the custom_id matches the template.
     @classmethod
-    async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match[str], /):
+    async def from_custom_id(cls, interaction: discord.Interaction, item: discord.ui.Button, match: re.Match, /):
         user_id = int(match['id'])
         return cls(user_id)
 
@@ -786,7 +717,12 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.options.append(self.answer.value)
-        await interaction.response.send_message(f'Option added! ```{self.answer.value}```', ephemeral=True)
+        embed = discord.Embed(
+            title="💾 Option added!",
+            description=f'```{self.answer.value}```',
+            color=self.poll_builder.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 
@@ -804,7 +740,12 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.description = self.answer.value
-        await interaction.response.send_message(f'Description set! ```{self.answer.value}```', ephemeral=True)
+        embed = discord.Embed(
+            title="💾 Description set!",
+            description=f'```{self.answer.value}```',
+            color=self.poll_builder.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 

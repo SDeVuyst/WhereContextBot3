@@ -49,3 +49,43 @@ class MissingNwords(app_commands.CheckFailure):
         self.required = required
         self.message = f"You need {required} N-words to use this command, but you only have {usercount}."
         super().__init__(self.message)
+
+
+class UserNotInVC(app_commands.CheckFailure):
+    """
+    Thrown when a user is attempting something, but is not in a voice channel
+    """
+
+    def __init__(self, message="User is not in a voice channel."):
+        self.message = message
+        super().__init__(self.message)
+
+
+class BotNotInVC(app_commands.CheckFailure):
+    """
+    Thrown when a user is attempting something, but the bot is not in a voice channel.
+    """
+
+    def __init__(self, message="Bot is not in a voice channel."):
+        self.message = message
+        super().__init__(self.message)
+
+
+class BotNotPlaying(app_commands.CheckFailure):
+    """
+    Thrown when a user is attempting something, but the bot is not playing audio.
+    """
+
+    def __init__(self, message="Bot is not playing anything."):
+        self.message = message
+        super().__init__(self.message)
+
+
+class TimeoutCommand(app_commands.CheckFailure):
+    """
+    Thrown when a user has exceeded a time limit.
+    """
+
+    def __init__(self, message=""):
+        self.message = message
+        super().__init__(self.message)

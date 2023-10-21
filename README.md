@@ -292,43 +292,5 @@ Displays the amount of times a user has said the nword.
 Change the nword count of a user.
 
 
-## System variables
-
-* application_id
-* autounban
-* channel
-* countdown
-* countdown_title
-* DATABASE_URL
-* grom
-* guild_id
-* openaisecret
-* owners
-* permissions
-* spotify_client_id
-* spotify_client_secret
-* time_delay
-* token
-* uberduckapi
-* uberducksecret
-* yt_api
-* yachja
-
-## Requirements / Technologies used
-
-* discord.py
-* psycopg2
-* yt_dlp
-* PyNaCl==1.4.0
-* ffmpeg
-* aiohttp>=3.7.4
-* requests
-* pytube
-* openai
-* dateparser
-* reactionmenu
-* StringProgressBar
-* spotipy
-* google-api-python-client
 
 Also thanks to [kkrypt0n](https://github.com/kkrypt0nn/Python-Discord-Bot-Template) for providing a very helpful template.

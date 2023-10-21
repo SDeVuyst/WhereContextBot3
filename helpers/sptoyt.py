@@ -11,9 +11,9 @@ from spotipy.oauth2 import SpotifyClientCredentials
 class SpotifyToYT:
 
     def __init__(self):
-        self.spotify_client_id = os.environ.get("spotify_client_id")
-        self.spotify_client_secret = os.environ.get("spotify_client_secret")
-        self.yt_api = os.environ.get("yt_api")
+        self.spotify_client_id = os.environ.get("SPOTIFY_ID")
+        self.spotify_client_secret = os.environ.get("SPOTIFY_SECRET")
+        self.yt_api = os.environ.get("YT_TOKEN")
 
     #create api
     def connect(self):
