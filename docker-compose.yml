@@ -16,7 +16,9 @@ services:
     container_name: wcb3_postgres_container
     image: postgres:latest
     restart: always
+    user: wcb3
     environment:
+      PGUSER: wcb3
       POSTGRES_DB: wcb3
       POSTGRES_PASSWORD: wcb3
 
