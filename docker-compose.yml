@@ -17,9 +17,8 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      PGUSER: wcb3
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: wcb3
-      POSTGRES_PASSWORD: wcb3
 
     expose:
       - "5432"
