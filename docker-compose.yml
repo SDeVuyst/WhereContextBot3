@@ -9,7 +9,7 @@ services:
     env_file: .env
     entrypoint: ['python', 'bot.py']
     depends_on:
-      wcb3_postgres:
+      - wcb3_postgres
         
 
   wcb3_postgres:
@@ -34,7 +34,7 @@ services:
     ports:
       - 8081:8081
     depends_on:
-      wcb3_postgres:
+      - wcb3_postgres
 
 
 volumes:
