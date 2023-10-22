@@ -15,6 +15,7 @@ services:
   wcb3_postgres:
     container_name: wcb3_postgres_container
     image: postgres:latest
+    user: wcb3
     restart: always
     env_file: .env
 
