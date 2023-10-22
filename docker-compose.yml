@@ -17,6 +17,9 @@ services:
     image: postgres:latest
     user: wcb3
     restart: always
+    environment:
+      POSTGRES_PASSWORD: wcb3
+      POSTGRES_USER: wcb3
     env_file: .env
 
     healthcheck:
