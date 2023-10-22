@@ -43,14 +43,14 @@ class Stats(commands.Cog, name="stats"):
 
 
     @app_commands.command(
-        name="individuele_stats",
+        name="statistic",
         description="How many times did a user use a command",
         extras={'cog': 'stats'}
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=1, per=10)
-    async def stats_individual(self,interaction, user: discord.User) -> None:
+    async def statistic(self,interaction, user: discord.User) -> None:
         """Shows the individual stats for a user for a given command
 
         Args:
