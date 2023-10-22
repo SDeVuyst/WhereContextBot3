@@ -9,23 +9,27 @@ services:
     env_file: .env
     entrypoint: ['python', 'bot.py']
     depends_on:
-      - wcb3_postgres
-        
+      wcb3_postgres:
+        condition: service_healthy
 
   wcb3_postgres:
     container_name: wcb3_postgres_container
     image: postgres:latest
     restart: always
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_DB: wcb3
+    env_file: .env
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d wcb3 -U wcb3"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
     expose:
       - "5432"
 
     volumes:
       - ./database/postgres_data:/var/lib/postgresql/data
- 
+
     ports:
       - 5432:5432
 
@@ -34,9 +38,10 @@ services:
     image: adminer
     restart: unless-stopped
     ports:
-      - 8081:8081
+      - 8080:8080
     depends_on:
-      - wcb3_postgres
+      wcb3_postgres:
+        condition: service_healthy
 
 
 volumes:
@@ -44,4 +49,3 @@ volumes:
 
 networks:
   esnet:
-
