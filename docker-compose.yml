@@ -28,7 +28,7 @@ services:
       - "5432"
 
     volumes:
-      - ./database/postgres_data:/var/lib/postgresql/data
+      - /var/lib/docker/volumes/pg_wcb3/_data
 
     ports:
       - 5432:5432
