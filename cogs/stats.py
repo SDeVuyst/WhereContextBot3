@@ -61,7 +61,7 @@ class Stats(commands.Cog, name="stats"):
         await interaction.response.send_message(view=view)
         await view.wait()
         if view.chosen_command is None:
-            raise TimeoutCommand("Timeout in /stats_individual")
+            raise TimeoutCommand("Timeout in /statistic")
 
         
         embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
@@ -177,7 +177,7 @@ class Stats(commands.Cog, name="stats"):
         elif command == "bancount":
             desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
         else:
-            desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
+            desc = f"**<@{userid}> used /{command} ```{count[0][0]}``` times.**"
 
         embed = discord.Embed(
             title="📊 Individual Statistic",
