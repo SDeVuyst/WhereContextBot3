@@ -231,9 +231,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
                     inline=False
                 )
             
-            # voeg id toe aan messages indien nodig
-            if self.menu.currentIndex == len(self.menu.messages):
-                self.menu.messages.append(m.id)
+            
 
         
 
@@ -244,7 +242,10 @@ class OutOfContext(commands.Cog, name="outofcontext"):
                 description="Message was deleted, you can remove this one from the game"
             )
         
-        
+        # voeg id toe aan messages indien nodig
+        if self.menu.currentIndex == len(self.menu.messages):
+            self.menu.messages.append(m.id)
+            
         return embed
         
         
