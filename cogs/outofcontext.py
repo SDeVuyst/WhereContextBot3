@@ -174,75 +174,80 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         """
 
         # haal bericht op van discord
-        m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
-        desc = f"[Go to message]({m.jump_url})" if len(m.content) == 0 else f"**{m.content}**\n[Go to message]({m.jump_url})"
-        embed = discord.Embed(
-            title="**Out of Context**", 
-            color=self.bot.defaultColor,
-            description=desc
-        )
-
-        if m.attachments:
-            # als er meerdere attachments zijn, tonen we enkel de eerste
-            embed.set_image(url=m.attachments[0].url)
-
-            # check als er video in message zit
-            for attch in m.attachments:
-                try:
-                    embed.description += f"\n**Contains {attch.content_type if attch.content_type else 'unknown attachment'}!**"
-
-                # attachement type is onbekend
-                except TypeError:
-                    embed.description += "\n**Contains unknown attachment!**"
-
         try:
-
-            embed.add_field(
-                name="Times played",
-                value=f"```{times_played}```",
-                inline=True
+            m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
+            desc = f"[Go to message]({m.jump_url})" if len(m.content) == 0 else f"**{m.content}**\n[Go to message]({m.jump_url})"
+            embed = discord.Embed(
+                title="**Out of Context**", 
+                color=self.bot.defaultColor,
+                description=desc
             )
 
-            # embed.add_field(
-            #     name="Added by",
-            #     # value=f"<@{int(added_by)}>",
-            #     value = f"```{user.name}```",
-            #     inline=True
-            # )
+            if m.attachments:
+                # als er meerdere attachments zijn, tonen we enkel de eerste
+                embed.set_image(url=m.attachments[0].url)
 
-            embed.add_field(
-                name="Added at",
-                value=f"```{m.created_at.strftime('%d/%m/%Y - %H:%M:%S')}```",
-                inline=True
-            )
+                # check als er video in message zit
+                for attch in m.attachments:
+                    try:
+                        embed.description += f"\n**Contains {attch.content_type if attch.content_type else 'unknown attachment'}!**"
 
-            embed.set_footer(
-                text=f"message id: {id}"
-            )
+                    # attachement type is onbekend
+                    except TypeError:
+                        embed.description += "\n**Contains unknown attachment!**"
 
-            user = await self.bot.fetch_user(int(added_by))
-            embed.set_thumbnail(
-                url=str(user.avatar.url)
-            )
+            try:
 
-            embed.set_author(
-                name=user.name, 
-                icon_url=str(user.avatar.url)
-            )
+                embed.add_field(
+                    name="Times played",
+                    value=f"```{times_played}```",
+                    inline=True
+                )
+
+                embed.add_field(
+                    name="Added at",
+                    value=f"```{m.created_at.strftime('%d/%m/%Y - %H:%M:%S')}```",
+                    inline=True
+                )
+
+                embed.set_footer(
+                    text=f"message id: {id}"
+                )
+
+                user = await self.bot.fetch_user(int(added_by))
+                embed.set_thumbnail(
+                    url=str(user.avatar.url)
+                )
+
+                embed.set_author(
+                    name=user.name, 
+                    icon_url=str(user.avatar.url)
+                )
+
+            except Exception as e:
+                embed.add_field(
+                    name="User error",
+                    value=e,
+                    inline=False
+                )
+            
+            # voeg id toe aan messages indien nodig
+            if self.menu.currentIndex == len(self.menu.messages):
+                self.menu.messages.append(m.id)
+
+        
 
         except Exception as e:
-            embed.add_field(
-                name="User error",
-                value=e,
-                inline=False
+            embed = discord.Embed(
+                title="**Out of Context**", 
+                color=self.bot.errorColor,
+                description="Message was deleted, you can remove this one from the game"
             )
         
         
-        # voeg id toe aan messages indien nodig
-        if self.menu.currentIndex == len(self.menu.messages):
-            self.menu.messages.append(m.id)
-
         return embed
+        
+        
 
 
     async def remove(self, id, guild):
