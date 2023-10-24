@@ -205,7 +205,12 @@ class General(commands.Cog, name="general"):
         await db_manager.increment_or_add_nword(interaction.user.id, -3)
         
         # stuur confirmatie
-        await interaction.response.send_message(content="✅ done.", ephemeral=True)
+        embed = discord.Embed(
+            title="✅ done.",
+            description=f"I dm'd {user.display_name}",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 
