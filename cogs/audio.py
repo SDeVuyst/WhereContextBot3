@@ -8,12 +8,11 @@ import discord
 import asyncio
 import random
 import tempfile
-from helpers import Track, checks, http, sptoyt, ytdl_helper, db_manager
+from helpers import Track, checks, sptoyt, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
 from pytube import Playlist
 from strprogressbar import ProgressBar
 from datetime import datetime
-
 
 
 # Here we name the cog and create a new class for the cog.
@@ -107,92 +106,7 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
-    @app_commands.command(name="tts", description="Text to Speech (5🪙)", extras={'cog': 'audio'})
-    @app_commands.choices(voice=[
-        discord.app_commands.Choice(name="Alexa", value="alexa"),
-        discord.app_commands.Choice(name="Peter Griffin", value="peter-griffin"),
-        discord.app_commands.Choice(name="Glenn Quagmire", value="quagmire"),
-        discord.app_commands.Choice(name="Walter White", value="walter-white"),
-        discord.app_commands.Choice(name="Saul Goodman", value="saul-goodman"),
-        discord.app_commands.Choice(name="Barack Obama", value="barack-obama"),
-        discord.app_commands.Choice(name="DIO (jp)", value="dio-jp"),
-        discord.app_commands.Choice(name="PewDiePie", value="pewdiepie"),
-        discord.app_commands.Choice(name="Hitler", value="hitler-rant"),
-    ])
-    @app_commands.checks.cooldown(rate=1, per=120)
-    @checks.not_blacklisted()
-    @checks.in_audio_command_channel()
-    @checks.not_in_dm()
-    @checks.user_in_vc()
-    @checks.bot_in_vc()
-    @checks.cost_nword(5)
-    @app_commands.describe(speech="What to say")
-    @app_commands.describe(voice="Which voice to say your text in")
-    async def tts(self, interaction, speech: str, voice: discord.app_commands.Choice[str]):
-        """ Play a tts message in vc
-
-        Args:
-            interaction (Interaction): User Interaction
-            speech (str): What to say
-            voice (discord.app_commands.Choice[str]): Which voice
-        """ 
-            
-        await interaction.response.defer()
-
-        try:
-            vc = interaction.guild.voice_client
-
-            # creeer audio file 
-            audio_data = await http.query_uberduck(speech, voice.value)
-            with tempfile.NamedTemporaryFile(
-                suffix=".wav"
-            ) as wav_f, tempfile.NamedTemporaryFile(suffix=".opus") as opus_f:
-                wav_f.write(audio_data.getvalue())
-                wav_f.flush()
-                subprocess.check_call(["ffmpeg", "-y", "-i", wav_f.name, opus_f.name])
-
-                self.bot.logger.info(wav_f)
-                self.bot.logger.info(opus_f)
-
-                # speel audio af
-                source = discord.FFmpegOpusAudio(opus_f.name)
-
-                self.bot.logger.info(source)
-                
-                
-                if vc.is_playing():
-                    vc.pause()
-
-                vc.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
-                
-                while vc.is_playing():
-                    await asyncio.sleep(0.5)
-                    
-                if vc.is_paused():
-                    vc.resume()
-            
-            # confirmatie
-            embed = discord.Embed(
-                title=f"🎤 Said ```{speech}``` in a {voice.name} voice!",
-                color=self.bot.succesColor
-            )
-
-            #update ncount
-            await db_manager.increment_or_add_nword(interaction.user.id, -5)
-            
-            await interaction.followup.send(embed=embed)
-
-
-        except Exception as e:
-            embed = discord.Embed(
-                title=f"Error",
-                description=e,
-                color=self.bot.errorColor
-            )
-            await interaction.followup.send(embed=embed)
-
-
-    @app_commands.command(name="play", description="play a youtube video or playlist (use multiple times to add to queue)", extras={'cog': 'audio'})
+    @app_commands.command(name="play", description="play some music", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
     @checks.not_in_dm()

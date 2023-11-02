@@ -12,3 +12,4 @@ reactionmenu
 strprogressbar
 spotipy
 google-api-python-client
+pillow

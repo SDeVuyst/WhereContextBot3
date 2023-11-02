@@ -758,3 +758,37 @@ async def get_message_ids_poll():
     except Exception as err:
         print(err)
         return [[[]]]
+
+
+async def get_most_used_command(user_id):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT command, count FROM command_stats WHERE user_id=%s ORDER BY count DESC LIMIT 1", 
+                    (str(user_id),)
+                )
+                return cursor.fetchone()
+            
+    except Exception as err:
+        return (-1, err)
+
+
+async def get_total_used_command(user_id):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT SUM(count) FROM command_stats WHERE user_id=%s", 
+                    (str(user_id), )
+                )
+                return cursor.fetchone()
+            
+    except Exception as err:
+        return (-1, err)

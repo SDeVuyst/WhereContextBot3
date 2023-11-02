@@ -13,7 +13,7 @@ from discord.ext import commands
 from discord.interactions import Interaction
 from discord.ui import Select, View
 
-from helpers import checks, db_manager
+from helpers import checks, db_manager, PodiumBuilder
 from exceptions import TimeoutCommand
 
 
@@ -24,6 +24,7 @@ class Stats(commands.Cog, name="stats"):
     
     @app_commands.command(name="leaderboard", description="Leaderboard of a command", extras={'cog': 'stats'})
     @checks.not_blacklisted()
+    @checks.is_owner()
     @app_commands.checks.cooldown(rate=1, per=10)
     async def leaderboard(self,interaction):
         """Shows the leaderboard for a command
@@ -34,11 +35,48 @@ class Stats(commands.Cog, name="stats"):
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
         await view.wait()
+
         if view.chosen_command is None:
             raise TimeoutCommand('Timeout in /leaderboard')
         
-        embed = await self.get_leaderboard_embed(view.chosen_command)
-        await interaction.edit_original_response(embed=embed, view=None)
+        elif view.chosen_command == "ncountCHECK":
+            leaderb = await db_manager.get_nword_leaderboard()
+
+        elif view.chosen_command == "bancount":
+            leaderb = await db_manager.get_ban_leaderboard()
+
+        else:
+            # krijg count bericht uit db
+            leaderb = await db_manager.get_leaderboard(view.chosen_command)
+        
+        # Geen berichten
+        if len(leaderb) == 0:
+            embed = discord.Embed(
+                description=f"❌ **This command has not been used yet.**",
+                color=self.bot.defaultColor
+            )
+            return await interaction.edit_original_response(embed=embed, view=None)
+        
+        # error
+        elif leaderb[0] == -1:
+            embed = discord.Embed(
+                title=f"Something went wrong",
+                description=leaderb[1],
+                color=self.bot.errorColor
+            )
+            return await interaction.edit_original_response(embed=embed, view=None)
+        
+        if view.chosen_command == "ncountCHECK":
+            command = "N-words said"  
+        elif view.chosen_command == "danae":
+            command = "danae trigger"
+        else:
+            command = f'/{view.chosen_command}'
+        
+        file = await PodiumBuilder.PodiumBuilder(self.bot).getLeaderboard(leaderb, command)
+
+        # embed = await self.get_leaderboard_embed(view.chosen_command)
+        await interaction.edit_original_response(attachments=[file], view=None)
 
 
 
@@ -69,56 +107,58 @@ class Stats(commands.Cog, name="stats"):
         await interaction.edit_original_response(embed=embed, view=None)
 
 
+    
+    # async def get_leaderboard_embed(self, command):
+    #     """Get embed for a leaderboard 
 
-    async def get_leaderboard_embed(self, command):
-        """Get embed for a leaderboard 
+    #     Args:
+    #         command (str): Which command
 
-        Args:
-            command (str): Which command
-
-        Returns:
-            Embed
-        """
-        if command == "ncountCHECK":
-            leaderb = await db_manager.get_nword_leaderboard()
-        elif command == "bancount":
-            leaderb = await db_manager.get_ban_leaderboard()
-        else:
-            # krijg count bericht uit db
-            leaderb = await db_manager.get_leaderboard(command)
+    #     Returns:
+    #         Embed
+    #     """
+    #     if command == "ncountCHECK":
+    #         leaderb = await db_manager.get_nword_leaderboard()
+    #     elif command == "bancount":
+    #         leaderb = await db_manager.get_ban_leaderboard()
+    #     else:
+    #         # krijg count bericht uit db
+    #         leaderb = await db_manager.get_leaderboard(command)
         
-        # Geen berichten
-        if len(leaderb) == 0:
-            embed = discord.Embed(
-                description=f"❌ **This command has not been used yet.**",
-                color=self.bot.defaultColor
-            )
-            return embed
+    #     # Geen berichten
+    #     if len(leaderb) == 0:
+    #         embed = discord.Embed(
+    #             description=f"❌ **This command has not been used yet.**",
+    #             color=self.bot.defaultColor
+    #         )
+    #         return embed
         
-        # error
-        elif leaderb[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=leaderb[1],
-                color=self.bot.errorColor
-            )
-            return embed
+    #     # error
+    #     elif leaderb[0] == -1:
+    #         embed = discord.Embed(
+    #             title=f"Something went wrong",
+    #             description=leaderb[1],
+    #             color=self.bot.errorColor
+    #         )
+    #         return embed
         
-        desc = ""
-        for i, stat in enumerate(leaderb):
-            user_id, count = tuple(stat)
-            desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
+    #     file = await PodiumBuilder.PodiumBuilder(self.bot).getPodium(leaderb)
 
-        command = "N-words said" if command == "ncountCHECK" else command
-        command = "danae trigger" if command == "danae" else command
+    #     # desc = ""
+    #     # for i, stat in enumerate(leaderb):
+    #     #     user_id, count = tuple(stat)
+    #     #     desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
 
-        embed = discord.Embed(
-            title=f"🏆 Leaderboard for {command}",
-            description=desc,
-            color=self.bot.defaultColor
-        )
+    #     # command = "N-words said" if command == "ncountCHECK" else command
+    #     # command = "danae trigger" if command == "danae" else command
 
-        return embed
+    #     # embed = discord.Embed(
+    #     #     title=f"🏆 Leaderboard for {command}",
+    #     #     description=desc,
+    #     #     color=self.bot.defaultColor
+    #     # )
+
+    #     # return embed
 
 
     async def get_stat_individual_embed(self, userid, command):
@@ -247,6 +287,7 @@ class CommandView(View):
         """
         self.chosen_command = choices[0]
         self.children[1].disabled= True
+        self.children[1].placeholder = f"{self.chosen_command} - Loading..."
         await interaction.message.edit(view=self)
         await interaction.response.defer()
         self.stop()

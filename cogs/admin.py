@@ -11,7 +11,7 @@ import os
 from discord import app_commands
 from discord.ext import commands
 from helpers import checks, db_manager
-
+from discord.ext.commands import has_permissions
 
 class Admin(commands.Cog, name="admin"):
     def __init__(self, bot):
@@ -20,6 +20,107 @@ class Admin(commands.Cog, name="admin"):
     conmand_cog_group = app_commands.Group(name="cog", description="Cog Group")
     blacklist_group = app_commands.Group(name="blacklist", description="Blacklist Group")
     
+
+
+    @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'admin'})
+    @app_commands.checks.cooldown(rate=1, per=300) # 1 per 5 minutes
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    @checks.cost_nword(10)
+    @app_commands.describe(status="What do you want the status of the bot to be")
+    async def status(self, interaction, status: app_commands.Range[str, 1, 50]) -> None:
+        """Set the status of the bot
+
+        Args:
+            interaction (Interaction): Users Interaction
+            status (app_commands.Range[str, 1, 50]): status
+        """
+
+        await interaction.response.defer()
+
+        # set the status
+        self.bot.statusManual = datetime.now()
+        await self.bot.change_presence(activity=discord.Game(status))
+
+        embed = discord.Embed(
+            title="✅ Status changed!",
+            description=f"Changed status to ```{status}```",
+            color=self.bot.succesColor
+        )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -10)
+        
+        # stuur het antwoord
+        await interaction.followup.send(embed=embed)
+
+
+    
+    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'admin'})
+    @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
+    @checks.not_blacklisted()
+    @checks.not_in_dm()
+    @checks.cost_nword(125)
+    @app_commands.describe(user="Who to block")
+    async def anti_gif(self, interaction, user: discord.User) -> None:
+        """Prevent a user from using gifs for 1 hour
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (User): who to block
+        """
+
+        await interaction.response.defer()
+
+        # add user to block list
+        self.bot.gif_prohibited.append(
+            (user.name, datetime.now())
+        )
+
+        embed = discord.Embed(
+            title="✅ Done!",
+            description=f"<@{user.id}> is now banned from using gifs.",
+            color=self.bot.succesColor
+        )
+
+        #update ncount
+        await db_manager.increment_or_add_nword(interaction.user.id, -125)
+
+        # stuur het antwoord
+        await interaction.followup.send(embed=embed)
+
+
+
+    @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'admin'})
+    @has_permissions(ban_members=True)
+    @app_commands.checks.cooldown(rate=1, per=180)
+    @checks.in_correct_server()
+    @checks.not_in_dm()
+    @checks.not_blacklisted()
+    async def lien(self, interaction) -> None:
+        """Kicks Jerome in case of emergency
+
+        Args:
+            interaction (Interaction): Users Interaction
+        """
+
+        # kick grom
+        try:
+            gromID = int(os.environ.get("GROM"))
+            grom = await interaction.guild.fetch_member(gromID)
+            await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
+        # grom kick error
+        except:
+            pass
+        # stuur lockdown bericht
+        embed = discord.Embed(
+            title=":warning: ***LIEN LOCKDOWN*** :warning:",
+            description="<@464400950702899211> has been kicked.",
+            color=self.bot.errorColor
+        )
+        await interaction.response.send_message(embed=embed)
+
+
     @app_commands.command(
         name="sync",
         description="Synchronizes the slash commands (admin only)",

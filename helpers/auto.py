@@ -65,15 +65,17 @@ async def autoroles(bot, member):
     
 
     if member.id in members:
-
+        roles_to_add = []
         # voeg autoroles toe
         for role in members.get(member.id):
             try:
                 new_role = discord.utils.get(member.guild.roles, id=roles.get(role))
-                await member.add_roles(new_role)
+                roles_to_add.append(new_role)
+                # await member.add_roles(new_role)
             except:
                 bot.logger.warning(f"role {role} not found")
 
+        await member.add_roles(*roles_to_add)
         
         bot.logger.info(f"Added autoroles")
         await member.send('Added your roles back!')

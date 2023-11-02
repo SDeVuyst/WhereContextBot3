@@ -14,13 +14,13 @@ import re
 from datetime import datetime
 
 import discord
+import io
 from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands import has_permissions
 
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
-from helpers import checks, db_manager
+from helpers import checks, db_manager, PodiumBuilder
 
 
 openai.api_key = os.environ.get("OPENAI_SECRET")
@@ -106,34 +106,83 @@ class General(commands.Cog, name="general"):
         return await menu.start()
 
 
-    @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'general'})
-    @has_permissions(ban_members=True)
-    @app_commands.checks.cooldown(rate=1, per=180)
-    @checks.in_correct_server()
-    @checks.not_in_dm()
+
+
+    @app_commands.command(name="profile", description="See someones profile", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    async def lien(self, interaction) -> None:
-        """Kicks Jerome in case of emergency
+    @checks.is_owner()
+    @app_commands.describe(user="Which user")
+    async def profile(self, interaction, user: discord.User=None) -> None:
+        """View someones bot profile
 
         Args:
             interaction (Interaction): Users Interaction
+            user (discord.User): Which user
         """
+        await interaction.response.defer()
 
-        # kick grom
-        try:
-            gromID = int(os.environ.get("GROM"))
-            grom = await interaction.guild.fetch_member(gromID)
-            await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
-        # grom kick error
-        except:
-            pass
-        # stuur lockdown bericht
+        # geen gebruiker meegegeven, gaat over zichzelf
+        if user is None:
+            user = interaction.user
+
+        # creeer embed
         embed = discord.Embed(
-            title=":warning: ***LIEN LOCKDOWN*** :warning:",
-            description="<@464400950702899211> has been kicked.",
-            color=self.bot.errorColor
+            title=f"**{user.display_name}'s Profile**",
+            color=self.bot.defaultColor,
+            timestamp=datetime.utcnow()
         )
-        await interaction.response.send_message(embed=embed)
+
+        embed.set_thumbnail(
+            url=str(user.avatar.url)
+        )
+
+        embed.set_author(
+            name=user.name, 
+            icon_url=str(user.avatar.url)
+        )
+
+        ncount = await db_manager.get_nword_count(user.id)
+        embed.add_field(
+            name="🥷🏿 N-Count",
+            value=f"```{normalizeCount(ncount)}```",
+            inline=True
+        )
+
+        bancount = await db_manager.get_ban_count(user.id)
+        embed.add_field(
+            name="🔨 Amount of Bans",
+            value=f"```{normalizeCount(bancount)}```",
+            inline=True
+        )
+
+        # get most used command
+        commandcount = await db_manager.get_most_used_command(user.id)
+        if commandcount is None or commandcount[0] == -1:
+            value = f"```No Commands Used```"
+        else:
+            com = "Danae Trigger" if commandcount[0] == 'danae' else f"/{commandcount[0]}"
+            value=f"```{com}: {commandcount[1]}```"
+
+        embed.add_field(
+            name="🤖 Most Used Command",
+            value=value,
+            inline=False
+        )
+
+        # get total amount of commands used
+        totalcommandcount = await db_manager.get_total_used_command(user.id)
+        totalcommandcountvalue = 0 if totalcommandcount is None or totalcommandcount[0] == -1 else totalcommandcount[0]
+        embed.add_field(
+            name="🗒️ Total Commands Used",
+            value=f"```{totalcommandcountvalue}```",
+            inline=False
+        )
+
+        # show podiums
+        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage(user.id)
+        embed.set_image(url="attachment://podium.png")
+        
+        await interaction.followup.send(embed=embed, files=[file])
 
 
 
@@ -173,7 +222,6 @@ class General(commands.Cog, name="general"):
 
  
         await interaction.response.send_message(embed=embed)
-
 
 
 
@@ -349,73 +397,6 @@ class General(commands.Cog, name="general"):
             )
 
         await interaction.response.send_message(embed=embed)
-
-
-    @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'general'})
-    @app_commands.checks.cooldown(rate=1, per=300) # 1 per 5 minutes
-    @checks.not_blacklisted()
-    @checks.not_in_dm()
-    @checks.cost_nword(10)
-    @app_commands.describe(status="What do you want the status of the bot to be")
-    async def status(self, interaction, status: app_commands.Range[str, 1, 50]) -> None:
-        """Set the status of the bot
-
-        Args:
-            interaction (Interaction): Users Interaction
-            status (app_commands.Range[str, 1, 50]): status
-        """
-
-        await interaction.response.defer()
-
-        # set the status
-        self.bot.statusManual = datetime.now()
-        await self.bot.change_presence(activity=discord.Game(status))
-
-        embed = discord.Embed(
-            title="✅ Status changed!",
-            description=f"Changed status to ```{status}```",
-            color=self.bot.succesColor
-        )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -10)
-        
-        # stuur het antwoord
-        await interaction.followup.send(embed=embed)
-
-
-    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'general'})
-    @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
-    @checks.not_blacklisted()
-    @checks.not_in_dm()
-    @checks.cost_nword(125)
-    @app_commands.describe(user="Who to block")
-    async def anti_gif(self, interaction, user: discord.User) -> None:
-        """Prevent a user from using gifs for 1 hour
-
-        Args:
-            interaction (Interaction): Users Interaction
-            user (User): who to block
-        """
-
-        await interaction.response.defer()
-
-        # add user to block list
-        self.bot.gif_prohibited.append(
-            (user.name, datetime.now())
-        )
-
-        embed = discord.Embed(
-            title="✅ Done!",
-            description=f"<@{user.id}> is now banned from using gifs.",
-            color=self.bot.succesColor
-        )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -125)
-
-        # stuur het antwoord
-        await interaction.followup.send(embed=embed)
 
 
     @app_commands.command(name="impersonate", description="Send a message diguised as a user (10🪙)", extras={'cog': 'general'})
@@ -751,3 +732,10 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
 async def setup(bot):
     await bot.add_cog(General(bot))
+
+
+def normalizeCount(count):
+    if len(count) == 0 or int(count[0][0]) == 0 or count[0] == -1:
+        return 0
+    else:
+        return count[0][0]
