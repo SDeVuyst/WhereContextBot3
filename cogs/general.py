@@ -179,7 +179,7 @@ class General(commands.Cog, name="general"):
         )
 
         # show podiums
-        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage(user.id)
+        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
         embed.set_image(url="attachment://podium.png")
         
         await interaction.followup.send(embed=embed, files=[file])

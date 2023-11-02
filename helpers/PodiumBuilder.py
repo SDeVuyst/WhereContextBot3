@@ -30,19 +30,19 @@ class PodiumBuilder:
         # create object for drawing
         draw = ImageDraw.Draw(bg)
 
+
+        podiums = []
+
         # add places 1-9
-        for i, stat in enumerate(leaderboard, start=0):
+        for i, stat in enumerate(leaderboard):
             
             # get user info
             user_id, count = tuple(stat)
             user = await self.bot.fetch_user(int(user_id))
             
-            # is podium
-            if i < 3:
-                pasteCoords = [(900, 900), (200, 900), (1700, 900)]
-                
-                p = self.getPodiumImage(user_id, i+1)
-                bg.paste(p, pasteCoords[i], p)
+            # is podium, save info for later
+            if i < 3:       
+                podiums.append((user_id, count))
             
             # is text
             else:
@@ -64,6 +64,13 @@ class PodiumBuilder:
                     align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
                 )
 
+        # add podium
+        podiumImage = self.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62))
+        podiumImage = resize_image(podiumImage, 2000)
+        remaining_width = bg.width - podiumImage.width
+
+        bg.paste(podiumImage, (remaining_width//2, 1850 - podiumImage.height))
+
         # draw title
         draw.text(
             (1285, 260),
@@ -83,7 +90,7 @@ class PodiumBuilder:
         return discord.File(buffer, 'leaderboard.png')
     
 
-    def getPodiumImage(self, user_id, place, resize=True):
+    def getPodiumImage(self, user_id, place):
         location = self.definedPodiums.get(str(user_id), "default/DefaultPodium")
 
         if location == "GiblePodium":
@@ -93,22 +100,26 @@ class PodiumBuilder:
             
         image = Image.open(f'media/images/{location}{place}.png')
 
-        if resize:
-            new_height = 800 + (place-1)*200
-            new_width  = int(new_height * image.size[0] / image.size[1])
-            return image.resize((new_width, new_height), Image.Resampling.LANCZOS)
-        
         return image
 
     
-    def getAllPodiumsImage(self, user_id):
-        p1 = remove_transparency(self.getPodiumImage(user_id, 1, False))
-        p2 = remove_transparency(self.getPodiumImage(user_id, 2, False))
-        p3 = remove_transparency(self.getPodiumImage(user_id, 3, False))
+    def getAllPodiumsImage(self, user_ids, return_file=True, padding=200, color=(44, 45, 47)):
+        # create normalised images for every given podium
+        if len(user_ids) == 1:
+            order = [1]
+        elif len(user_ids) == 2:
+            order = [2, 1]
+        else:
+            order = [2, 1, 3]
 
-        dst = get_concat_h_multi_blank([p2, p1, p3], p1.height)
-        # paste pods on correct location
+        podiums = [remove_transparency(self.getPodiumImage(id, order[i]), color=color) for i, id in enumerate(user_ids)]
+        
+        # paste podiums on correct location
+        dst = get_concat_h_multi_blank(podiums, padding, color=color)
 
+        if not return_file:
+            return dst
+        
         # create buffer
         buffer = io.BytesIO()
 
@@ -121,17 +132,17 @@ class PodiumBuilder:
         return discord.File(buffer, 'podium.png')   
     
 
-def get_concat_h_multi_blank(im_list, height):
+def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
     _im = im_list.pop(0)
     for im in im_list:
-        _im = get_concat_h_blank(_im, im, height)
+        _im = get_concat_h_blank(_im, im, padding, color)
     return _im
 
 
-def get_concat_h_blank(im1, im2, height, color=(44, 45, 47)):
-    dst = Image.new('RGB', (im1.width + im2.width, height), color)
+def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
+    dst = Image.new('RGB', (im1.width + im2.width + padding, im1.height), color)
     dst.paste(im1, (0, 0))
-    dst.paste(im2, (im1.width, 0))
+    dst.paste(im2, (im1.width + padding, 0))
     return dst
 
 
@@ -141,3 +152,16 @@ def remove_transparency(im, color=(44, 45, 47)):
     new_image.paste(im, mask=im)
 
     return new_image.convert("RGB")
+
+
+def resize_image(im, width, max_height=1000):
+    wpercent = (width / float(im.size[0]))
+    hsize = int((float(im.size[1]) * float(wpercent)))
+
+    # calculated height exceedes max height
+    if hsize > max_height:
+        hsize = max_height
+        hpercent = (hsize / float(im.size[1]))
+        width = int((float(im.size[0]) * float(hpercent)))
+
+    return im.resize((width, hsize), Image.Resampling.LANCZOS)
