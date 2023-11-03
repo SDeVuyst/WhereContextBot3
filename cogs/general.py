@@ -110,6 +110,7 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="profile", description="See someones profile", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.is_owner()
+    @app_commands.checks.cooldown(rate=1, per=10)
     @app_commands.describe(user="Which user")
     async def profile(self, interaction, user: discord.User=None) -> None:
         """View someones bot profile
@@ -131,6 +132,7 @@ class General(commands.Cog, name="general"):
             timestamp=datetime.utcnow()
         )
 
+        # set thumbnail als users character
         embed.set_thumbnail(
             url=str(user.avatar.url)
         )
@@ -170,7 +172,7 @@ class General(commands.Cog, name="general"):
 
         # get total amount of commands used
         totalcommandcount = await db_manager.get_total_used_command(user.id)
-        totalcommandcountvalue = 0 if totalcommandcount is None or totalcommandcount[0] == -1 else totalcommandcount[0]
+        totalcommandcountvalue = 0 if (totalcommandcount is None or totalcommandcount[0] == -1) else totalcommandcount[0]
         embed.add_field(
             name="🗒️ Total Commands Used",
             value=f"```{totalcommandcountvalue}```",
