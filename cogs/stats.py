@@ -81,14 +81,14 @@ class Stats(commands.Cog, name="stats"):
 
 
     @app_commands.command(
-        name="individuele_stats",
+        name="statistic",
         description="How many times did a user use a command",
         extras={'cog': 'stats'}
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=1, per=10)
-    async def stats_individual(self,interaction, user: discord.User) -> None:
+    async def statistic(self,interaction, user: discord.User) -> None:
         """Shows the individual stats for a user for a given command
 
         Args:
@@ -99,66 +99,13 @@ class Stats(commands.Cog, name="stats"):
         await interaction.response.send_message(view=view)
         await view.wait()
         if view.chosen_command is None:
-            raise TimeoutCommand("Timeout in /stats_individual")
+            raise TimeoutCommand("Timeout in /statistic")
 
         
         embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
         await interaction.edit_original_response(embed=embed, view=None)
 
-
-    
-    # async def get_leaderboard_embed(self, command):
-    #     """Get embed for a leaderboard 
-
-    #     Args:
-    #         command (str): Which command
-
-    #     Returns:
-    #         Embed
-    #     """
-    #     if command == "ncountCHECK":
-    #         leaderb = await db_manager.get_nword_leaderboard()
-    #     elif command == "bancount":
-    #         leaderb = await db_manager.get_ban_leaderboard()
-    #     else:
-    #         # krijg count bericht uit db
-    #         leaderb = await db_manager.get_leaderboard(command)
-        
-    #     # Geen berichten
-    #     if len(leaderb) == 0:
-    #         embed = discord.Embed(
-    #             description=f"❌ **This command has not been used yet.**",
-    #             color=self.bot.defaultColor
-    #         )
-    #         return embed
-        
-    #     # error
-    #     elif leaderb[0] == -1:
-    #         embed = discord.Embed(
-    #             title=f"Something went wrong",
-    #             description=leaderb[1],
-    #             color=self.bot.errorColor
-    #         )
-    #         return embed
-        
-    #     file = await PodiumBuilder.PodiumBuilder(self.bot).getPodium(leaderb)
-
-    #     # desc = ""
-    #     # for i, stat in enumerate(leaderb):
-    #     #     user_id, count = tuple(stat)
-    #     #     desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
-
-    #     # command = "N-words said" if command == "ncountCHECK" else command
-    #     # command = "danae trigger" if command == "danae" else command
-
-    #     # embed = discord.Embed(
-    #     #     title=f"🏆 Leaderboard for {command}",
-    #     #     description=desc,
-    #     #     color=self.bot.defaultColor
-    #     # )
-
-    #     # return embed
 
 
     async def get_stat_individual_embed(self, userid, command):
@@ -244,7 +191,6 @@ class CommandView(View):
             SelectOption(label="General", emoji="🤖", value="general"),
             SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
-            SelectOption(label="Reacties", emoji="💭", value="reacties"),
             SelectOption(label="Admin", emoji="👨‍🔧", value="admin")
         ]     
     )
@@ -260,7 +206,6 @@ class CommandView(View):
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
-            "reacties": "💭 Reacties",
             "admin": "👨‍🔧 Admin"
         }
         # self.children[0].disabled = True

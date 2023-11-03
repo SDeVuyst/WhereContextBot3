@@ -14,7 +14,8 @@ class PodiumBuilder:
             "512256261459542019": "meng/MengPodium",
             "559715606014984195": "gible/GiblePodium",
             "339820557086228490": "jakob/JakobPodium",
-            "756527409876041859": "zeb/ZebPodium"
+            "756527409876041859": "zeb/ZebPodium",
+            "453136562885099531": "wouter/WouterPodium"
         }
 
     async def getLeaderboard(self, leaderboard, command):

@@ -393,7 +393,7 @@ async def on_tree_error(interaction, error):
     :param context: The context of the normal command that failed executing.
     :param error: The error that has been faced.
     """
-    bot.logger.info(error)
+    
     if isinstance(error, discord.app_commands.CommandOnCooldown):
         minutes, seconds = divmod(error.retry_after, 60)
         hours, minutes = divmod(minutes, 60)
@@ -402,7 +402,6 @@ async def on_tree_error(interaction, error):
             description=f"⏲️ **Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
             color=bot.errorColor,
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.UserBlacklisted):
         """
@@ -412,7 +411,7 @@ async def on_tree_error(interaction, error):
         embed = discord.Embed(
             description="🛑 You are blacklisted from using the bot!", color=bot.errorColor
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+
         if interaction.guild:
             bot.logger.warning(
                 f"{interaction.user} (ID: {interaction.user.id}) tried to execute a command in the guild {interaction.guild.name} (ID: {interaction.guild_id}), but the user is blacklisted from using the bot."
@@ -429,7 +428,6 @@ async def on_tree_error(interaction, error):
         embed = discord.Embed(
             description="🛑 You are not the owner of the bot!", color=bot.errorColor
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
         if interaction.guild:
             bot.logger.warning(
                 f"{interaction.user} (ID: {interaction.user.id}) tried to execute an owner only command in the guild {interaction.guild.name} (ID: {interaction.guild_id}), but the user is not an owner of the bot."
@@ -446,7 +444,6 @@ async def on_tree_error(interaction, error):
             + "` to execute this command!",
             color=bot.errorColor,
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, discord.app_commands.BotMissingPermissions):
         embed = discord.Embed(
@@ -455,7 +452,6 @@ async def on_tree_error(interaction, error):
             + "` to fully perform this command!",
             color=bot.errorColor,
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.WrongChannel):
         embed = discord.Embed(
@@ -464,7 +460,6 @@ async def on_tree_error(interaction, error):
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.MissingNwords):
         embed = discord.Embed(
@@ -473,14 +468,12 @@ async def on_tree_error(interaction, error):
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.UserNotInVC):
         embed = discord.Embed(
             title=f"🔇 You are not in a voice channel",
             color=bot.errorColor
         ) 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.BotNotInVC):
         embed = discord.Embed(
@@ -488,7 +481,6 @@ async def on_tree_error(interaction, error):
             description="use /join to add bot to vc",
             color=bot.errorColor
         ) 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     elif isinstance(error, exceptions.BotNotPlaying):
         embed = discord.Embed(
@@ -496,14 +488,12 @@ async def on_tree_error(interaction, error):
             description="Use /play to play a song or playlist",
             color=bot.defaultColor
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
     
     elif isinstance(error, exceptions.TimeoutCommand):
         embed = discord.Embed(
             title="⏲️ You took too long!",
             color=bot.errorColor
         )
-        await interaction.followup.send(embed=embed, ephemeral=True)
 
     else:
         embed = discord.Embed(
@@ -512,7 +502,13 @@ async def on_tree_error(interaction, error):
             description=str(error).capitalize(),
             color=bot.errorColor,
         )
-        await interaction.response.send_message(embed=embed)
+
+    bot.logger.info(error)
+    
+    # send out response
+    if interaction.response.is_done():
+        return await interaction.followup.send(embed=embed)
+    await interaction.response.send_message(embed=embed)
 
 
 bot.tree.on_error = on_tree_error

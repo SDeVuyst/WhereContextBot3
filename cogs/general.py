@@ -51,7 +51,6 @@ class General(commands.Cog, name="general"):
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
-            "reacties": "💭 Reacties",
             "admin": "👨‍🔧 Admin"
         }
 
