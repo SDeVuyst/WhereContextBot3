@@ -1,5 +1,5 @@
 from enum import Enum
-from helpers import sptoyt
+from helpers import SpotifyToYT
 from pytube import extract, YouTube, Search
 
 import re
@@ -18,7 +18,7 @@ class Track():
 
         # check als url spotify track is
         if input.find("open.spotify.com/track") != -1:
-            spToYt = sptoyt.SpotifyToYT()
+            spToYt = SpotifyToYT.SpotifyToYT()
             self.url = spToYt.spotifyToYoutubeURLs(input)
             self.track_type = TrackType.SPOTIFY
 

@@ -8,7 +8,7 @@ import discord
 import asyncio
 import random
 import tempfile
-from helpers import Track, checks, sptoyt, ytdl_helper, db_manager
+from helpers import Track, checks, SpotifyToYT, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
 from pytube import Playlist
 from strprogressbar import ProgressBar
@@ -147,7 +147,7 @@ class Audio(commands.Cog, name="audio"):
                     if track.find("list=") != -1:
                         vid_urls = Playlist(track)
                     else:
-                        spToYt = sptoyt.SpotifyToYT()
+                        spToYt = SpotifyToYT.SpotifyToYT()
                         vid_urls = spToYt.spotifyToYoutubeURLs(track)
 
 
