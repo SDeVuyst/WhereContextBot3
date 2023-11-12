@@ -366,7 +366,7 @@ class General(commands.Cog, name="general"):
         
         t = dateparser.parse(wanneer, settings={
             'DATE_ORDER': 'DMY',
-            'TIMEZONE': 'CEST',
+            'TIMEZONE': 'CET',
             'PREFER_DAY_OF_MONTH': 'first',
             'PREFER_DATES_FROM': 'future',
             'DEFAULT_LANGUAGES': ["en", "nl"]

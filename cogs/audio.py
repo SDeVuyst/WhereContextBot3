@@ -116,8 +116,8 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="no", value=0),
         discord.app_commands.Choice(name="yes", value=1),   
     ])
-    @app_commands.describe(track="The track you want to play")
-    @app_commands.describe(in_front="Whether the track should be in the front of the queue or in the back")
+    @app_commands.describe(track="The track you want to play (name or spotify/youtube link)")
+    @app_commands.describe(in_front="Whether the track should be in the front of the queue")
     async def play(self, interaction, track: str, in_front: discord.app_commands.Choice[int]=0):
         """ Play audio from a video
 
