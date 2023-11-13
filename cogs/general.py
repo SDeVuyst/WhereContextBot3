@@ -138,7 +138,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="minecraft",description="Minecraft server info", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    async def modlist(self, interaction) -> None:
+    async def minecraft(self, interaction) -> None:
 
         embed = discord.Embed(
             title="⛏ Minecraft",
