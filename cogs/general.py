@@ -148,6 +148,8 @@ class General(commands.Cog, name="general"):
         mods = [
             "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
             "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create/download/4835191)",
+            "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry/download/4836884)",
+            "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails/download/4836196)",
             "[**📖 JEI**](https://www.curseforge.com/minecraft/mc-mods/jei/download/4712868)",
             "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap/download/4841242)",
             "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin/download/4770828)",
