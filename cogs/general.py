@@ -153,7 +153,7 @@ class General(commands.Cog, name="general"):
             "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin/download/4770828)",
             "[**🌉 Macaw's Bridges**](https://www.curseforge.com/minecraft/mc-mods/macaws-bridges/download/4605466)",
             "[**🛰️ Citadel**](https://www.curseforge.com/minecraft/mc-mods/citadel/download/4848887)",
-            "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene/download/4856807",
+            "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene/download/4856807)",
             "[**🖼️ Supplementaries**](https://www.curseforge.com/minecraft/mc-mods/supplementaries/download/4836493)",
             "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
         ]
