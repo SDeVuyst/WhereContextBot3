@@ -143,7 +143,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title="⛏ Minecraft",
-            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip](https://www.dropbox.com/scl/fi/osgm2wdje7ozytah8u9x6/mods.zip?rlkey=wbrwziif25d0txl1razh6jo1x&dl=0)__*",
+            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip](https://www.dropbox.com/scl/fi/bm8ivcmvc0xa554ak3ibk/mods.zip?rlkey=gffewouazquqtz8nsk8xrd4em&dl=0)__*",
             color=self.bot.defaultColor
         )
 
@@ -167,6 +167,7 @@ class General(commands.Cog, name="general"):
             "[**🚧 YUNG's Better Mineshafts**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-mineshafts-forge)",
             "[**🏰 YUNG's Better Nether Fortresses**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-nether-fortresses)",
             "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
+            "[**🐧 Waddles**](https://www.curseforge.com/minecraft/mc-mods/waddles)",
         ]
         world_mods_formatted = '\n'.join(world_mods)
         embed.add_field(
