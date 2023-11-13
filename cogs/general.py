@@ -158,6 +158,7 @@ class General(commands.Cog, name="general"):
             "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene/download/4856807)",
             "[**🖼️ Supplementaries**](https://www.curseforge.com/minecraft/mc-mods/supplementaries/download/4836493)",
             "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
+            "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
         ]
         mods_formatted = '\n'.join(mods)
         embed.add_field(
