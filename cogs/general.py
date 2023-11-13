@@ -148,10 +148,10 @@ class General(commands.Cog, name="general"):
 
         general_mods = [
             "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
-            "[**🛰️ Citadel**](https://www.curseforge.com/minecraft/mc-mods/citadel/download/4848887)",
-            "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene/download/4856807)",
-            "[**🌱 Terrablender**](https://www.curseforge.com/minecraft/mc-mods/terrablender/download/4647094)",
-            "[**🦿 YUNG's API**](https://www.curseforge.com/minecraft/mc-mods/yungs-api/download/4769522)",
+            "[**🛰️ Citadel**](https://www.curseforge.com/minecraft/mc-mods/citadel)",
+            "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene)",
+            "[**🌱 Terrablender**](https://www.curseforge.com/minecraft/mc-mods/terrablender)",
+            "[**🦿 YUNG's API**](https://www.curseforge.com/minecraft/mc-mods/yungs-api)",
         ]
         general_mods_formatted = '\n'.join(general_mods)
         embed.add_field(
@@ -159,13 +159,13 @@ class General(commands.Cog, name="general"):
         )
 
         world_mods = [
-            "[**🌍 Biomes O' Plenty**](https://www.curseforge.com/minecraft/mc-mods/biomes-o-plenty/download/4764804)",
-            "[**🌊 YUNG's Better Ocean Monuments**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-ocean-monuments/download/4769446)",
-            "[**🔮 YUNG's Better End Island**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-end-island/download/4769482)",
-            "[**⚔️ YUNG's Better Strongholds**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-strongholds/download/4769083)",
-            "[**🚧 YUNG's Better Mineshafts**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-mineshafts-forge/download/4769063)",
-            "[**🏰 YUNG's Better Nether Fortresses**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-nether-fortresses/download/4774764)",
-            "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
+            "[**🌍 Biomes O' Plenty**](https://www.curseforge.com/minecraft/mc-mods/biomes-o-plenty)",
+            "[**🌊 YUNG's Better Ocean Monuments**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-ocean-monuments)",
+            "[**🔮 YUNG's Better End Island**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-end-island)",
+            "[**⚔️ YUNG's Better Strongholds**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-strongholds)",
+            "[**🚧 YUNG's Better Mineshafts**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-mineshafts-forge)",
+            "[**🏰 YUNG's Better Nether Fortresses**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-nether-fortresses)",
+            "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
         ]
         world_mods_formatted = '\n'.join(world_mods)
         embed.add_field(
@@ -173,9 +173,9 @@ class General(commands.Cog, name="general"):
         )
 
         create_mods = [
-            "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create/download/4835191)",
-            "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry/download/4836884)",
-            "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails/download/4836196)",
+            "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create)",
+            "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry)",
+            "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails)",
         ]
         create_mods_formatted = '\n'.join(create_mods)
         embed.add_field(
@@ -183,8 +183,8 @@ class General(commands.Cog, name="general"):
         )
 
         deco_mods = [
-            "[**🖼️ Supplementaries**](https://www.curseforge.com/minecraft/mc-mods/supplementaries/download/4836493)",
-            "[**🌉 Macaw's Bridges**](https://www.curseforge.com/minecraft/mc-mods/macaws-bridges/download/4605466)",
+            "[**🖼️ Supplementaries**](https://www.curseforge.com/minecraft/mc-mods/supplementaries)",
+            "[**🌉 Macaw's Bridges**](https://www.curseforge.com/minecraft/mc-mods/macaws-bridges)",
         ]
         deco_mods_formatted = '\n'.join(deco_mods)
         embed.add_field(
@@ -192,10 +192,10 @@ class General(commands.Cog, name="general"):
         )
 
         QOL_mods = [
-            "[**📖 JEI**](https://www.curseforge.com/minecraft/mc-mods/jei/download/4712868)",
-            "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap/download/4841242)",
-            "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin/download/4770828)",
-            "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
+            "[**📖 JEI**](https://www.curseforge.com/minecraft/mc-mods/jei)",
+            "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap)",
+            "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin)",
+            "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
         ]
         QOL_mods_formatted = '\n'.join(QOL_mods)
         embed.add_field(
