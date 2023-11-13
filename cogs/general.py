@@ -202,7 +202,7 @@ class General(commands.Cog, name="general"):
             name="QOL Mods", value=QOL_mods_formatted, inline=True
         )
     
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, file=discord.File(f"{os.path.realpath(os.path.dirname(__file__))}/../image/minecraft/mods.zip", filename="mods.zip"))
 
 
 
