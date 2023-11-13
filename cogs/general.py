@@ -150,10 +150,12 @@ class General(commands.Cog, name="general"):
             "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
             "[**🛰️ Citadel**](https://www.curseforge.com/minecraft/mc-mods/citadel/download/4848887)",
             "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene/download/4856807)",
+            "[**🌱 Terrablender**](https://www.curseforge.com/minecraft/mc-mods/terrablender/download/4647094)",
+            "[**🦿 YUNG's API**](https://www.curseforge.com/minecraft/mc-mods/yungs-api/download/4769522)",
         ]
         general_mods_formatted = '\n'.join(general_mods)
         embed.add_field(
-            name="General Mods", value=general_mods_formatted, inline=False
+            name="General Mods", value=general_mods_formatted, inline=True
         )
 
         world_mods = [
@@ -167,7 +169,7 @@ class General(commands.Cog, name="general"):
         ]
         world_mods_formatted = '\n'.join(world_mods)
         embed.add_field(
-            name="World Mods", value=world_mods_formatted, inline=False
+            name="World Mods", value=world_mods_formatted, inline=True
         )
 
         create_mods = [
@@ -177,7 +179,7 @@ class General(commands.Cog, name="general"):
         ]
         create_mods_formatted = '\n'.join(create_mods)
         embed.add_field(
-            name="Create Mods", value=create_mods_formatted, inline=False
+            name="Create Mods", value=create_mods_formatted, inline=True
         )
 
         deco_mods = [
@@ -186,7 +188,7 @@ class General(commands.Cog, name="general"):
         ]
         deco_mods_formatted = '\n'.join(deco_mods)
         embed.add_field(
-            name="Deco Mods", value=deco_mods_formatted, inline=False
+            name="Deco Mods", value=deco_mods_formatted, inline=True
         )
 
         QOL_mods = [
@@ -197,7 +199,7 @@ class General(commands.Cog, name="general"):
         ]
         QOL_mods_formatted = '\n'.join(QOL_mods)
         embed.add_field(
-            name="QOL Mods", value=QOL_mods_formatted, inline=False
+            name="QOL Mods", value=QOL_mods_formatted, inline=True
         )
     
         await interaction.response.send_message(embed=embed)
