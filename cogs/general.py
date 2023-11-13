@@ -10,6 +10,7 @@ import os
 import openai
 import dateparser
 import re
+import io
 
 from datetime import datetime
 
@@ -142,7 +143,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title="⛏ Minecraft",
-            description=f"```mc.silasdevuyst.com```",
+            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip](https://www.dropbox.com/scl/fi/osgm2wdje7ozytah8u9x6/mods.zip?rlkey=wbrwziif25d0txl1razh6jo1x&dl=0)__*",
             color=self.bot.defaultColor
         )
 
@@ -201,8 +202,8 @@ class General(commands.Cog, name="general"):
         embed.add_field(
             name="QOL Mods", value=QOL_mods_formatted, inline=True
         )
-    
-        await interaction.response.send_message(embed=embed, file=discord.File(f"{os.path.realpath(os.path.dirname(__file__))}/../../media/minecraft/mods.zip", filename="mods.zip"))
+
+        await interaction.response.send_message(embed=embed)
 
 
 
