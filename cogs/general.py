@@ -142,7 +142,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title="⛏ Minecraft",
-            description=f"IP: ```mc.silasdevuyst.com```",
+            description=f"```mc.silasdevuyst.com```",
             color=self.bot.defaultColor
         )
         mods = [
