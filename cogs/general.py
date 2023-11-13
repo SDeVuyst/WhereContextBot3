@@ -146,10 +146,6 @@ class General(commands.Cog, name="general"):
             color=self.bot.defaultColor
         )
         mods = [
-            "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
-            "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create/download/4835191)",
-            "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry/download/4836884)",
-            "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails/download/4836196)",
             "[**📖 JEI**](https://www.curseforge.com/minecraft/mc-mods/jei/download/4712868)",
             "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap/download/4841242)",
             "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin/download/4770828)",
@@ -160,9 +156,19 @@ class General(commands.Cog, name="general"):
             "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
             "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
         ]
+        create_mods = [
+            "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
+            "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create/download/4835191)",
+            "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry/download/4836884)",
+            "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails/download/4836196)",
+        ]
         mods_formatted = '\n'.join(mods)
+        create_mods_formatted = '\n'.join(create_mods)
         embed.add_field(
-            name="Mods", value=mods_formatted, inline=False
+            name="Create Mods", value=create_mods_formatted, inline=False
+        )
+        embed.add_field(
+            name="Other Mods", value=mods_formatted, inline=False
         )
         await interaction.response.send_message(embed=embed)
 
