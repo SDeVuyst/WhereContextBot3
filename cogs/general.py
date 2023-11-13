@@ -136,6 +136,34 @@ class General(commands.Cog, name="general"):
         await interaction.response.send_message(embed=embed)
 
 
+    @app_commands.command(name="minecraft",description="Minecraft server info", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    async def modlist(self, interaction) -> None:
+
+        embed = discord.Embed(
+            title="⛏ Minecraft",
+            description=f"IP: ```mc.silasdevuyst.com```",
+            color=self.bot.defaultColor
+        )
+        mods = [
+            "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
+            "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create/download/4835191)",
+            "[**📖 JEI**](https://www.curseforge.com/minecraft/mc-mods/jei/download/4712868)",
+            "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap/download/4841242)",
+            "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin/download/4770828)",
+            "[**🌉 Macaw's Bridges**](https://www.curseforge.com/minecraft/mc-mods/macaws-bridges/download/4605466)",
+            "[**🛰️ Citadel**](https://www.curseforge.com/minecraft/mc-mods/citadel/download/4848887)",
+            "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene/download/4856807",
+            "[**🖼️ Supplementaries**](https://www.curseforge.com/minecraft/mc-mods/supplementaries/download/4836493)",
+            "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs/download/4745999)",
+        ]
+        mods_formatted = '\n'.join(mods)
+        embed.add_field(
+            name="Mods", value=mods_formatted, inline=False
+        )
+        await interaction.response.send_message(embed=embed)
+
+
 
     @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('COUNTDOWN_TITLE')}", extras={'cog': 'general'})
     @checks.not_blacklisted()
@@ -150,11 +178,9 @@ class General(commands.Cog, name="general"):
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
-            title = f"⌛ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             desc = f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!"
             kleur = self.bot.succesColor
         else:
-            title = f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
@@ -162,7 +188,7 @@ class General(commands.Cog, name="general"):
             
 
         embed = discord.Embed(
-            title=title,
+            title=f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}",
             description=desc,
             color=kleur
         )
@@ -171,9 +197,7 @@ class General(commands.Cog, name="general"):
             url=os.environ.get('COUNTDOWN_URL')
         )
 
- 
         await interaction.response.send_message(embed=embed)
-
 
 
 
