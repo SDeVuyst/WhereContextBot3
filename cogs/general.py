@@ -143,7 +143,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title="⛏ Minecraft",
-            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip](https://www.dropbox.com/scl/fi/bm8ivcmvc0xa554ak3ibk/mods.zip?rlkey=gffewouazquqtz8nsk8xrd4em&dl=0)__*",
+            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip](https://www.dropbox.com/scl/fi/kekrbvshej7u1b8gih7ap/mods.zip?rlkey=ivibejqop8fq8r6aacnqv5n00&dl=0)__*",
             color=self.bot.defaultColor
         )
 
@@ -153,6 +153,7 @@ class General(commands.Cog, name="general"):
             "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene)",
             "[**🌱 Terrablender**](https://www.curseforge.com/minecraft/mc-mods/terrablender)",
             "[**🦿 YUNG's API**](https://www.curseforge.com/minecraft/mc-mods/yungs-api)",
+            "[**🏗️ Framework**](https://www.curseforge.com/minecraft/mc-mods/framework/)",
         ]
         general_mods_formatted = '\n'.join(general_mods)
         embed.add_field(
@@ -198,6 +199,7 @@ class General(commands.Cog, name="general"):
             "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap)",
             "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin)",
             "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
+            "[**🎒 Backpacked**](https://www.curseforge.com/minecraft/mc-mods/backpacked)",
         ]
         QOL_mods_formatted = '\n'.join(QOL_mods)
         embed.add_field(
