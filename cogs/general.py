@@ -143,7 +143,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title="⛏ Minecraft",
-            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip](https://www.dropbox.com/scl/fi/kekrbvshej7u1b8gih7ap/mods.zip?rlkey=ivibejqop8fq8r6aacnqv5n00&dl=0)__*",
+            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip]({os.environ.get('modszip_url')})__*",
             color=self.bot.defaultColor
         )
 
