@@ -199,7 +199,10 @@ class General(commands.Cog, name="general"):
             "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap)",
             "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin)",
             "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
+            "[**📦 Storage Drawers**](https://www.curseforge.com/minecraft/mc-mods/storage-drawers)",
             "[**🎒 Backpacked**](https://www.curseforge.com/minecraft/mc-mods/backpacked)",
+            "[**🏷️ Curios**](https://www.curseforge.com/minecraft/mc-mods/curios)",
+            "[**⛔ Anti-Endermen Griefing**](https://www.curseforge.com/minecraft/mc-mods/disable-enderman-picking-up-blocks)",
         ]
         QOL_mods_formatted = '\n'.join(QOL_mods)
         embed.add_field(
