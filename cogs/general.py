@@ -179,6 +179,7 @@ class General(commands.Cog, name="general"):
             "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create)",
             "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry)",
             "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails)",
+            "[**🔌 Create: Power Loader**](https://www.curseforge.com/minecraft/mc-mods/create-power-loader)",
         ]
         create_mods_formatted = '\n'.join(create_mods)
         embed.add_field(
