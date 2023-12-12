@@ -494,6 +494,19 @@ async def on_tree_error(interaction, error):
             title="⏲️ You took too long!",
             color=bot.errorColor
         )
+    
+    elif isinstance(error, exceptions.CogLoadError):
+        embed = discord.Embed(
+            title="❌ Cog error!",
+            color=bot.errorColor
+        )
+    
+    elif isinstance(error, discord.HTTPException):
+        embed = discord.Embed(
+            title="❌ Something went wrong!",
+            description="most likely daily application command limits.",
+            color=bot.errorColor
+        )
 
     else:
         embed = discord.Embed(

@@ -12,6 +12,8 @@ from discord import app_commands
 from discord.ext import commands
 from helpers import checks, db_manager
 from discord.ext.commands import has_permissions
+from datetime import datetime
+from exceptions import CogLoadError
 
 class Admin(commands.Cog, name="admin"):
     def __init__(self, bot):
@@ -139,47 +141,36 @@ class Admin(commands.Cog, name="admin"):
             interaction (Interaction): Users interaction
             scope (discord.app_commands.Choice[str]): The scope to sync, can be global or server
         """
-        try:
-            await interaction.response.defer()
+        await interaction.response.defer()
 
-            if scope.value == "global":
-                cmds = await self.bot.tree.sync()
-                self.bot.save_ids(cmds)
+        if scope.value == "global":
+            cmds = await self.bot.tree.sync()
+            self.bot.save_ids(cmds)
 
-                embed = discord.Embed(
-                    description="Slash commands have been globally synchronized.",
-                    color=self.bot.succesColor,
-                )
-                await interaction.followup.send(embed=embed)
-                return
-            
-            elif scope.value == "server":
-
-                # context.bot.tree.copy_global_to(guild=context.guild)
-                cmds = await self.bot.tree.sync(guild=interaction.guild)
-                self.bot.save_ids(cmds)
-
-                embed = discord.Embed(
-                    description="Slash commands have been synchronized in this server.",
-                    color=self.bot.succesColor,
-                )
-                await interaction.followup.send(embed=embed)
-                return
-            
             embed = discord.Embed(
-                description="The scope must be `global` or `server`.", color=self.bot.errorColor
+                description="Slash commands have been globally synchronized.",
+                color=self.bot.succesColor,
             )
             await interaction.followup.send(embed=embed)
+            return
+        
+        elif scope.value == "server":
 
-            
+            # context.bot.tree.copy_global_to(guild=context.guild)
+            cmds = await self.bot.tree.sync(guild=interaction.guild)
+            self.bot.save_ids(cmds)
 
-        except discord.HTTPException as e:
-            self.bot.logger.warning(e)
             embed = discord.Embed(
-                description="HTTPException, most likely daily application command limits.",
-                color=self.bot.errorColor,
+                description="Slash commands have been synchronized in this server.",
+                color=self.bot.succesColor,
             )
-            await interaction.response.send_message(embed=embed)
+            await interaction.followup.send(embed=embed)
+            return
+        
+        embed = discord.Embed(
+            description="The scope must be `global` or `server`.", color=self.bot.errorColor
+        )
+        await interaction.followup.send(embed=embed)
 
 
 
@@ -202,11 +193,8 @@ class Admin(commands.Cog, name="admin"):
             self.bot.loaded.add(cog)
             self.bot.unloaded.discard(cog)
         except Exception:
-            embed = discord.Embed(
-                description=f"Could not load the `{cog}` cog.", color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
+            raise CogLoadError(cog, 0)
+        
         embed = discord.Embed(
             description=f"Successfully loaded the `{cog}` cog.", color=self.bot.succesColor
         )
@@ -234,11 +222,7 @@ class Admin(commands.Cog, name="admin"):
             self.bot.loaded.discard(cog)
             self.bot.unloaded.add(cog)
         except Exception:
-            embed = discord.Embed(
-                description=f"Could not unload the `{cog}` cog.", color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
+            raise CogLoadError(cog, 1)
         embed = discord.Embed(
             description=f"Successfully unloaded the `{cog}` cog.", color=self.bot.succesColor
         )
@@ -264,12 +248,8 @@ class Admin(commands.Cog, name="admin"):
             await self.bot.reload_extension(f"cogs.{cog}")
         
         except Exception:
-            embed = discord.Embed(
-                description=f"Could not reload the `{cog}` cog.", color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
-        
+            raise CogLoadError(cog, 2)
+
         embed = discord.Embed(
             description=f"Successfully reloaded the `{cog}` cog.", color=self.bot.succesColor
         )
@@ -352,13 +332,7 @@ class Admin(commands.Cog, name="admin"):
         
         # error
         elif blacklisted_users[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=blacklisted_users[1],
-                color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
+            raise Exception(blacklisted_users[1])
 
         # alles is ok
         embed = discord.Embed(title="Blacklisted Users", color=self.bot.defaultColor)
@@ -399,12 +373,7 @@ class Admin(commands.Cog, name="admin"):
 
         # error
         if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.",
-                color=self.bot.errorColor,
-            )
-            await interaction.response.send_message(embed=embed)
-            return
+            raise Exception("Kon geen verbinding maken met de databank.")
         
         # alles oke
         embed = discord.Embed(
@@ -443,11 +412,7 @@ class Admin(commands.Cog, name="admin"):
 
         #error
         if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.", color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
-            return
+            raise Exception('Kon geen verbinding maken met de databank.')
         
         # alles ok
         embed = discord.Embed(
@@ -498,7 +463,7 @@ class Admin(commands.Cog, name="admin"):
     @checks.not_blacklisted()
     @app_commands.describe(user="Which user")
     @app_commands.describe(nickname="What nickname")
-    async def nickname(self, interaction, user: discord.User, nickname: str) -> None:
+    async def nickname(self, interaction, user: discord.User, nickname: app_commands.Range[str, 1, 32]) -> None:
         """Set the nickname of a user
 
         Args:
@@ -506,22 +471,14 @@ class Admin(commands.Cog, name="admin"):
             user (discord.User): Which user
             nickname (str): what nickname
         """
-        try:
-            await user.edit(nick=nickname)
-            embed = discord.Embed(
-                title='✅ Done',
-                description=f"{user} is now called {nickname}",
-                color=self.bot.succesColor
-            )
-            await interaction.response.send_message(embed=embed)
-
-        except Exception as e:
-            embed = discord.Embed(
-                title=f"Er is iets misgegaan.",
-                description=e,
-                color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed)
+        
+        await user.edit(nick=nickname)
+        embed = discord.Embed(
+            title='✅ Done',
+            description=f"{user} is now called {nickname}",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed)
 
 
 

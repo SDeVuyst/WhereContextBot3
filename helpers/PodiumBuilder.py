@@ -10,12 +10,16 @@ class PodiumBuilder:
         self.bot = bot
 
         self.definedPodiums = {
+            "273503117348306944": "arno/ArnoPodium",
             "222415043550117888": "ba/BaPodium",
-            "512256261459542019": "meng/MengPodium",
             "559715606014984195": "gible/GiblePodium",
+            "494508091283603462": "jacko/JackoPodium",
             "339820557086228490": "jakob/JakobPodium",
+            "527916521754722315": "leander/LeanderPodium",
+            "512256261459542019": "meng/MengPodium",
+            "464400950702899211": "pingy/PingyPodium",
+            "453136562885099531": "wouter/WouterPodium",
             "756527409876041859": "zeb/ZebPodium",
-            "453136562885099531": "wouter/WouterPodium"
         }
 
     async def getLeaderboard(self, leaderboard, command):
@@ -30,7 +34,6 @@ class PodiumBuilder:
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
-
 
         podiums = []
 

@@ -1,5 +1,3 @@
-
-import subprocess
 from discord.ext import commands
 import os
 from discord import app_commands
@@ -7,7 +5,6 @@ from math import ceil
 import discord
 import asyncio
 import random
-import tempfile
 from helpers import Track, checks, SpotifyToYT, ytdl_helper, db_manager
 import yt_dlp as youtube_dl
 from pytube import Playlist
@@ -40,6 +37,7 @@ class Audio(commands.Cog, name="audio"):
 
         self.pause_time = None
         self.pause_delta = None
+
 
 
     @app_commands.command(name="soundboard", description="Play effect from soundboard (5🪙)", extras={'cog': 'audio'})
@@ -106,6 +104,7 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
+
     @app_commands.command(name="play", description="play some music", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -116,14 +115,14 @@ class Audio(commands.Cog, name="audio"):
         discord.app_commands.Choice(name="no", value=0),
         discord.app_commands.Choice(name="yes", value=1),   
     ])
-    @app_commands.describe(track="The track you want to play (name or spotify/youtube link)")
+    @app_commands.describe(track="The track you want to play (name or link)")
     @app_commands.describe(in_front="Whether the track should be in the front of the queue")
     async def play(self, interaction, track: str, in_front: discord.app_commands.Choice[int]=0):
         """ Play audio from a video
 
         Args:
             interaction (Interaction): User Interaction
-            url (str): url of youtube video/playlist or spotify playlist/song
+            url (str): url track/playlist
             in_front (discord.app_commands.Choice[int]): If the audio has to be played now or put in queue
         """
         
@@ -225,6 +224,7 @@ class Audio(commands.Cog, name="audio"):
             return
 
 
+
     @app_commands.command(name="list", description="See the Queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -259,39 +259,6 @@ class Audio(commands.Cog, name="audio"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(name="nowplaying", description="See the currently playing track", extras={'cog': 'audio'})
-    @checks.not_blacklisted()
-    @checks.in_audio_command_channel()
-    @checks.not_in_dm()
-    async def nowplaying(self, interaction):
-        """Which audio is now playing
-
-        Args:
-            interaction (Interaction): Users interaction
-        """
-
-        try:
-            title="🎵 Now playing" if self.track_playing is not None else "🎛️ Nothing is playing"
-            desc = f"[{self.track_playing.title}]({self.track_playing.url})" if self.track_playing is not None else None
-        except:
-            title="🎛️ Nothing is playing"
-            desc = None
-
-        embed = discord.Embed(
-            title=title,
-            description=desc,
-            color=self.bot.defaultColor
-        )
-
-        try:
-            embed.set_thumbnail(
-                url=self.track_playing.image
-            )
-        except:
-            pass
-
-        await interaction.response.send_message(embed=embed)
-
 
     @app_commands.command(name="pause", description="Pause currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
@@ -314,7 +281,8 @@ class Audio(commands.Cog, name="audio"):
             color=self.bot.succesColor
         )
         await interaction.response.send_message(embed=embed)
-      
+
+
         
     @app_commands.command(name="resume", description="Resume currently playing track", extras={'cog': 'audio'})
     @checks.not_blacklisted()
@@ -347,6 +315,7 @@ class Audio(commands.Cog, name="audio"):
         await interaction.response.send_message(embed=embed)
 
 
+
     @app_commands.command(name="loop", description="Loop the queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -374,6 +343,7 @@ class Audio(commands.Cog, name="audio"):
             color=self.bot.succesColor
         )
         await interaction.response.send_message(embed=embed)
+
 
 
     @app_commands.command(name="skip", description="Skip the currently playing track", extras={'cog': 'audio'})
@@ -407,6 +377,7 @@ class Audio(commands.Cog, name="audio"):
         await interaction.response.send_message(embed=embed)
 
 
+
     @app_commands.command(name="stop", description="Stop the listening session (this clears the queue!)", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -434,6 +405,7 @@ class Audio(commands.Cog, name="audio"):
         await interaction.response.send_message(embed=embed)
 
         self.track_playing = None
+
 
 
     @app_commands.command(name="join", description="bot joins voice channel", extras={'cog': 'audio'})
@@ -465,6 +437,7 @@ class Audio(commands.Cog, name="audio"):
         await interaction.response.send_message(embed=embed)
     
 
+
     @app_commands.command(name="leave", description="bot leaves voice channel", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -487,6 +460,7 @@ class Audio(commands.Cog, name="audio"):
             await interaction.response.send_message(embed=embed)
 
 
+
     @app_commands.command(name="shuffle", description="Shuffles the queue", extras={'cog': 'audio'})
     @checks.not_blacklisted()
     @checks.in_audio_command_channel()
@@ -507,6 +481,7 @@ class Audio(commands.Cog, name="audio"):
                 color=self.bot.succesColor
             )
             await interaction.response.send_message(embed=embed)
+
 
 
     async def play_next(self, interaction, first_player=False):
