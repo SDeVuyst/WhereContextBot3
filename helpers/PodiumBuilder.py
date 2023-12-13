@@ -52,18 +52,19 @@ class PodiumBuilder:
             else:
                 # profile picture
                 pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
-                pfp = pfp.resize((230, 230))
-                bg.paste(pfp, (525, 2200 + (i-3)*340))
+                pfp = pfp.resize((232, 232))
+                bg.paste(pfp, (525, 2250 + (i-3)*330))
 
                 # username
+                name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
                 draw.text(
-                    (1200, 2360 + (i-3)*340), 
-                    text=user.display_name, 
+                    (1200, 2375 + (i-3)*330), 
+                    text=name, 
                     align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
                 )
                 # count
                 draw.text(
-                    (1960, 2365 + (i-3)*340), 
+                    (1960, 2370 + (i-3)*330), 
                     text=str(count), 
                     align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
                 )

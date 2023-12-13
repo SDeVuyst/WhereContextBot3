@@ -70,13 +70,15 @@ class Stats(commands.Cog, name="stats"):
             command = "N-words said"  
         elif view.chosen_command == "danae":
             command = "danae trigger"
+        elif view.chosen_command == "keleo":
+            command = "keleo trigger"
         else:
             command = f'/{view.chosen_command}'
         
         file = await PodiumBuilder.PodiumBuilder(self.bot).getLeaderboard(leaderb, command)
 
         # embed = await self.get_leaderboard_embed(view.chosen_command)
-        await interaction.edit_original_response(attachments=[file], view=None)
+        await interaction.edit_original_response(attachments=[file], view=None, embed=None)
 
 
 
@@ -135,6 +137,8 @@ class Stats(commands.Cog, name="stats"):
                 desc = f"🔨 **<@{userid}> has not been banned yet.**"
             elif command == "danae":
                 desc = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
+            elif command == "keleo":
+                desc = f"✌️ **<@{userid}> has not triggered the keleo feature yet.**"
             else:
                 desc = f"❌ **<@{userid}> didn't use /{command} yet.**"
 
@@ -161,6 +165,8 @@ class Stats(commands.Cog, name="stats"):
             desc = f"**<@{userid}> said the n-word ```{count[0][0]}``` times.**"
         elif command == "danae":
             desc = f"**<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
+        elif command == "keleo":
+            desc = f"**<@{userid}> triggered 'keleo' ```{count[0][0]}``` times.**"
         elif command == "bancount":
             desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
         else:
@@ -231,9 +237,15 @@ class CommandView(View):
             choices (list): What has the user chosen
         """
         self.chosen_command = choices[0]
-        self.children[1].disabled= True
-        self.children[1].placeholder = f"{self.chosen_command} - Loading..."
-        await interaction.message.edit(view=self)
+        # self.children[0].disabled = True
+        # self.children[1].disabled= True
+        # self.children[1].placeholder = f"{self.chosen_command} - Loading..."
+        embed = discord.Embed(
+            title="⏳ Loading...",
+            description="This can take up to 10 seconds.",
+            color=self.bot.defaultColor
+        )
+        await interaction.message.edit(view=None, embed=embed)
         await interaction.response.defer()
         self.stop()
 
@@ -257,6 +269,7 @@ class CommandSelect(Select):
             commands.insert(0, ("N-Words said", "ncountCHECK"))
             commands.insert(0, ("Bans", "bancount"))
             commands.insert(0, ("Danae trigger", "danae"))
+            commands.insert(0, ("Keleo trigger", "keleo"))
         
 
         super().__init__(

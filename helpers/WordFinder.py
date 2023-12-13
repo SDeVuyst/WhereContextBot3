@@ -14,6 +14,7 @@ class WordFinder:
         await self.find_yachja_word(bot, message)
         await self.check_gif(bot, message)
         await self.check_gf(bot, message)
+        await self.check_keleo(bot, message)
 
  
     async def findNWord(self, bot, message):
@@ -63,7 +64,7 @@ class WordFinder:
         # author can send gifs
         if message.author.name not in [i[0] for i in bot.gif_prohibited]:
             return
-        
+
         responses = [
             f"<@{message.author.id}> shatap lil bro", 
             f"<@{message.author.id}> you are NOT him",
@@ -97,3 +98,16 @@ class WordFinder:
             # update db
             await db_manager.increment_or_add_command_count(message.author.id, 'danae', 1)
             bot.logger.info(f"danae trigger by {message.author.display_name}: {message.content}")
+
+
+    async def check_keleo(self, bot, message):
+        content = message.content.replace("\n", " ").lower()
+        triggers = ["keleo", "leonard", "dj"]
+        responses = ["https://media.discordapp.net/attachments/727476894106386504/1117027462015107164/keleo_gif.gif", "You only need 3 things in life, happiness and good weather - the golden rule by keleo"]
+
+        # check for a trigger in the message
+        if any(trigger in content for trigger in triggers):
+            await message.reply(random.choice(responses), silent=True)
+            # update db
+            await db_manager.increment_or_add_command_count(message.author.id, 'keleo', 1)
+            bot.logger.info(f"keleo trigger by {message.author.display_name}: {message.content}")
