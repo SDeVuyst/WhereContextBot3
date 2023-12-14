@@ -701,6 +701,33 @@ k
         
 
 
+class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
+
+    def __init__(self, configure_view):
+        self.configure_view = configure_view
+        super().__init__(timeout=None)
+    
+    # nickname input
+    answer = discord.ui.TextInput(
+        label='Nickname', 
+        required=True,
+        max_length=32
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        # save value
+        self.configure_view.nickname = self.answer.value
+
+        # respond to user
+        embed = discord.Embed(
+            title="💾Default nickname set!",
+            description=f'```{self.answer.value}```',
+            color=self.configure_view.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+
 class RolesSelectView(discord.ui.View):
     def __init__(self, user, all_roles, bot, autoroles, timeout = 180):
         self.user = user
@@ -775,35 +802,9 @@ class RolesSelect(discord.ui.Select):
 
 
 
-class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
-
-    def __init__(self, configure_view):
-        self.configure_view = configure_view
-        super().__init__(timeout=None)
-    
-    # nickname input
-    answer = discord.ui.TextInput(
-        label='Nickname', 
-        required=True,
-        max_length=32
-    )
-
-    async def on_submit(self, interaction: discord.Interaction):
-        # save value
-        self.configure_view.nickname = self.answer.value
-
-        # respond to user
-        embed = discord.Embed(
-            title="💾Default nickname set!",
-            description=f'```{self.answer.value}```',
-            color=self.configure_view.bot.succesColor
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
-
-
 async def setup(bot):
     await bot.add_cog(Admin(bot))
+
 
 
 # gives correct int based off db output
