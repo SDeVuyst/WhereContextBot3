@@ -16,7 +16,7 @@ import psycopg2
 import discord
 from discord.ext import tasks
 from discord.ext.commands import Bot
-from helpers import WordFinder, db_manager, auto
+from helpers import WordFinder, db_manager
 import exceptions
 
 from datetime import datetime, timedelta
@@ -246,79 +246,80 @@ async def on_message(message: discord.Message) -> None:
 async def on_raw_reaction_add(payload):
     is_poll = await db_manager.is_poll(payload.message_id)
     
-    if is_poll:
-        
-        emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+    if not is_poll:
+        return
+    
+    emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 
-        channel = bot.get_channel(payload.channel_id)
-        message = await channel.fetch_message(payload.message_id)
-        user = bot.get_user(payload.user_id)
-        
-        bot.logger.info(f"{user.display_name} voted {payload.emoji.name}")
+    channel = bot.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    user = bot.get_user(payload.user_id)
+    
+    bot.logger.info(f"{user.display_name} voted {payload.emoji.name}")
 
-        # remove wrong emoji reactions
-        if payload.emoji.name not in emojis:
-            await message.remove_reaction(payload.emoji, user)
-            return 
-        
-        # get current reactions on poll
-        reactions = await db_manager.get_poll_reactions(payload.message_id)
-        reactions = reactions[0][0]
+    # remove wrong emoji reactions
+    if payload.emoji.name not in emojis:
+        await message.remove_reaction(payload.emoji, user)
+        return 
+    
+    # get current reactions on poll
+    reactions = await db_manager.get_poll_reactions(payload.message_id)
+    reactions = reactions[0][0]
 
-        i = emojis.index(payload.emoji.name)
+    i = emojis.index(payload.emoji.name)
 
-        # new reaction                                      not bot initial reaction
-        if str(payload.user_id) not in reactions[i] and str(payload.user_id) != os.environ.get("APPLICATION_ID"):
-            # remove all previous reactions from user
-            reactions = [[ subelt for subelt in elt if subelt not in [str(payload.user_id), f"'{payload.user_id}'"] ] for elt in reactions] 
-            # remove 'placeholder'
-            reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
-            # add new user reaction
-            reactions[i].append(str(payload.user_id))
-            # fill subarrays with placeholders
-            max_length = max([len(i) for i in reactions])
-            reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
-
-
-        # update db with the new information
-        string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
-        await db_manager.set_poll_reactions(payload.message_id, string_reactions)
-
-        # delete the emoji reaction
-        if str(payload.user_id) != os.environ.get("APPLICATION_ID"):
-            await message.remove_reaction(payload.emoji, user)
-
-
-        e = message.embeds[0]
-        # remove placeholders
+    # new reaction                                      not bot initial reaction
+    if str(payload.user_id) not in reactions[i] and str(payload.user_id) != os.environ.get("APPLICATION_ID"):
+        # remove all previous reactions from user
+        reactions = [[ subelt for subelt in elt if subelt not in [str(payload.user_id), f"'{payload.user_id}'"] ] for elt in reactions] 
+        # remove 'placeholder'
         reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
-        
-        # update message to show correct votes
-        vals = [len(sub) for sub in reactions]
-        total = sum(vals)
-        field = '\u200b'
-        for i in range(len(vals)):
-            perc = 0 if total == 0 else vals[i]/total
-            field += f'**{emojis[i]}: {vals[i]} votes - {perc:.0%}**\n' # TODO
-        
-        e.remove_field(index=1)
-        e.add_field(
-            name='**🏁 Results**',
-            value=field,
-            inline=False
-        )
-        
-        # update thumbnail
-        data = repr([str(len(sub)) for sub in reactions])
-        ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
-        ops = repr([o[4:] for o in ops])
-        url = f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}".replace(' ', '')
-        e.set_thumbnail(
-            url=url
-        )
+        # add new user reaction
+        reactions[i].append(str(payload.user_id))
+        # fill subarrays with placeholders
+        max_length = max([len(i) for i in reactions])
+        reactions = [sub + ((max_length-len(sub)) * ['placeholder']) for sub in reactions]
 
-        # update the message with the edited embed
-        await message.edit(embed=e)
+
+    # update db with the new information
+    string_reactions = repr(reactions).replace("[", "{").replace("]", "}")
+    await db_manager.set_poll_reactions(payload.message_id, string_reactions)
+
+    # delete the emoji reaction
+    if str(payload.user_id) != os.environ.get("APPLICATION_ID"):
+        await message.remove_reaction(payload.emoji, user)
+
+
+    e = message.embeds[0]
+    # remove placeholders
+    reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions] 
+    
+    # update message to show correct votes
+    vals = [len(sub) for sub in reactions]
+    total = sum(vals)
+    field = '\u200b'
+    for i in range(len(vals)):
+        perc = 0 if total == 0 else vals[i]/total
+        field += f'**{emojis[i]}: {vals[i]} votes - {perc:.0%}**\n' # TODO
+    
+    e.remove_field(index=1)
+    e.add_field(
+        name='**🏁 Results**',
+        value=field,
+        inline=False
+    )
+    
+    # update thumbnail
+    data = repr([str(len(sub)) for sub in reactions])
+    ops = e.fields[0].value.replace("*", "").split("\n")[:-1]
+    ops = repr([o[4:] for o in ops])
+    url = f"https://quickchart.io/chart?c={{type:'pie',data:{{datasets:[{{data:{data}}}],labels:{ops}}}}}".replace(' ', '')
+    e.set_thumbnail(
+        url=url
+    )
+
+    # update the message with the edited embed
+    await message.edit(embed=e)
 
         
 
@@ -333,9 +334,40 @@ async def on_member_remove(member):
 async def on_member_join(member):
     bot.logger.info(f"{member.id} joined a server!")
 
-    if member.guild.id == int(os.environ.get("GUILD_ID")):
-        await auto.autoroles(bot, member)
-        await auto.autonick(bot, member)
+    description = ""
+    # autonick
+    nick = await db_manager.get_nickname(member.guild.id, member.id)
+
+    if nick not in [None, -1]:
+        await member.edit(nick=nick[0])
+        bot.logger.info(f'Autonick set')
+        description += f"Your nickname is now '{nick[0]}'.\n"
+
+    # autoroles
+    roles_to_add = await db_manager.get_autoroles(member.guild.id, member.id)
+    if roles_to_add not in [None, -1]:
+        
+        roles_to_add = [int(role_id) for role_id in roles_to_add[0]]
+
+        # add roles to user
+        for role_id in roles_to_add:
+            try:
+                new_role = discord.utils.get(member.guild.roles, id=role_id)
+                await member.add_roles(new_role)
+            except:
+                bot.logger.warning(f"role {role_id} not found")
+        
+        bot.logger.info(f"Added autoroles")
+        description += f"You got your roles back!"
+
+    # send welcome to user
+    embed = discord.Embed(
+        title=f"Welcome to {member.guild.name}!",
+        description=description,
+        color=bot.defaultColor,
+    )
+    await member.send(embed=embed)
+    
         
 
 @bot.event

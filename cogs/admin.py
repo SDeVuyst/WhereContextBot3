@@ -8,9 +8,10 @@ Version: 5.5.0
 
 import discord
 import os
+import random
 from discord import app_commands
 from discord.ext import commands
-from helpers import checks, db_manager
+from helpers import checks, db_manager, PodiumBuilder
 from discord.ext.commands import has_permissions
 from datetime import datetime
 from exceptions import CogLoadError
@@ -53,7 +54,7 @@ class Admin(commands.Cog, name="admin"):
         #update ncount
         await db_manager.increment_or_add_nword(interaction.user.id, -10)
         
-        # stuur het antwoord
+        # send response
         await interaction.followup.send(embed=embed)
 
 
@@ -509,10 +510,97 @@ class Admin(commands.Cog, name="admin"):
 
 
 
+    @app_commands.command(name="profile", description="See someones profile", extras={'cog': 'admin'})
+    @checks.not_blacklisted()
+    @app_commands.checks.cooldown(rate=1, per=10)
+    @app_commands.describe(user="Which user")
+    async def profile(self, interaction, user: discord.User=None) -> None:
+        """View someones bot profile
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user
+        """
+        await interaction.response.defer()
+
+        # geen gebruiker meegegeven, gaat over zichzelf
+        if user is None:
+            user = interaction.user
+
+        # creeer embed
+        embed = discord.Embed(
+            title=f"**{user.display_name}'s Profile**",
+            color=self.bot.defaultColor,
+            timestamp=datetime.utcnow()
+        )
+
+        # set thumbnail als users character
+        embed.set_thumbnail(
+            url=str(user.avatar.url)
+        )
+
+        embed.set_author(
+            name=user.name, 
+            icon_url=str(user.avatar.url)
+        )
+
+        nick = await db_manager.get_nickname(interaction.guild_id, user.id)
+        embed.add_field(
+            name="📛 Default Nickname",
+            value="```None```" if nick in [-1, None] else f"```{nick[0]}```",
+            inline=False
+        )
+
+        ncount = await db_manager.get_nword_count(user.id)
+        embed.add_field(
+            name="🥷🏿 N-Count",
+            value=f"```{normalizeCount(ncount)}```",
+            inline=True
+        )
+
+        bancount = await db_manager.get_ban_count(user.id)
+        embed.add_field(
+            name="🔨 Amount of Bans",
+            value=f"```{normalizeCount(bancount)}```",
+            inline=True
+        )
+
+        # get most used command
+        commandcount = await db_manager.get_most_used_command(user.id)
+        if commandcount is None or commandcount[0] == -1:
+            value = f"```No Commands Used```"
+        else:
+            com = "Danae Trigger" if commandcount[0] == 'danae' else f"/{commandcount[0]}"
+            value=f"```{com}: {commandcount[1]}```"
+
+        embed.add_field(
+            name="🤖 Most Used Command",
+            value=value,
+            inline=False
+        )
+
+        # get total amount of commands used
+        totalcommandcount = await db_manager.get_total_used_command(user.id)
+        totalcommandcountvalue = 0 if (totalcommandcount is None or totalcommandcount[0] == -1) else totalcommandcount[0]
+        embed.add_field(
+            name="🗒️ Total Commands Used",
+            value=f"```{totalcommandcountvalue}```",
+            inline=False
+        )
+
+        # show podiums
+        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
+        embed.set_image(url="attachment://podium.png")
+        
+        await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
+
+
+
 class UnbanView(discord.ui.View):
     def __init__(self, bans, bot):
         super().__init__()
         self.add_item(UnbanDropdown(bans, bot))
+
 
 
 class UnbanDropdown(discord.ui.Select):
@@ -534,8 +622,193 @@ class UnbanDropdown(discord.ui.Select):
         await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()
 
+
     
+class ConfigureView(discord.ui.View):
+    def __init__(self, bot, embed, user_id):
+        self.bot = bot
+        self.embed = embed
+        self.nickname = 'None'
+        self.user_id = int(user_id)
+
+        super().__init__(timeout=500)
+
+
+    @discord.ui.button(label="Set default nickname", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
+    async def add_nickname(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # send modal
+        modal = AddNicknameModal(self)
+        await interaction.response.send_modal(modal)
+
+        # wait till modal finishes
+        await modal.wait()
+
+        # save the nickname
+        await db_manager.set_nickname(interaction.guild_id, self.user_id, self.nickname)
+
+        # set description to embed
+        self.embed.set_field_at(index=0, name="📛 Default Nickname", value=f"```{self.nickname}```", inline=False)
+
+        # edit config embed
+        msg = await interaction.original_response()
+        await msg.edit(embed=self.embed, view=self)
+
+    
+
+    @discord.ui.button(label="Set default roles", emoji='📝', style=discord.ButtonStyle.blurple, disabled=False)
+    async def add_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
+        autoroles = await db_manager.get_autoroles(interaction.guild_id, self.user_id)
+        if autoroles is not None:
+            autoroles = [int(role_id) for role_id in autoroles[0]]
+        else:
+            autoroles = []
+
+        await interaction.response.send_message(
+            view=RolesSelectView(
+                interaction.guild.get_member(self.user_id), 
+                await interaction.guild.fetch_roles(), 
+                self.bot,
+                autoroles
+            )
+        )
+
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        """Check that the user is the one who is clicking buttons
+k
+        Args:
+            interaction (discord.Interaction): Users Interaction
+
+        Returns:
+            bool
+        """
+        responses = [
+            f"<@{interaction.user.id}> shatap lil bro", 
+            f"<@{interaction.user.id}> you are NOT him",
+            f"<@{interaction.user.id}> blud thinks he's funny",
+            f"<@{interaction.user.id}> imma touch you lil nigga",
+            f"<@{interaction.user.id}> it's on sight now",
+        ]
+
+        try:
+            is_possible = (interaction.user.id == self.user_id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+            if not is_possible:
+                await interaction.response.send_message(random.choice(responses))
+            return is_possible
+        
+        except:
+            return False
+        
+
+
+class RolesSelectView(discord.ui.View):
+    def __init__(self, user, all_roles, bot, autoroles, timeout = 180):
+        self.user = user
+        self.all_roles = all_roles
+        self.bot = bot
+        self.selectedRoles = None
+        
+        super().__init__(timeout=timeout)
+        self.add_item(RolesSelect(user, all_roles, bot, self, autoroles))    
+
+    # a cancel button
+    # will keep the message but remove the view and replace the text with "Cancelled"
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, row=3, disabled=False, emoji="✖️")
+    async def close_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = discord.Embed(
+            title=f"Canceled!",
+            color=self.bot.defaultColor,
+        )
+        await interaction.response.edit_message(embed=embed, view=None, delete_after=10)
+
+
+    @discord.ui.button(label="Submit", style=discord.ButtonStyle.green, row=3, disabled=False, emoji='✅')
+    async def submit_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer in case processing the selected data takes a while
+        await interaction.response.defer()
+        selected_roles = [discord.utils.get(self.all_roles, name=role) for role in self.selectedRoles]
+
+        # save roles in db
+        succes = await db_manager.set_autoroles(
+            interaction.guild_id,
+            self.user.id,
+            [str(role.id) for role in selected_roles]
+        )
+
+        if not succes:
+            raise Exception("Could not save roles to db.")
+        
+        # create formatted string representing the selected roles
+        formatted_selected_roles = ''
+        for role in selected_roles:
+            formatted_selected_roles += role.mention + '\n'
+
+        embed = discord.Embed(
+            title=f"✅ Edited default Roles!",
+            description=f"Your new AutoRoles are now:\n{formatted_selected_roles}",
+            color=self.bot.succesColor,
+        )
+        
+        await interaction.edit_original_response(embed=embed, view=None)
+
+
+
+class RolesSelect(discord.ui.Select):
+    def __init__(self, user, all_roles, bot, view, autoroles):
+        self.bot = bot
+        self.roleView = view
+
+        # get available roles for the user
+        highest_role = discord.utils.find(lambda role: role in all_roles, reversed(user.roles))
+        available_roles = [role for role in all_roles if role <= highest_role]
+        available_roles = list(filter(lambda r: r.name != '@everyone', available_roles))
+
+        # generate the options
+        options = [discord.SelectOption(label=role.name, default=role.id in autoroles) for role in available_roles[:25]]
+
+        super().__init__(placeholder="Select an option", max_values=len(options), min_values=0, options=options)
+
+
+    async def callback(self, interaction: discord.Interaction):
+        self.roleView.selectedRoles = self.values
+        await interaction.response.defer()
+
+
+
+class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
+
+    def __init__(self, configure_view):
+        self.configure_view = configure_view
+        super().__init__(timeout=None)
+    
+    # nickname input
+    answer = discord.ui.TextInput(
+        label='Nickname', 
+        required=True,
+        max_length=32
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        # save value
+        self.configure_view.nickname = self.answer.value
+
+        # respond to user
+        embed = discord.Embed(
+            title="💾Default nickname set!",
+            description=f'```{self.answer.value}```',
+            color=self.configure_view.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
 
 
 async def setup(bot):
     await bot.add_cog(Admin(bot))
+
+
+# gives correct int based off db output
+def normalizeCount(count):
+    if len(count) == 0 or int(count[0][0]) == 0 or count[0] == -1:
+        return 0
+    else:
+        return count[0][0]

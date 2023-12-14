@@ -20,7 +20,7 @@ from discord.ext import commands
 
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
-from helpers import checks, db_manager, PodiumBuilder
+from helpers import checks, db_manager
 
 
 openai.api_key = os.environ.get("OPENAI_SECRET")
@@ -103,87 +103,6 @@ class General(commands.Cog, name="general"):
         menu.add_button(ViewButton.back())
         menu.add_button(ViewButton.next())
         return await menu.start()
-
-
-
-
-    @app_commands.command(name="profile", description="See someones profile", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    @checks.is_owner()
-    @app_commands.checks.cooldown(rate=1, per=10)
-    @app_commands.describe(user="Which user")
-    async def profile(self, interaction, user: discord.User=None) -> None:
-        """View someones bot profile
-
-        Args:
-            interaction (Interaction): Users Interaction
-            user (discord.User): Which user
-        """
-        await interaction.response.defer()
-
-        # geen gebruiker meegegeven, gaat over zichzelf
-        if user is None:
-            user = interaction.user
-
-        # creeer embed
-        embed = discord.Embed(
-            title=f"**{user.display_name}'s Profile**",
-            color=self.bot.defaultColor,
-            timestamp=datetime.utcnow()
-        )
-
-        # set thumbnail als users character
-        embed.set_thumbnail(
-            url=str(user.avatar.url)
-        )
-
-        embed.set_author(
-            name=user.name, 
-            icon_url=str(user.avatar.url)
-        )
-
-        ncount = await db_manager.get_nword_count(user.id)
-        embed.add_field(
-            name="🥷🏿 N-Count",
-            value=f"```{normalizeCount(ncount)}```",
-            inline=True
-        )
-
-        bancount = await db_manager.get_ban_count(user.id)
-        embed.add_field(
-            name="🔨 Amount of Bans",
-            value=f"```{normalizeCount(bancount)}```",
-            inline=True
-        )
-
-        # get most used command
-        commandcount = await db_manager.get_most_used_command(user.id)
-        if commandcount is None or commandcount[0] == -1:
-            value = f"```No Commands Used```"
-        else:
-            com = "Danae Trigger" if commandcount[0] == 'danae' else f"/{commandcount[0]}"
-            value=f"```{com}: {commandcount[1]}```"
-
-        embed.add_field(
-            name="🤖 Most Used Command",
-            value=value,
-            inline=False
-        )
-
-        # get total amount of commands used
-        totalcommandcount = await db_manager.get_total_used_command(user.id)
-        totalcommandcountvalue = 0 if (totalcommandcount is None or totalcommandcount[0] == -1) else totalcommandcount[0]
-        embed.add_field(
-            name="🗒️ Total Commands Used",
-            value=f"```{totalcommandcountvalue}```",
-            inline=False
-        )
-
-        # show podiums
-        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
-        embed.set_image(url="attachment://podium.png")
-        
-        await interaction.followup.send(embed=embed, files=[file])
 
 
 
@@ -733,10 +652,3 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
 async def setup(bot):
     await bot.add_cog(General(bot))
-
-
-def normalizeCount(count):
-    if len(count) == 0 or int(count[0][0]) == 0 or count[0] == -1:
-        return 0
-    else:
-        return count[0][0]

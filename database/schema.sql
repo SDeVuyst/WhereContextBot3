@@ -43,3 +43,17 @@ CREATE TABLE IF NOT EXISTS polls (
   message_id varchar(20) NOT NULL,
   reactions varchar(20)[][]
 );
+
+CREATE TABLE IF NOT EXISTS nicknames (
+  id SERIAL PRIMARY KEY,
+  server_id varchar(20) NOT NULL DEFAULT '710963677943169107',
+  user_id varchar(20) NOT NULL,
+  nickname varchar(32) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS autoroles (
+  id SERIAL PRIMARY KEY,
+  server_id varchar(20) NOT NULL DEFAULT '710963677943169107',
+  user_id varchar(20) NOT NULL,
+  roles varchar(20)[]
+);

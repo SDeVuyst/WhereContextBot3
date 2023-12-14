@@ -792,3 +792,127 @@ async def get_total_used_command(user_id):
             
     except Exception as err:
         return (-1, err)
+    
+
+
+
+async def get_nickname(server_id, user_id):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT nickname FROM nicknames WHERE user_id=%s AND server_id=%s", (str(user_id), str(server_id),)
+                )
+                return cursor.fetchone()
+            
+    except Exception as err:
+        return -1
+    
+
+
+async def set_nickname(server_id, user_id, nickname):
+    alreadyExists = await has_nickname(server_id, user_id)
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE nicknames SET nickname = %s WHERE user_id=%s AND server_id=%s", ((nickname), str(user_id), str(server_id),)
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO nicknames(server_id, user_id, nickname) VALUES (%s, %s, %s)",
+                        (str(server_id), str(user_id), nickname,)
+                    )
+                    
+                con.commit()
+                return True
+
+        except:
+            return False
+        
+
+async def has_nickname(server_id, user_id: int) -> bool:
+    """
+    This function will check if a user has a set nickname.
+
+    """
+        
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM nicknames WHERE user_id=%s AND server_id=%s", (str(user_id), str(server_id),)
+                )
+                result = cursor.fetchall()
+                return len(result) > 0
+        # Als er iets misgaat, zeggen we dat user al nickname heeft
+        except:
+            return True
+        
+
+async def set_autoroles(server_id, user_id, roles):
+    alreadyExists = await has_autoroles(server_id, user_id)
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE autoroles SET roles = %s WHERE user_id=%s AND server_id=%s", ((roles), str(user_id), str(server_id),)
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO autoroles(server_id, user_id, roles) VALUES (%s, %s, %s)",
+                        (str(server_id), str(user_id), roles,)
+                    )
+                    
+                con.commit()
+                return True
+
+        except:
+            return False
+        
+
+async def has_autoroles(server_id, user_id: int) -> bool:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM autoroles WHERE user_id=%s AND server_id=%s", (str(user_id), str(server_id),)
+                )
+                result = cursor.fetchall()
+                return len(result) > 0
+        # Als er iets misgaat, zeggen we dat user al nickname heeft
+        except:
+            return True
+        
+
+async def get_autoroles(server_id, user_id):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT roles FROM autoroles WHERE user_id=%s AND server_id=%s", (str(user_id), str(server_id),)
+                )
+                return cursor.fetchone()
+            
+    except Exception as err:
+        return -1

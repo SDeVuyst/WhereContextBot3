@@ -107,17 +107,11 @@ class OutOfContext(commands.Cog, name="outofcontext"):
             embed = discord.Embed(
                 description="There are no messages.", color=self.bot.defaultColor
             )
-            
             return (embed, False)
         
         # error
         elif messages[0] == -1 or not worked:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=messages[1],
-                color=self.bot.errorColor
-            )
-            return (embed, False)
+            raise Exception(messages[1])
 
         # alles is ok
         embed = await self.getEmbed(int(messages[0][0]), guild, int(messages[0][2]), int(messages[0][3]))
@@ -148,12 +142,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         
         # error
         elif messages[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=messages[1],
-                color=self.bot.errorColor
-            )
-            return (embed, False)
+            raise Exception(messages[1])
 
         # alles is ok
         embed = await self.getEmbed(int(messages[0][0]), guild, int(messages[0][2]), int(messages[0][3]))
