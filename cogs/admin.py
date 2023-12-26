@@ -97,7 +97,6 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'admin'})
     @has_permissions(ban_members=True)
     @app_commands.checks.cooldown(rate=1, per=180)
-    @checks.in_correct_server()
     @checks.not_in_dm()
     @checks.not_blacklisted()
     async def lien(self, interaction) -> None:
@@ -112,15 +111,21 @@ class Admin(commands.Cog, name="admin"):
             gromID = int(os.environ.get("GROM"))
             grom = await interaction.guild.fetch_member(gromID)
             await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
+
+            embed = discord.Embed(
+                title=":warning: ***LIEN LOCKDOWN*** :warning:",
+                description="<@464400950702899211> has been kicked.",
+                color=self.bot.errorColor
+            )
         # grom kick error
         except:
-            pass
+            embed = discord.Embed(
+                title=":warning: ***LIEN LOCKDOWN*** :warning:",
+                description="<@464400950702899211> is not in the server.",
+                color=self.bot.errorColor
+            )
+
         # stuur lockdown bericht
-        embed = discord.Embed(
-            title=":warning: ***LIEN LOCKDOWN*** :warning:",
-            description="<@464400950702899211> has been kicked.",
-            color=self.bot.errorColor
-        )
         await interaction.response.send_message(embed=embed)
 
 

@@ -22,7 +22,11 @@ class Stats(commands.Cog, name="stats"):
         self.bot = bot
         
     
-    @app_commands.command(name="leaderboard", description="Leaderboard of a command", extras={'cog': 'stats'})
+    @app_commands.command(
+            name="leaderboard",
+            description="Leaderboard of a command", 
+            extras={'cog': 'stats'}
+    )
     @checks.not_blacklisted()
     @checks.is_owner()
     @app_commands.checks.cooldown(rate=1, per=10)
@@ -84,26 +88,34 @@ class Stats(commands.Cog, name="stats"):
 
     @app_commands.command(
         name="statistic",
-        description="How many times did a user use a command",
+        description="How many times did a user use a feature",
         extras={'cog': 'stats'}
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=1, per=10)
-    async def statistic(self,interaction, user: discord.User) -> None:
+    async def statistic(self,interaction, user: discord.User = None) -> None:
         """Shows the individual stats for a user for a given command
 
         Args:
             interaction (Interaction): Users interaction
             user (discord.User): Which user
         """
+
+        # geen gebruiker meegegeven, gaat over zichzelf
+        if user is None:
+            user = interaction.user
+
+        # send view to get chosen command
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
         await view.wait()
+
+        # timeout
         if view.chosen_command is None:
             raise TimeoutCommand("Timeout in /statistic")
 
-        
+        #  generate response
         embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
         await interaction.edit_original_response(embed=embed, view=None)
