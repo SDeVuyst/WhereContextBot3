@@ -140,6 +140,7 @@ async def on_ready() -> None:
     bot.logger.info("-------------------")
     status_task.start()
     check_remindme.start()
+    check_gif_unban.start()
 
     cmds = await bot.tree.sync()
     bot.save_ids(cmds)
