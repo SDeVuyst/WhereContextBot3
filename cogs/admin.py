@@ -589,7 +589,7 @@ class Admin(commands.Cog, name="admin"):
         )
 
         # show podiums
-        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
+        file = await PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
         embed.set_image(url="attachment://podium.png")
         
         await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))

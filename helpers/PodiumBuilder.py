@@ -4,12 +4,16 @@ import discord
 import io
 import requests
 import random
+import os
+
+from helpers import db_manager
 
 class PodiumBuilder:
     def __init__(self, bot) -> None:
         self.bot = bot
 
         self.definedPodiums = {
+            "": "arion/ArionPodium", # TODO
             "273503117348306944": "arno/ArnoPodium",
             "222415043550117888": "ba/BaPodium",
             "559715606014984195": "gible/GiblePodium",
@@ -18,7 +22,9 @@ class PodiumBuilder:
             "527916521754722315": "leander/LeanderPodium",
             "512256261459542019": "meng/MengPodium",
             "464400950702899211": "pingy/PingyPodium",
+            "": "silas/silasPodium", # TODO
             "453136562885099531": "wouter/WouterPodium",
+            "": "yachja/YachjaPodium", # TODO
             "756527409876041859": "zeb/ZebPodium",
         }
 
@@ -43,6 +49,8 @@ class PodiumBuilder:
             # get user info
             user_id, count = tuple(stat)
             user = await self.bot.fetch_user(int(user_id))
+            # normalize count
+            count = human_format(count)
             
             # is podium, save info for later
             if i < 3:       
@@ -95,20 +103,19 @@ class PodiumBuilder:
         return discord.File(buffer, 'leaderboard.png')
     
 
-    def getPodiumImage(self, user_id, place):
+    def getPodiumImage(self, user_id, place, alwaysSpecial = False):
         location = self.definedPodiums.get(str(user_id), "default/DefaultPodium")
 
-        if location == "GiblePodium":
+        if location == "gible/GiblePodium" and alwaysSpecial:
             # 1/20 chance gible podium is shiny
-            if random.randint(0, 20) == 20:
-                location = "ShinyGiblePodium"
+            location = "gible/ShinyGiblePodium"
             
         image = Image.open(f'media/images/{location}{place}.png')
 
         return image
 
     
-    def getAllPodiumsImage(self, user_ids, return_file=True, padding=200, color=(44, 45, 47)):
+    async def getAllPodiumsImage(self, user_ids, return_file=True, padding=200, color=(44, 45, 47)):
         # create normalised images for every given podium
         if len(user_ids) == 1:
             order = [1]
@@ -116,9 +123,26 @@ class PodiumBuilder:
             order = [2, 1]
         else:
             order = [2, 1, 3]
-
-        podiums = [remove_transparency(self.getPodiumImage(id, order[i]), color=color) for i, id in enumerate(user_ids)]
         
+        
+        alwaysSpecial = random.randint(1, 12) == 2
+        podiums = [remove_transparency(self.getPodiumImage(id, order[i], alwaysSpecial), color=color) for i, id in enumerate(user_ids)]
+        
+        # dm gible
+        if alwaysSpecial:
+            GIBLE_ID = int(os.environ.get("GIBLE_ID"))
+            await db_manager.increment_or_add_nword(GIBLE_ID, 500)
+
+            embed = discord.Embed(
+                title='🎉 Congratulations!',
+                description=f"A shiny version of gible has been pulled! You have been awarded 500 n-words.",
+                color=self.bot.succesColor,
+            )
+
+            gible_user = self.bot.get_user(GIBLE_ID)
+            await gible_user.send(embed=embed)
+
+
         # paste podiums on correct location
         dst = get_concat_h_multi_blank(podiums, padding, color=color)
 
@@ -170,3 +194,12 @@ def resize_image(im, width, max_height=1000):
         width = int((float(im.size[0]) * float(hpercent)))
 
     return im.resize((width, hsize), Image.Resampling.LANCZOS)
+
+
+def human_format(num):
+    num = float('{:.3g}'.format(num))
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])

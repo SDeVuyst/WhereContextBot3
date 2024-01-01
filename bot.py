@@ -176,7 +176,7 @@ async def check_gif_unban():
     bot.gif_prohibited = ok_list
 
 
-@tasks.loop(seconds=10)
+@tasks.loop(seconds=30)
 async def check_remindme():
 
     # krijg reminders uit db
