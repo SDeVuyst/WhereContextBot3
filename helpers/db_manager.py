@@ -326,7 +326,7 @@ async def get_nword_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, count FROM nword_counter ORDER BY count DESC LIMIT 10"
+                    "SELECT user_id, count FROM nword_counter ORDER BY count DESC LIMIT 9"
                 )
                 return cursor.fetchall()
             
@@ -464,7 +464,7 @@ async def get_leaderboard(command: str) -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, count FROM command_stats WHERE command=%s ORDER BY count DESC LIMIT 10", 
+                    "SELECT user_id, count FROM command_stats WHERE command=%s ORDER BY count DESC LIMIT 9", 
                     (command,)
                 )
                 return cursor.fetchall()
@@ -579,7 +579,7 @@ async def get_ban_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, count FROM user_bans ORDER BY count DESC LIMIT 10"
+                    "SELECT user_id, count FROM user_bans ORDER BY count DESC LIMIT 9"
                 )
                 return cursor.fetchall()
             
@@ -768,7 +768,7 @@ async def get_most_used_command(user_id):
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT command, count FROM command_stats WHERE user_id=%s ORDER BY count DESC LIMIT 1", 
+                    "SELECT command, count FROM command_stats WHERE user_id=%s  AND command!='danae' AND command!='keleo' AND command!='messages_played' AND command!='messages_deleted' AND command!='Add' AND command!='Remove' ORDER BY count DESC LIMIT 1", 
                     (str(user_id),)
                 )
                 return cursor.fetchone()
@@ -785,7 +785,7 @@ async def get_total_used_command(user_id):
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT SUM(count) FROM command_stats WHERE user_id=%s", 
+                    "SELECT SUM(count) FROM command_stats WHERE user_id=%s AND command!='danae' AND command!='keleo' AND command!='messages_played' AND command!='messages_deleted' AND command!='Add' AND command!='Remove'", 
                     (str(user_id), )
                 )
                 return cursor.fetchone()
