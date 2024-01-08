@@ -22,7 +22,7 @@ class PodiumBuilder:
             "527916521754722315": "leander/LeanderPodium",
             "512256261459542019": "meng/MengPodium",
             "464400950702899211": "pingy/PingyPodium",
-            "": "silas/silasPodium", # TODO
+            "462932133170774036": "silas/SolosPodium",
             "453136562885099531": "wouter/WouterPodium",
             "": "yachja/YachjaPodium", # TODO
             "756527409876041859": "zeb/ZebPodium",
