@@ -593,12 +593,15 @@ class Admin(commands.Cog, name="admin"):
             inline=False
         )
 
-        # show podiums
-        file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
-        embed.set_image(url="attachment://podium.png")
+        # show podiums if user has one
+        builder = PodiumBuilder.PodiumBuilder(self.bot)
+        if builder.userHasPodium(user.id):
+            file = PodiumBuilder.PodiumBuilder(self.bot).getAllPodiumsImage([user.id, user.id, user.id], padding=100)
+            embed.set_image(url="attachment://podium.png")
         
-        await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
+            return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
 
+        await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user.id))
 
 
 class UnbanView(discord.ui.View):

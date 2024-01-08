@@ -22,6 +22,9 @@ class PodiumBuilder:
             "756527409876041859": "zeb/ZebPodium",
         }
 
+    def userHasPodium(self, user_id):
+        return str(user_id) in self.definedPodiums
+
     async def getLeaderboard(self, leaderboard, command):
         # self.bot.logger.info(leaderboard)
 
