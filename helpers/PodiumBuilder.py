@@ -13,7 +13,7 @@ class PodiumBuilder:
         self.bot = bot
 
         self.definedPodiums = {
-            "": "arion/ArionPodium", # TODO
+            "334371900170043402": "arion/ArionPodium",
             "273503117348306944": "arno/ArnoPodium",
             "222415043550117888": "ba/BaPodium",
             "559715606014984195": "gible/GiblePodium",
