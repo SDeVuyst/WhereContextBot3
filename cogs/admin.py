@@ -596,7 +596,7 @@ class Admin(commands.Cog, name="admin"):
         # show podiums if user has one
         builder = PodiumBuilder.PodiumBuilder(self.bot)
         if builder.userHasPodium(user.id):
-            file = await builder.getAllPodiumsImage([user.id, user.id, user.id], padding=100)
+            file = await builder.getAllPodiumsImage([user.id, user.id, user.id], padding=100, add_characters=False)
             embed.set_image(url="attachment://podium.png")
         
             return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
@@ -751,7 +751,7 @@ class RolesSelectView(discord.ui.View):
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, row=3, disabled=False, emoji="✖️")
     async def close_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         embed = discord.Embed(
-            title=f"Canceled!",
+            title=f"Cancelled!",
             color=self.bot.defaultColor,
         )
         await interaction.response.edit_message(embed=embed, view=None, delete_after=10)
