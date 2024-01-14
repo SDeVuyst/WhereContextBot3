@@ -69,6 +69,7 @@ class PodiumBuilder:
             },
             "462932133170774036": {
                 "podiumLocation": "silas/SolosPodium",
+                "poseLocation": "default/DefaultPose", # TODO testing
                 "badgePasteCoords": [
                     (255, 1050), (255, 1130), (255, 1320)
                 ],  
@@ -186,9 +187,9 @@ class PodiumBuilder:
             location = defined_art.get("shinyPodiumLocation")
         
         # load the selected image
-        # image = Image.open(f'media/images/{location}{place}.png')
+        image = Image.open(f'media/images/{location}{place}.png')
 
-        image = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{place}.png')
+        #image = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{place}.png')
         return image
     
     async def addCharacterToPodium(self, podiumImage, user_id, poseNumber, place):
@@ -199,8 +200,8 @@ class PodiumBuilder:
         customCharacterLocation = defined_art.get("characterLocation", "default/DefaultPose")
 
         # load the character image
-        characterImage = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{customCharacterLocation}{poseNumber}.png')
-        # characterImage = Image.open(f'media/images/{customCharacterLocation}{poseNumber}.png')
+        #characterImage = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{customCharacterLocation}{poseNumber}.png')
+        characterImage = Image.open(f'media/images/{customCharacterLocation}{poseNumber}.png')
         # resize it
         characterImage = resize_image(characterImage, 700)
 
@@ -220,8 +221,8 @@ class PodiumBuilder:
 
         # paste badge to fix 3d realness of character standing on podium
         pasteCoords = defined_art.get("badgePasteCoords", [(255, 1050), (255, 1130), (255, 1320)])
-        #badgeImage = Image.open(f"media/images/Badge{place}.png")
-        badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{place}.png")
+        badgeImage = Image.open(f"media/images/Badge{place}.png")
+        #badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{place}.png")
         bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
 
         # bg.show()
@@ -291,6 +292,33 @@ class PodiumBuilder:
         buffer.seek(0)
 
         return discord.File(buffer, 'podium.png')   
+    
+
+
+    def getAmountOfPoses(self, user_id):
+        return 5 # TODO
+    
+
+
+    async def getAllPosesImage(self, user_id):
+        location = self.definedArt.get("poseLocation", "default/DefaultPose")
+        poses = [
+            # remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{i}.png")) # toDO
+            remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
+            for i in range(self.getAmountOfPoses(user_id))
+        ]
+        dst = get_concat_h_multi_blank(poses, 150)
+
+        # create buffer
+        buffer = io.BytesIO()
+
+        # save PNG in buffer
+        dst.save(buffer, format='PNG')    
+
+        # move to beginning of buffer so `send()` it will read from beginning
+        buffer.seek(0)
+
+        return discord.File(buffer, 'poses.png')   
     
 
 # concat multiple images

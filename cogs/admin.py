@@ -661,7 +661,6 @@ class ConfigureView(discord.ui.View):
         msg = await interaction.original_response()
         await msg.edit(embed=self.embed, view=self)
 
-    
 
     @discord.ui.button(label="Set default roles", emoji='📝', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -678,6 +677,17 @@ class ConfigureView(discord.ui.View):
                 self.bot,
                 autoroles
             )
+        )
+
+    
+    @discord.ui.button(label="Set Character Poses", emoji='👥', style=discord.ButtonStyle.blurple, disabled=False)
+    async def set_pose(self, interaction: discord.Interaction, button: discord.ui.Button):
+        builder = PodiumBuilder.PodiumBuilder(self.bot)
+        file = await builder.getAllPosesImage(self.user_id)
+        amountOfPoses = builder.getAmountOfPoses(self.user_id)
+        
+        await interaction.response.send_message(
+            files=[file]
         )
 
 
