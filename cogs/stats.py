@@ -38,7 +38,12 @@ class Stats(commands.Cog, name="stats"):
         """
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
+
+        secondMessage = await interaction.channel.send("** **")
+        
         await view.wait()
+
+        
 
         if view.chosen_command is None:
             raise TimeoutCommand('Timeout in /leaderboard')
@@ -79,10 +84,11 @@ class Stats(commands.Cog, name="stats"):
         else:
             command = f'/{view.chosen_command}'
         
-        file = await PodiumBuilder.PodiumBuilder(self.bot).getLeaderboard(leaderb, command)
+        files = await PodiumBuilder.PodiumBuilder(self.bot).getLeaderboard(leaderb, command)
 
         # embed = await self.get_leaderboard_embed(view.chosen_command)
-        await interaction.edit_original_response(attachments=[file], view=None, embed=None)
+        await interaction.edit_original_response(attachments=[files[0]], view=None, embed=None)
+        await secondMessage.edit(content="", attachments=[files[1]])
 
 
 

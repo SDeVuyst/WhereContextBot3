@@ -15,7 +15,7 @@ class PodiumBuilder:
             "334371900170043402": {
                 "podiumLocation": "arion/ArionPodium",
                 "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
+                    (300, 1050), (255, 1130), (255, 1320)
                 ],  
             },
             "273503117348306944": {
@@ -42,7 +42,7 @@ class PodiumBuilder:
             },
             "527916521754722315": {
                 "podiumLocation": "leander/LeanderPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (280, 1320)],  
             },
             "512256261459542019": {
                 "podiumLocation": "meng/MengPodium",
@@ -77,18 +77,19 @@ class PodiumBuilder:
             },
         }
 
+
+
     def userHasPodium(self, user_id):
         return str(user_id) in self.definedArt
+    
 
-    async def getLeaderboard(self, leaderboard, command):
-        # self.bot.logger.info(leaderboard)
 
+    async def getTopLeaderboard(self, leaderboard, command):
         #  load background
-        bg = Image.open('media/images/LeaderboardNoPod.png')
+        bg = Image.open('media/images/LeaderboardTop.png')
 
         # load fonts
-        fontm = ImageFont.truetype("media/fonts/contm.ttf", size=120)
-        fontb = ImageFont.truetype("media/fonts/contb.ttf", size=175)
+        fontb = ImageFont.truetype("media/fonts/contb.ttf", size=350)
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
@@ -100,45 +101,24 @@ class PodiumBuilder:
             
             # get user info
             user_id, count = tuple(stat)
-            user = await self.bot.fetch_user(int(user_id))
+
             # normalize count
             count = human_format(count)
             
             # is podium, save info for later
             if i < 3:       
                 podiums.append((user_id, count))
-            
-            # is text
-            else:
-                # profile picture
-                pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
-                pfp = pfp.resize((232, 232))
-                bg.paste(pfp, (525, 2250 + (i-3)*330))
-
-                # username
-                name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
-                draw.text(
-                    (1200, 2375 + (i-3)*330), 
-                    text=name, 
-                    align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
-                )
-                # count
-                draw.text(
-                    (1960, 2370 + (i-3)*330), 
-                    text=str(count), 
-                    align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
-                )
 
         # add podium
-        podiumImage = await self.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62))
-        podiumImage = resize_image(podiumImage, 2000)
+        podiumImage = await self.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
+        podiumImage = resize_image(podiumImage, 4500, 3500)
         remaining_width = bg.width - podiumImage.width
 
-        bg.paste(podiumImage, (remaining_width//2, 1850 - podiumImage.height))
+        bg.paste(podiumImage, (remaining_width//2, bg.height - podiumImage.height - 300))
 
-        # draw title
+        # draw title    
         draw.text(
-            (1285, 260),
+            (2550, 570),
             text=command,
             align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
         )
@@ -152,7 +132,72 @@ class PodiumBuilder:
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
-        return discord.File(buffer, 'leaderboard.png')
+        return discord.File(buffer, 'leaderboardtop.png')
+    
+
+    async def getBottomLeaderboard(self, leaderboard, command):
+        #  load background
+        bg = Image.open('media/images/LeaderboardBottom.png')
+
+        # load fonts
+        fontm = ImageFont.truetype("media/fonts/contm.ttf", size=120)
+
+        # create object for drawing
+        draw = ImageDraw.Draw(bg)
+
+        # add places 4-8
+        for i, stat in enumerate(leaderboard):
+            
+            # get user info
+            user_id, count = tuple(stat)
+            user = await self.bot.fetch_user(int(user_id))
+            # normalize count
+            count = human_format(count)
+            
+            # is podium, save info for later
+            if i < 3:       
+                continue
+            
+            # is text
+            else:
+                # profile picture
+                pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
+                pfp = pfp.resize((232, 232))
+                bg.paste(pfp, (525, 200 + (i-3)*330))
+
+                # username
+                name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
+                draw.text(
+                    (1200, 220 + (i-3)*330), 
+                    text=name, 
+                    align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
+                )
+                # count
+                draw.text(
+                    (1960, 220 + (i-3)*330), 
+                    text=str(count), 
+                    align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
+                )
+
+        # create buffer
+        buffer = io.BytesIO()
+
+        # save PNG in buffer
+        bg.save(buffer, format='PNG')    
+
+        # move to beginning of buffer so `send()` it will read from beginning
+        buffer.seek(0)
+
+        return discord.File(buffer, 'leaderboardbottom.png')
+    
+
+
+    async def getLeaderboard(self, leaderboard, command):
+
+        top = await self.getTopLeaderboard(leaderboard, command)
+        bottom = await self.getBottomLeaderboard(leaderboard, command)
+
+        return [top, bottom]
     
 
     async def getPodiumImage(self, user_id, place, alwaysShiny = False):
