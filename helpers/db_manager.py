@@ -916,3 +916,76 @@ async def get_autoroles(server_id, user_id):
             
     except Exception as err:
         return -1
+    
+
+
+async def set_poses(user_id, poses, place):
+    alreadyExists = await has_poses(user_id, place)
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE poses SET active_poses = %s WHERE user_id=%s AND place=%s", ((poses), str(user_id), int(place))
+                    )
+                else:
+                    cursor.execute(
+                        "INSERT INTO poses(active_poses, user_id, place) VALUES (%s, %s, %s)",
+                        (poses, str(user_id), int(place),)
+                    )
+                    
+                con.commit()
+                return True
+
+        except:
+            return False
+        
+
+async def has_poses(user_id, place) -> bool:
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM poses WHERE user_id=%s AND place=%s", (str(user_id), int(place),)
+                )
+                result = cursor.fetchall()
+                return len(result) > 0
+
+        except:
+            return False
+        
+
+async def get_poses(user_id, place):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT active_poses FROM poses WHERE user_id=%s AND place=%s", (str(user_id), int(place),)
+                )
+                return cursor.fetchone()
+            
+    except Exception as err:
+        return -1
+    
+
+async def remove_poses(user_id, place):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute("DELETE FROM poses WHERE user_id=%s AND place=%s", (str(user_id), int(place),))
+                con.commit()
+                return True
+            
+    except Exception as err:
+        return False

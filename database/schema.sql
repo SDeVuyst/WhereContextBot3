@@ -57,3 +57,10 @@ CREATE TABLE IF NOT EXISTS autoroles (
   user_id varchar(20) NOT NULL,
   roles varchar(20)[]
 );
+
+CREATE TABLE IF NOT EXISTS poses (
+  id SERIAL PRIMARY KEY,
+  user_id varchar(20) NOT NULL,
+  active_poses INTEGER[],
+  place INTEGER NOT NULL
+);

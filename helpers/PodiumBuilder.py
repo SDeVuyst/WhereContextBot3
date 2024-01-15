@@ -5,7 +5,7 @@ import io
 import requests
 import random
 
-# from helpers import db_manager
+from helpers import db_manager
 
 class PodiumBuilder:
     def __init__(self, bot) -> None:
@@ -69,9 +69,10 @@ class PodiumBuilder:
             },
             "462932133170774036": {
                 "podiumLocation": "silas/SolosPodium",
-                "poseLocation": "default/DefaultPose", # TODO testing
+                #"poseLocation": "default/DefaultPose", # TODO
+                #"amountOfCustomPoses": 5, #TODO
                 "badgePasteCoords": [
-                    (415, 1050), (255, 1130), (255, 1320)
+                    (415, 1050), (255, 1130), (255, 1320) # TODO 2 & 3
                 ],  
                 "poseOffset": [
                     (0, 100), (0, 200), (0, 340)
@@ -153,7 +154,7 @@ class PodiumBuilder:
                 )
 
         # add podium
-        podiumImage = self.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62))
+        podiumImage = await self.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62))
         podiumImage = resize_image(podiumImage, 2000)
         remaining_width = bg.width - podiumImage.width
 
@@ -252,8 +253,16 @@ class PodiumBuilder:
             podiumImage = await self.getPodiumImage(id, order[i], alwaysShiny)
 
             if add_characters: 
+
+                # get active pose and pick 1 at random
+                poses = await db_manager.get_poses(str(id), i+1)
+                if poses is not None:
+                    pose = random.choice([int(pose) for pose in poses[0]])
+                else:
+                    pose = random.randint(1, self.getAmountOfPoses(str(id)))
+
                 # add character
-                podiumImage = await self.addCharacterToPodium(podiumImage, str(id), 1, order[i]) # TODO pose picker
+                podiumImage = await self.addCharacterToPodium(podiumImage, str(id), pose, order[i])
 
             podiums.append(podiumImage)
 
@@ -300,14 +309,15 @@ class PodiumBuilder:
 
 
     def getAmountOfPoses(self, user_id):
-        return 5 # TODO
+        user_art = self.definedArt.get(str(user_id), {})
+        return user_art.get("amountOfCustomPoses", 5)
     
 
 
     async def getAllPosesImage(self, user_id):
         location = self.definedArt.get("poseLocation", "default/DefaultPose")
         poses = [
-            #remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{i+1}.png")) # toDO
+            #remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{i+1}.png"))
             remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
             for i in range(self.getAmountOfPoses(user_id))
         ]
@@ -328,8 +338,11 @@ class PodiumBuilder:
 
 # concat multiple images with overlap (only if all 3 podiums present)
 def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
+    # calculate padding
     padding = max(left_image.width, right_image.width)//3
+    padding = min(200, padding)
     
+    # create bg image with correct dimensions
     dst = Image.new(
         'RGBA', 
         (min(left_image.width, right_image.width) *3 + padding*2,
@@ -337,12 +350,14 @@ def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
         color
     )
 
+    # paste the podiums onto the bg
     pasteWidth = (dst.width - main_image.width)//2
     dst.paste(main_image, (pasteWidth, 0), main_image)
     dst.paste(left_image, (0, dst.height - left_image.height), left_image)
     dst.paste(right_image, (dst.width - right_image.width, dst.height - left_image.height), right_image)
     
     return dst
+
 
 # concat multiple images
 def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
@@ -351,6 +366,7 @@ def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
         _im = get_concat_h_blank(_im, im, padding, color)
     return _im
 
+
 # concat 2 images
 def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
     im1, im2 = remove_transparency(im1, color), remove_transparency(im2, color)
@@ -358,6 +374,7 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
     dst.paste(im1, (0, 0))
     dst.paste(im2, (im1.width + padding, 0))
     return dst
+
 
 def remove_transparency(im, color=(44, 45, 47)):
     im = im.convert("RGBA")

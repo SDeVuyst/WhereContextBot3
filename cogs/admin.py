@@ -685,8 +685,24 @@ class ConfigureView(discord.ui.View):
         builder = PodiumBuilder.PodiumBuilder(self.bot)
         file = await builder.getAllPosesImage(self.user_id)
         amountOfPoses = builder.getAmountOfPoses(self.user_id)
-        
+
+        # get previously selected poses
+        selectedPoses = []
+        for i in range(1, 4):
+            poses = await db_manager.get_poses(self.user_id, i)
+            if poses is not None:
+                poses = [int(pose) for pose in poses[0]]
+            else:
+                poses = []
+            selectedPoses.append(poses)
+
         await interaction.response.send_message(
+            view=PosesSelectView(
+                self.bot,
+                amountOfPoses,
+                selectedPoses,
+                interaction.guild.get_member(self.user_id), 
+            ),
             files=[file]
         )
 
@@ -816,6 +832,99 @@ class RolesSelect(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         self.roleView.selectedRoles = self.values
+        await interaction.response.defer()
+
+
+
+class PosesSelectView(discord.ui.View):
+    def __init__(self, bot, amountOfPoses, selectedPoses, user, timeout = 180):
+        self.bot = bot
+        self.amountOfPoses = amountOfPoses
+        self.selectedPoses = selectedPoses
+        self.user = user
+        
+        super().__init__(timeout=timeout)
+        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[0], user, 1))
+        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[1], user, 2))    
+        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[2], user, 3))        
+
+    # a cancel button
+    # will keep the message but remove the view and replace the text with "Cancelled"
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red, row=3, disabled=False, emoji="✖️")
+    async def close_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        embed = discord.Embed(
+            title=f"Cancelled!",
+            color=self.bot.defaultColor,
+        )
+        await interaction.response.edit_message(embed=embed, view=None, delete_after=10)
+
+
+    @discord.ui.button(label="Submit", style=discord.ButtonStyle.green, row=3, disabled=False, emoji='✅')
+    async def submit_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer in case processing the selected data takes a while
+        await interaction.response.defer()
+        
+        for place in range(1, 4):
+
+            poses = [int(i) for i in self.selectedPoses[place-1]]
+            if len(poses) > 0:
+                # save poses in db
+                succes = await db_manager.set_poses(
+                    self.user.id,
+                    poses,
+                    place
+                )
+            
+            else:
+                # user removed the active poses
+                succes = await db_manager.remove_poses(
+                    self.user.id,
+                    place
+                )
+
+            if not succes:
+                raise Exception("Could not save poses to db.")
+
+        embed = discord.Embed(
+            title=f"✅ Saved active poses!",
+            color=self.bot.succesColor,
+        )
+        
+        await interaction.edit_original_response(embed=embed, view=None)
+
+
+
+class PosesSelect(discord.ui.Select):
+    def __init__(self, view, bot, amountOfPoses, selectedPoses, user, place):
+        self.poseView = view
+        self.bot = bot
+        self.amountOfPoses = amountOfPoses
+        self.selectedPoses = selectedPoses
+        self.user = user
+        self.place = place
+
+        # generate the options
+        options = [
+            discord.SelectOption(
+                label=f"Pose {i+1}", default=i+1 in selectedPoses, value=i+1
+            ) for i in range(amountOfPoses)
+        ]
+
+        # readable format
+        places = ["1st", "2nd", "3rd"]
+
+        super().__init__(
+            placeholder=f"Select your active poses ({places[place-1]} Place)", 
+            max_values=amountOfPoses, 
+            min_values=0, 
+            options=options
+        )
+
+
+    async def callback(self, interaction: discord.Interaction):
+        # save the selected poses
+        poses = [1,0,2]
+        self.poseView.selectedPoses[poses[self.place-1]] = self.values
         await interaction.response.defer()
 
 
