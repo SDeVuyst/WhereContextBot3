@@ -300,7 +300,7 @@ async def on_raw_reaction_add(payload):
     field = '\u200b'
     for i in range(len(vals)):
         perc = 0 if total == 0 else vals[i]/total
-        field += f'**{emojis[i]}: {vals[i]} votes - {perc:.0%}**\n' # TODO
+        field += f'**{emojis[i]}: {vals[i]} votes - {perc:.0%}**\n'
     
     e.remove_field(index=1)
     e.add_field(

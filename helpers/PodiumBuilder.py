@@ -20,84 +20,60 @@ class PodiumBuilder:
             },
             "273503117348306944": {
                 "podiumLocation": "arno/ArnoPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "222415043550117888": {
                 "podiumLocation": "ba/BaPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "559715606014984195": {
                 "podiumLocation": "gible/GiblePodium",
                 "shinyPodiumLocation": "gible/ShinyGiblePodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "shinyPodiums": [1, 2, 3],
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "494508091283603462": {
                 "podiumLocation": "jacko/JackoPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "339820557086228490": {
                 "podiumLocation": "jakob/JakobPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "527916521754722315": {
                 "podiumLocation": "leander/LeanderPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "512256261459542019": {
                 "podiumLocation": "meng/MengPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "464400950702899211": {
                 "podiumLocation": "pingy/PingyPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "462932133170774036": {
                 "podiumLocation": "silas/SolosPodium",
                 #"poseLocation": "default/DefaultPose", # TODO
                 #"amountOfCustomPoses": 5, #TODO
-                "badgePasteCoords": [
-                    (415, 1050), (255, 1130), (255, 1320) # TODO 2 & 3
-                ],  
-                "poseOffset": [
-                    (0, 100), (0, 200), (0, 340)
-                ]
+                "badgePasteCoords": [(415, 1050), (255, 1130), (255, 1320)],   # TODO 2 & 3
+                "poseOffset": [(0, 100), (0, 200), (0, 340)]
             },
             "453136562885099531": {
                 "podiumLocation": "wouter/WouterPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "733845345225670686": {
                 "podiumLocation": "yachja/YachjaPodium",
-                "badgePasteCoords": [
-                    (1070, 1340), (320, 1130), (300, 1310)
-                ],
-                "poseOffset": [
-                    (0, 400), (0, 200), (0, 340)
-                ]
+                "shinyPodiumLocation": "yachja/ShinyYachjaPodium",
+                "shinyPodiums": [3],
+
+                "badgePasteCoords": [(1070, 1340), (320, 1130), (300, 1310)],
+                "poseOffset": [(0, 400), (0, 200), (0, 340)]
             },  
             "756527409876041859": {
                 "podiumLocation": "zeb/ZebPodium",
-                "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
         }
 
@@ -187,7 +163,7 @@ class PodiumBuilder:
         location = defined_art.get("podiumLocation", "default/DefaultPodium")
 
         # check if podium can be shiny and if it should be
-        if "shinyPodiumLocation" in defined_art and alwaysShiny:
+        if "shinyPodiumLocation" in defined_art and place in defined_art.get("shinyPodiums", []) and alwaysShiny:
             location = defined_art.get("shinyPodiumLocation")
         
         # load the selected image
@@ -269,9 +245,11 @@ class PodiumBuilder:
         
         # dm user if podium is shiny
         if alwaysShiny:
-            for user_id in user_ids:
-                if "shinyPodiumLocation" in self.definedArt.get(str(user_id), {}):
-                
+            for i, user_id in enumerate(user_ids):
+                defined_art = self.definedArt.get(str(user_id), {})
+                if "shinyPodiumLocation" in defined_art and order[i] in defined_art.get("shinyPodiums", []):
+                    
+                    # TODO uncomment
                     # await db_manager.increment_or_add_nword(int(user_id), 500)
 
                     embed = discord.Embed(
