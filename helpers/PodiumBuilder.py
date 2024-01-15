@@ -71,7 +71,7 @@ class PodiumBuilder:
                 "podiumLocation": "silas/SolosPodium",
                 "poseLocation": "default/DefaultPose", # TODO testing
                 "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
+                    (415, 1050), (255, 1130), (255, 1320)
                 ],  
                 "poseOffset": [
                     (0, 100), (0, 200), (0, 340)
@@ -86,8 +86,11 @@ class PodiumBuilder:
             "733845345225670686": {
                 "podiumLocation": "yachja/YachjaPodium",
                 "badgePasteCoords": [
-                    (255, 1050), (255, 1130), (255, 1320)
-                ],  
+                    (1070, 1340), (320, 1130), (300, 1310)
+                ],
+                "poseOffset": [
+                    (0, 400), (0, 200), (0, 340)
+                ]
             },  
             "756527409876041859": {
                 "podiumLocation": "zeb/ZebPodium",
@@ -188,10 +191,11 @@ class PodiumBuilder:
         
         # load the selected image
         image = Image.open(f'media/images/{location}{place}.png')
-
         #image = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{place}.png')
+        
         return image
     
+
     async def addCharacterToPodium(self, podiumImage, user_id, poseNumber, place):
         # get object that contains info about the arts done
         defined_art = self.definedArt.get(user_id, {})
@@ -206,7 +210,7 @@ class PodiumBuilder:
         characterImage = resize_image(characterImage, 700)
 
         # create empty bg to add podium and character to
-        bg = Image.new('RGB', (podiumImage.width, podiumImage.height + characterImage.height), (44, 45, 47))
+        bg = Image.new('RGBA', (podiumImage.width, podiumImage.height + characterImage.height))
         
         # paste podium
         bg.paste(podiumImage, (0, characterImage.height), podiumImage)
@@ -245,14 +249,11 @@ class PodiumBuilder:
         # for every available user (top 3)
         for i, id in enumerate(user_ids):
             # get podium
-            podiumImage = await self.getPodiumImage(id, order[i], alwaysShiny) 
-            
+            podiumImage = await self.getPodiumImage(id, order[i], alwaysShiny)
+
             if add_characters: 
                 # add character
                 podiumImage = await self.addCharacterToPodium(podiumImage, str(id), 1, order[i]) # TODO pose picker
-            
-            # fill empty background
-            podiumImage = remove_transparency(podiumImage, color)
 
             podiums.append(podiumImage)
 
@@ -275,8 +276,11 @@ class PodiumBuilder:
                     # await user.send(embed=embed)
 
 
-        # paste podiums on correct location # TODO fix yachja overlapping pod
-        dst = get_concat_h_multi_blank(podiums, padding, color=color)
+        # paste podiums on correct location
+        if len(podiums) == 3:
+            dst = get_concat(podiums[1], podiums[0], podiums[2], color=color)
+        else:
+            dst = get_concat_h_multi_blank(podiums, padding, color)
 
         # return as image if necessary
         if not return_file:
@@ -303,7 +307,7 @@ class PodiumBuilder:
     async def getAllPosesImage(self, user_id):
         location = self.definedArt.get("poseLocation", "default/DefaultPose")
         poses = [
-            # remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{i}.png")) # toDO
+            #remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{i+1}.png")) # toDO
             remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
             for i in range(self.getAmountOfPoses(user_id))
         ]
@@ -321,6 +325,25 @@ class PodiumBuilder:
         return discord.File(buffer, 'poses.png')   
     
 
+
+# concat multiple images with overlap (only if all 3 podiums present)
+def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
+    padding = max(left_image.width, right_image.width)//3
+    
+    dst = Image.new(
+        'RGBA', 
+        (min(left_image.width, right_image.width) *3 + padding*2,
+        max(left_image.height, main_image.height, right_image.height)),
+        color
+    )
+
+    pasteWidth = (dst.width - main_image.width)//2
+    dst.paste(main_image, (pasteWidth, 0), main_image)
+    dst.paste(left_image, (0, dst.height - left_image.height), left_image)
+    dst.paste(right_image, (dst.width - right_image.width, dst.height - left_image.height), right_image)
+    
+    return dst
+
 # concat multiple images
 def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
     _im = im_list.pop(0)
@@ -330,11 +353,11 @@ def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
 
 # concat 2 images
 def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
+    im1, im2 = remove_transparency(im1, color), remove_transparency(im2, color)
     dst = Image.new('RGB', (im1.width + im2.width + padding, im1.height), color)
     dst.paste(im1, (0, 0))
     dst.paste(im2, (im1.width + padding, 0))
     return dst
-
 
 def remove_transparency(im, color=(44, 45, 47)):
     im = im.convert("RGBA")
