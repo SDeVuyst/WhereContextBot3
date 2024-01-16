@@ -670,7 +670,15 @@ class ConfigureView(discord.ui.View):
         else:
             autoroles = []
 
+        embed = discord.Embed(
+            title="📝 Select your default roles",
+            description="""Please select which roles you want to have automatically added when you join this server.\n
+            Note that you can do this for every server WCB3 is in, and can only select roles lower than your current role.\n""",
+            color=self.bot.defaultColor
+        )
+
         await interaction.response.send_message(
+            embed=embed,
             view=RolesSelectView(
                 interaction.guild.get_member(self.user_id), 
                 await interaction.guild.fetch_roles(), 
@@ -696,7 +704,16 @@ class ConfigureView(discord.ui.View):
                 poses = []
             selectedPoses.append(poses)
 
+        embed = discord.Embed(
+            title="👥 Select your Poses",
+            description="""You can pick different poses for each position on your podium.\n
+            If you select multiple poses, one will be selected at random every time your podium is displayed.""",
+            color=self.bot.defaultColor
+        )
+        embed.set_image(url="attachment://poses.png")
+
         await interaction.response.send_message(
+            embed=embed,
             view=PosesSelectView(
                 self.bot,
                 amountOfPoses,
@@ -804,9 +821,10 @@ class RolesSelectView(discord.ui.View):
         for role in selected_roles:
             formatted_selected_roles += role.mention + '\n'
 
+        desc = f"Your new AutoRoles are now:\n{formatted_selected_roles}" if len(selected_roles) > 0 else "You don't have any autoroles set for this server."
         embed = discord.Embed(
             title=f"✅ Edited default Roles!",
-            description=f"Your new AutoRoles are now:\n{formatted_selected_roles}",
+            description=desc,
             color=self.bot.succesColor,
         )
         
@@ -856,7 +874,7 @@ class PosesSelectView(discord.ui.View):
             title=f"Cancelled!",
             color=self.bot.defaultColor,
         )
-        await interaction.response.edit_message(embed=embed, view=None, delete_after=10)
+        await interaction.response.edit_message(embed=embed, view=None, delete_after=10, attachments=[])
 
 
     @discord.ui.button(label="Submit", style=discord.ButtonStyle.green, row=3, disabled=False, emoji='✅')

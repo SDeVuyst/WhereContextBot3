@@ -39,7 +39,7 @@ class Stats(commands.Cog, name="stats"):
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
 
-        secondMessage = await interaction.channel.send("** **")
+        secondMessage = await interaction.channel.send('** **')
         
         await view.wait()
 
@@ -88,7 +88,7 @@ class Stats(commands.Cog, name="stats"):
 
         # embed = await self.get_leaderboard_embed(view.chosen_command)
         await interaction.edit_original_response(attachments=[files[0]], view=None, embed=None)
-        await secondMessage.edit(content="", attachments=[files[1]])
+        await secondMessage.add_files(files[1])
 
 
 
