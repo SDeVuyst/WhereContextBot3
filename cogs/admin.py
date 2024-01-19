@@ -514,6 +514,39 @@ class Admin(commands.Cog, name="admin"):
         await interaction.response.send_message(link)
 
 
+    @app_commands.command(name="ban", description="Ban someone", extras={'cog': 'admin'})
+    @app_commands.describe(user="Which user")
+    @app_commands.describe(reason="Reason for the ban")
+    @checks.not_blacklisted()
+    @commands.has_permissions(ban_members = True)
+    async def ban(self, interaction, user: discord.Member, reason: str) -> None:
+        """Ban someone
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user
+        """
+        # ban user
+        await user.ban(reason=reason)
+
+        # send ban message to user
+        banned_embed = discord.Embed(
+            title=f"🔨 You have been banned from {interaction.guild.name}!",
+            description=f"Reason: ```{reason}```",
+            color=self.bot.defaultColor,
+            timestamp=datetime.utcnow()
+        )
+        await user.send(embed=banned_embed)
+
+        # respond to interaction
+        embed = discord.Embed(
+            title=f"✅ Done!",
+            description=f"Cooked his ass",
+            color=self.bot.succesColor
+        )
+        await interaction.response.send_message(embed=embed)
+
+
 
     @app_commands.command(name="profile", description="See someones profile", extras={'cog': 'admin'})
     @checks.not_blacklisted()

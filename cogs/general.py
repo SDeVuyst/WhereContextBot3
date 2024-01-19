@@ -7,7 +7,6 @@ Version: 5.5.0
 """
 
 import os
-import openai
 import dateparser
 import re
 
@@ -22,8 +21,6 @@ from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
 from helpers import checks, db_manager
 
-
-openai.api_key = os.environ.get("OPENAI_SECRET")
 
 
 class General(commands.Cog, name="general"):
