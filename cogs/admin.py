@@ -22,7 +22,7 @@ class Admin(commands.Cog, name="admin"):
 
     conmand_cog_group = app_commands.Group(name="cog", description="Cog Group")
     blacklist_group = app_commands.Group(name="blacklist", description="Blacklist Group")
-    
+
 
 
     @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'admin'})
@@ -53,12 +53,12 @@ class Admin(commands.Cog, name="admin"):
 
         #update ncount
         await db_manager.increment_or_add_nword(interaction.user.id, -10)
-        
+
         # send response
         await interaction.followup.send(embed=embed)
 
 
-    
+
     @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'admin'})
     @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
     @checks.not_blacklisted()
@@ -159,7 +159,7 @@ class Admin(commands.Cog, name="admin"):
             )
             await interaction.followup.send(embed=embed)
             return
-        
+
         elif scope.value == "server":
 
             # context.bot.tree.copy_global_to(guild=context.guild)
@@ -172,7 +172,7 @@ class Admin(commands.Cog, name="admin"):
             )
             await interaction.followup.send(embed=embed)
             return
-        
+
         embed = discord.Embed(
             description="The scope must be `global` or `server`.", color=self.bot.errorColor
         )
@@ -200,7 +200,7 @@ class Admin(commands.Cog, name="admin"):
             self.bot.unloaded.discard(cog)
         except Exception:
             raise CogLoadError(cog, 0)
-        
+
         embed = discord.Embed(
             description=f"Successfully loaded the `{cog}` cog.", color=self.bot.succesColor
         )
@@ -252,7 +252,7 @@ class Admin(commands.Cog, name="admin"):
         """
         try:
             await self.bot.reload_extension(f"cogs.{cog}")
-        
+
         except Exception:
             raise CogLoadError(cog, 2)
 
@@ -275,7 +275,7 @@ class Admin(commands.Cog, name="admin"):
         Args:
             interaction (Interaction): users interaction
         """
-        
+
         embed = discord.Embed(
             title="Cog info",
             color=self.bot.defaultColor
@@ -311,7 +311,7 @@ class Admin(commands.Cog, name="admin"):
 
         # We shut down the bot, but heroku will automatically restart it.
         await self.bot.close()
-        
+
 
 
     @blacklist_group.command(
@@ -327,7 +327,7 @@ class Admin(commands.Cog, name="admin"):
             interaction (Interaction): Users Interaction
         """
         blacklisted_users = await db_manager.get_blacklisted_users()
-        
+
         # Geen blacklisted users
         if len(blacklisted_users) == 0:
             embed = discord.Embed(
@@ -335,7 +335,7 @@ class Admin(commands.Cog, name="admin"):
             )
             await interaction.response.send_message(embed=embed)
             return
-        
+
         # error
         elif blacklisted_users[0] == -1:
             raise Exception(blacklisted_users[1])
@@ -380,7 +380,7 @@ class Admin(commands.Cog, name="admin"):
         # error
         if total == -1:
             raise Exception("Kon geen verbinding maken met de databank.")
-        
+
         # alles oke
         embed = discord.Embed(
             description=f"**{user.name}** has been successfully added to the blacklist",
@@ -419,7 +419,7 @@ class Admin(commands.Cog, name="admin"):
         #error
         if total == -1:
             raise Exception('Kon geen verbinding maken met de databank.')
-        
+
         # alles ok
         embed = discord.Embed(
             description=f"**{user.name}** has been successfully removed from the blacklist",
@@ -460,7 +460,7 @@ class Admin(commands.Cog, name="admin"):
         await db_manager.increment_or_add_nword(interaction.user.id, -500)
 
 
-    
+
     @app_commands.command(
         name="nickname",
         description="Set the nickname of a user",
@@ -477,7 +477,7 @@ class Admin(commands.Cog, name="admin"):
             user (discord.User): Which user
             nickname (str): what nickname
         """
-        
+
         await user.edit(nick=nickname)
         embed = discord.Embed(
             title='✅ Done',
@@ -496,8 +496,8 @@ class Admin(commands.Cog, name="admin"):
         Args:
             interaction (Interaction): Users Interaction
         """
-        
-        
+
+
         guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         channel = await guild.fetch_channel(int(os.environ.get("CHANNEL")))
 
@@ -518,7 +518,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.describe(user="Which user")
     @app_commands.describe(reason="Reason for the ban")
     @checks.not_blacklisted()
-    @commands.has_permissions(ban_members = True)
+    @checks.is_owner()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
         """Ban someone
 
@@ -526,8 +526,6 @@ class Admin(commands.Cog, name="admin"):
             interaction (Interaction): Users Interaction
             user
         """
-        # ban user
-        await user.ban(reason=reason)
 
         # send ban message to user
         banned_embed = discord.Embed(
@@ -537,6 +535,9 @@ class Admin(commands.Cog, name="admin"):
             timestamp=datetime.utcnow()
         )
         await user.send(embed=banned_embed)
+
+        # ban user
+        await user.ban(reason=reason)
 
         # respond to interaction
         embed = discord.Embed(
@@ -578,7 +579,7 @@ class Admin(commands.Cog, name="admin"):
         )
 
         embed.set_author(
-            name=user.name, 
+            name=user.name,
             icon_url=str(user.avatar.url)
         )
 
@@ -631,7 +632,7 @@ class Admin(commands.Cog, name="admin"):
         if builder.userHasPodium(user.id):
             file = await builder.getAllPodiumsImage([user.id, user.id, user.id], padding=100, add_characters=False)
             embed.set_image(url="attachment://podium.png")
-        
+
             return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
 
         await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user.id))
@@ -664,7 +665,7 @@ class UnbanDropdown(discord.ui.Select):
         await interaction.response.defer()
 
 
-    
+
 class ConfigureView(discord.ui.View):
     def __init__(self, bot, embed, user_id):
         self.bot = bot
@@ -713,14 +714,14 @@ class ConfigureView(discord.ui.View):
         await interaction.response.send_message(
             embed=embed,
             view=RolesSelectView(
-                interaction.guild.get_member(self.user_id), 
-                await interaction.guild.fetch_roles(), 
+                interaction.guild.get_member(self.user_id),
+                await interaction.guild.fetch_roles(),
                 self.bot,
                 autoroles
             )
         )
 
-    
+
     @discord.ui.button(label="Set Character Poses", emoji='👥', style=discord.ButtonStyle.blurple, disabled=False)
     async def set_pose(self, interaction: discord.Interaction, button: discord.ui.Button):
         builder = PodiumBuilder.PodiumBuilder(self.bot)
@@ -751,7 +752,7 @@ class ConfigureView(discord.ui.View):
                 self.bot,
                 amountOfPoses,
                 selectedPoses,
-                interaction.guild.get_member(self.user_id), 
+                interaction.guild.get_member(self.user_id),
             ),
             files=[file]
         )
@@ -767,7 +768,7 @@ k
             bool
         """
         responses = [
-            f"<@{interaction.user.id}> shatap lil bro", 
+            f"<@{interaction.user.id}> shatap lil bro",
             f"<@{interaction.user.id}> you are NOT him",
             f"<@{interaction.user.id}> blud thinks he's funny",
             f"<@{interaction.user.id}> imma touch you lil nigga",
@@ -779,10 +780,10 @@ k
             if not is_possible:
                 await interaction.response.send_message(random.choice(responses))
             return is_possible
-        
+
         except:
             return False
-        
+
 
 
 class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
@@ -790,10 +791,10 @@ class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
     def __init__(self, configure_view):
         self.configure_view = configure_view
         super().__init__(timeout=None)
-    
+
     # nickname input
     answer = discord.ui.TextInput(
-        label='Nickname', 
+        label='Nickname',
         required=True,
         max_length=32
     )
@@ -818,9 +819,9 @@ class RolesSelectView(discord.ui.View):
         self.all_roles = all_roles
         self.bot = bot
         self.selectedRoles = None
-        
+
         super().__init__(timeout=timeout)
-        self.add_item(RolesSelect(user, all_roles, bot, self, autoroles))    
+        self.add_item(RolesSelect(user, all_roles, bot, self, autoroles))
 
     # a cancel button
     # will keep the message but remove the view and replace the text with "Cancelled"
@@ -848,7 +849,7 @@ class RolesSelectView(discord.ui.View):
 
         if not succes:
             raise Exception("Could not save roles to db.")
-        
+
         # create formatted string representing the selected roles
         formatted_selected_roles = ''
         for role in selected_roles:
@@ -860,7 +861,7 @@ class RolesSelectView(discord.ui.View):
             description=desc,
             color=self.bot.succesColor,
         )
-        
+
         await interaction.edit_original_response(embed=embed, view=None)
 
 
@@ -893,11 +894,11 @@ class PosesSelectView(discord.ui.View):
         self.amountOfPoses = amountOfPoses
         self.selectedPoses = selectedPoses
         self.user = user
-        
+
         super().__init__(timeout=timeout)
         self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[0], user, 1))
-        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[1], user, 2))    
-        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[2], user, 3))        
+        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[1], user, 2))
+        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[2], user, 3))
 
     # a cancel button
     # will keep the message but remove the view and replace the text with "Cancelled"
@@ -914,7 +915,7 @@ class PosesSelectView(discord.ui.View):
     async def submit_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer in case processing the selected data takes a while
         await interaction.response.defer()
-        
+
         for place in range(1, 4):
 
             poses = [int(i) for i in self.selectedPoses[place-1]]
@@ -925,7 +926,7 @@ class PosesSelectView(discord.ui.View):
                     poses,
                     place
                 )
-            
+
             else:
                 # user removed the active poses
                 succes = await db_manager.remove_poses(
@@ -940,7 +941,7 @@ class PosesSelectView(discord.ui.View):
             title=f"✅ Saved active poses!",
             color=self.bot.succesColor,
         )
-        
+
         await interaction.edit_original_response(embed=embed, view=None)
 
 
@@ -965,9 +966,9 @@ class PosesSelect(discord.ui.Select):
         places = ["1st", "2nd", "3rd"]
 
         super().__init__(
-            placeholder=f"Select your active poses ({places[place-1]} Place)", 
-            max_values=amountOfPoses, 
-            min_values=0, 
+            placeholder=f"Select your active poses ({places[place-1]} Place)",
+            max_values=amountOfPoses,
+            min_values=0,
             options=options
         )
 
