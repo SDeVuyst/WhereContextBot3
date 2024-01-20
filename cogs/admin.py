@@ -698,6 +698,8 @@ class ConfigureView(discord.ui.View):
 
     @discord.ui.button(label="Set default roles", emoji='📝', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+
         autoroles = await db_manager.get_autoroles(interaction.guild_id, self.user_id)
         if autoroles is not None:
             autoroles = [int(role_id) for role_id in autoroles[0]]
@@ -711,7 +713,7 @@ class ConfigureView(discord.ui.View):
             color=self.bot.defaultColor
         )
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=embed,
             view=RolesSelectView(
                 interaction.guild.get_member(self.user_id),
@@ -724,6 +726,9 @@ class ConfigureView(discord.ui.View):
 
     @discord.ui.button(label="Set Character Poses", emoji='👥', style=discord.ButtonStyle.blurple, disabled=False)
     async def set_pose(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        await interaction.response.defer()
+
         builder = PodiumBuilder.PodiumBuilder(self.bot)
         file = await builder.getAllPosesImage(self.user_id)
         amountOfPoses = builder.getAmountOfPoses(self.user_id)
@@ -746,7 +751,7 @@ class ConfigureView(discord.ui.View):
         )
         embed.set_image(url="attachment://poses.png")
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             embed=embed,
             view=PosesSelectView(
                 self.bot,

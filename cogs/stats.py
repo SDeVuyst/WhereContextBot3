@@ -84,11 +84,13 @@ class Stats(commands.Cog, name="stats"):
         else:
             command = f'/{view.chosen_command}'
         
-        files = await PodiumBuilder.PodiumBuilder(self.bot).getLeaderboard(leaderb, command)
+        builder = PodiumBuilder.PodiumBuilder(self.bot)
 
-        # embed = await self.get_leaderboard_embed(view.chosen_command)
-        await interaction.edit_original_response(attachments=[files[0]], view=None, embed=None)
-        await secondMessage.add_files(files[1])
+        top = await builder.getTopLeaderboard(leaderb, command)
+        await interaction.edit_original_response(attachments=[top], view=None, embed=None)
+
+        bottom = await builder.getBottomLeaderboard(leaderb, command)
+        await secondMessage.add_files(bottom)
 
 
 
@@ -255,15 +257,13 @@ class CommandView(View):
             choices (list): What has the user chosen
         """
         self.chosen_command = choices[0]
-        # self.children[0].disabled = True
-        # self.children[1].disabled= True
-        # self.children[1].placeholder = f"{self.chosen_command} - Loading..."
         embed = discord.Embed(
             title="⏳ Loading...",
-            description="This can take up to 10 seconds.",
+            description="This can take a while.",
             color=self.bot.defaultColor
         )
         await interaction.message.edit(view=None, embed=embed)
+
         await interaction.response.defer()
         self.stop()
 

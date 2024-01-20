@@ -326,7 +326,7 @@ async def get_nword_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, count FROM nword_counter ORDER BY count DESC LIMIT 8"
+                    "SELECT user_id, count FROM nword_counter ORDER BY count DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -464,7 +464,7 @@ async def get_leaderboard(command: str) -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, count FROM command_stats WHERE command=%s ORDER BY count DESC LIMIT 8", 
+                    "SELECT user_id, count FROM command_stats WHERE command=%s ORDER BY count DESC LIMIT 5", 
                     (command,)
                 )
                 return cursor.fetchall()
@@ -579,7 +579,7 @@ async def get_ban_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, count FROM user_bans ORDER BY count DESC LIMIT 8"
+                    "SELECT user_id, count FROM user_bans ORDER BY count DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             

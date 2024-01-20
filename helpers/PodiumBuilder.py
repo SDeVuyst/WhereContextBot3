@@ -30,7 +30,9 @@ class PodiumBuilder:
                 "podiumLocation": "gible/GiblePodium",
                 "shinyPodiumLocation": "gible/ShinyGiblePodium",
                 "shinyPodiums": [1, 2, 3],
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "poseLocation": "gible/GiblePose",
+                "amountOfCustomPoses": 5,
+                "badgePasteCoords": [(515, 1050), (480, 1130), (370, 1320)],  
             },
             "494508091283603462": {
                 "podiumLocation": "jacko/JackoPodium",
@@ -54,8 +56,6 @@ class PodiumBuilder:
             },
             "462932133170774036": {
                 "podiumLocation": "silas/SolosPodium",
-                #"poseLocation": "default/DefaultPose", # TODO
-                #"amountOfCustomPoses": 5, #TODO
                 "badgePasteCoords": [(415, 1050), (255, 1130), (255, 1320)],   # TODO 2 & 3
                 "poseOffset": [(0, 100), (0, 200), (0, 340)]
             },
@@ -89,14 +89,14 @@ class PodiumBuilder:
         bg = Image.open('media/images/LeaderboardTop.png')
 
         # load fonts
-        fontb = ImageFont.truetype("media/fonts/contb.ttf", size=350)
+        fontb = ImageFont.truetype("media/fonts/contb.ttf", size=150)
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
 
         podiums = []
 
-        # add places 1-9
+        # add places 1-5
         for i, stat in enumerate(leaderboard):
             
             # get user info
@@ -111,14 +111,14 @@ class PodiumBuilder:
 
         # add podium
         podiumImage = await self.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
-        podiumImage = resize_image(podiumImage, 4500, 3500)
+        podiumImage = resize_image(podiumImage, 2000, 1800)
         remaining_width = bg.width - podiumImage.width
 
-        bg.paste(podiumImage, (remaining_width//2, bg.height - podiumImage.height - 300))
-
+        bg.paste(podiumImage, (remaining_width//2, bg.height - podiumImage.height - 150))
+    
         # draw title    
         draw.text(
-            (2550, 570),
+            (1330, 240),
             text=command,
             align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
         )
@@ -154,30 +154,25 @@ class PodiumBuilder:
             # normalize count
             count = human_format(count)
             
-            # is podium, save info for later
-            if i < 3:       
-                continue
-            
-            # is text
-            else:
-                # profile picture
-                pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
-                pfp = pfp.resize((232, 232))
-                bg.paste(pfp, (525, 200 + (i-3)*330))
+            # profile picture
+            pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
+            pfp = pfp.resize((240, 240))
+            bg.paste(pfp, (550, 400 + i*3750))
 
-                # username
-                name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
-                draw.text(
-                    (1200, 220 + (i-3)*330), 
-                    text=name, 
-                    align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
-                )
-                # count
-                draw.text(
-                    (1960, 220 + (i-3)*330), 
-                    text=str(count), 
-                    align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
-                )
+            # username
+            name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
+            draw.text(
+                (1275, 350 + i*375), 
+                text=name, 
+                align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
+            )
+            # count
+            draw.text(
+                (2050, 350 + i*375), 
+                text=str(count), 
+                align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
+            )
+
 
         # create buffer
         buffer = io.BytesIO()
@@ -190,14 +185,6 @@ class PodiumBuilder:
 
         return discord.File(buffer, 'leaderboardbottom.png')
     
-
-
-    async def getLeaderboard(self, leaderboard, command):
-
-        top = await self.getTopLeaderboard(leaderboard, command)
-        bottom = await self.getBottomLeaderboard(leaderboard, command)
-
-        return [top, bottom]
     
 
     async def getPodiumImage(self, user_id, place, alwaysShiny = False):
@@ -223,7 +210,7 @@ class PodiumBuilder:
         defined_art = self.definedArt.get(user_id, {})
 
         # get location of the character
-        customCharacterLocation = defined_art.get("characterLocation", "default/DefaultPose")
+        customCharacterLocation = defined_art.get("poseLocation", "default/DefaultPose")
 
         # load the character image
         #characterImage = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{customCharacterLocation}{poseNumber}.png')
@@ -338,7 +325,8 @@ class PodiumBuilder:
 
 
     async def getAllPosesImage(self, user_id):
-        location = self.definedArt.get("poseLocation", "default/DefaultPose")
+        defined_art = self.definedArt.get(str(user_id), {})
+        location = defined_art.get("poseLocation", "default/DefaultPose")
         poses = [
             #remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{i+1}.png"))
             remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
@@ -346,11 +334,29 @@ class PodiumBuilder:
         ]
         dst = get_concat_h_multi_blank(poses, 150)
 
+        # add poses to bg image
+        bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
+        bg.paste(dst, (0,0))
+
+        draw = ImageDraw.Draw(bg)
+        font = ImageFont.truetype("media/fonts/contb.ttf", size=200)
+
+        offsetPerPose = int(bg.width / (len(poses)+1))
+        yPaste = int(dst.height + (bg.height - dst.height) // 2)
+
+        # add numbering of poses
+        for i in range(len(poses)+1):
+            draw.text(
+                (450+(offsetPerPose*i), yPaste),
+                text=str(i+1),
+                align='center', font=font, anchor='mm', fill=(255, 104, 1)
+            )
+
         # create buffer
         buffer = io.BytesIO()
 
         # save PNG in buffer
-        dst.save(buffer, format='PNG')    
+        bg.save(buffer, format='PNG')    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
@@ -362,8 +368,7 @@ class PodiumBuilder:
 # concat multiple images with overlap (only if all 3 podiums present)
 def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
     # calculate padding
-    padding = max(left_image.width, right_image.width)//3
-    padding = min(200, padding)
+    padding = max(left_image.width, right_image.width, main_image.width)//3
     
     # create bg image with correct dimensions
     dst = Image.new(
