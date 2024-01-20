@@ -5,7 +5,7 @@ import io
 import requests
 import random
 
-from helpers import db_manager
+# from helpers import db_manager
 
 class PodiumBuilder:
     def __init__(self, bot) -> None:
@@ -14,17 +14,14 @@ class PodiumBuilder:
         self.definedArt = {
             "334371900170043402": {
                 "podiumLocation": "arion/ArionPodium",
-                "badgePasteCoords": [
-                    (300, 1050), (255, 1130), (255, 1320)
-                ],  
+                "badgePasteCoords": [(300, 1050), (340, 1130), (290, 1320)],  
             },
             "273503117348306944": {
                 "podiumLocation": "arno/ArnoPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
             },
             "222415043550117888": {
                 "podiumLocation": "ba/BaPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
             },
             "559715606014984195": {
                 "podiumLocation": "gible/GiblePodium",
@@ -32,36 +29,36 @@ class PodiumBuilder:
                 "shinyPodiums": [1, 2, 3],
                 "poseLocation": "gible/GiblePose",
                 "amountOfCustomPoses": 5,
-                "badgePasteCoords": [(515, 1050), (480, 1130), (370, 1320)],  
+                "badgePasteCoords": [(515, 1050), (370, 1130), (330, 1320)],  
             },
             "494508091283603462": {
                 "podiumLocation": "jacko/JackoPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
             },
             "339820557086228490": {
                 "podiumLocation": "jakob/JakobPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(295, 1050), (300, 1130), (295, 1320)],
             },
             "527916521754722315": {
                 "podiumLocation": "leander/LeanderPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (280, 1320)],  
+                "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
             },
             "512256261459542019": {
                 "podiumLocation": "meng/MengPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(295, 1050), (300, 1130), (295, 1320)],
             },
             "464400950702899211": {
                 "podiumLocation": "pingy/PingyPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(340, 1050), (350, 1130), (295, 1320)],
             },
             "462932133170774036": {
                 "podiumLocation": "silas/SolosPodium",
-                "badgePasteCoords": [(415, 1050), (255, 1130), (255, 1320)],   # TODO 2 & 3
-                "poseOffset": [(0, 100), (0, 200), (0, 340)]
+                "badgePasteCoords": [(415, 1050), (420, 1130), (420, 1315)],
+                "poseOffset": [(20, 100), (20, 220), (40, 400)]
             },
             "453136562885099531": {
                 "podiumLocation": "wouter/WouterPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "badgePasteCoords": [(365, 1050), (350, 1130), (295, 1320)],  
             },
             "733845345225670686": {
                 "podiumLocation": "yachja/YachjaPodium",
@@ -72,8 +69,8 @@ class PodiumBuilder:
                 "poseOffset": [(0, 400), (0, 200), (0, 340)]
             },  
             "756527409876041859": {
-                "podiumLocation": "zeb/ZebPodium",
-                "badgePasteCoords": [(255, 1050), (255, 1130), (255, 1320)],  
+                "podiumLocation": "zeb/ZebPodium", 
+                "badgePasteCoords": [(290, 1050), (300, 1130), (295, 1320)],
             },
         }
 
@@ -157,18 +154,18 @@ class PodiumBuilder:
             # profile picture
             pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
             pfp = pfp.resize((240, 240))
-            bg.paste(pfp, (550, 400 + i*3750))
+            bg.paste(pfp, (550, 400 + i*350))
 
             # username
             name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
             draw.text(
-                (1275, 350 + i*375), 
+                (1275, 400 + i*350), 
                 text=name, 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
             # count
             draw.text(
-                (2050, 350 + i*375), 
+                (2050, 350 + i*350), 
                 text=str(count), 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
@@ -199,8 +196,8 @@ class PodiumBuilder:
             location = defined_art.get("shinyPodiumLocation")
         
         # load the selected image
-        image = Image.open(f'media/images/{location}{place}.png')
-        #image = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{place}.png')
+        #image = Image.open(f'media/images/{location}{place}.png')
+        image = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{place}.png')
         
         return image
     
@@ -213,8 +210,8 @@ class PodiumBuilder:
         customCharacterLocation = defined_art.get("poseLocation", "default/DefaultPose")
 
         # load the character image
-        #characterImage = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{customCharacterLocation}{poseNumber}.png')
-        characterImage = Image.open(f'media/images/{customCharacterLocation}{poseNumber}.png')
+        characterImage = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{customCharacterLocation}{poseNumber}.png')
+        #characterImage = Image.open(f'media/images/{customCharacterLocation}{poseNumber}.png')
         # resize it
         characterImage = resize_image(characterImage, 700)
 
@@ -234,8 +231,8 @@ class PodiumBuilder:
 
         # paste badge to fix 3d realness of character standing on podium
         pasteCoords = defined_art.get("badgePasteCoords", [(255, 1050), (255, 1130), (255, 1320)])
-        badgeImage = Image.open(f"media/images/Badge{place}.png")
-        #badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{place}.png")
+        #badgeImage = Image.open(f"media/images/Badge{place}.png")
+        badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{place}.png")
         bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
 
         # bg.show()
@@ -263,7 +260,8 @@ class PodiumBuilder:
             if add_characters: 
 
                 # get active pose and pick 1 at random
-                poses = await db_manager.get_poses(str(id), i+1)
+                # poses = await db_manager.get_poses(str(id), i+1)
+                poses = None # TODO FIX
                 if poses is not None:
                     pose = random.choice([int(pose) for pose in poses[0]])
                 else:
@@ -328,7 +326,6 @@ class PodiumBuilder:
         defined_art = self.definedArt.get(str(user_id), {})
         location = defined_art.get("poseLocation", "default/DefaultPose")
         poses = [
-            #remove_transparency(Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{i+1}.png"))
             remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
             for i in range(self.getAmountOfPoses(user_id))
         ]
@@ -368,7 +365,7 @@ class PodiumBuilder:
 # concat multiple images with overlap (only if all 3 podiums present)
 def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
     # calculate padding
-    padding = max(left_image.width, right_image.width, main_image.width)//3
+    padding = min(main_image.width//3, 220)
     
     # create bg image with correct dimensions
     dst = Image.new(
