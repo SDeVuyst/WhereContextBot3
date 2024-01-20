@@ -28,7 +28,7 @@ class Stats(commands.Cog, name="stats"):
             extras={'cog': 'stats'}
     )
     @checks.not_blacklisted()
-    @checks.is_owner()
+    @checks.is_owner() # TODO remove
     @app_commands.checks.cooldown(rate=1, per=10)
     async def leaderboard(self,interaction):
         """Shows the leaderboard for a command
