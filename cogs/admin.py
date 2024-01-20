@@ -472,7 +472,7 @@ class Admin(commands.Cog, name="admin"):
             await user.send(embed=banned_embed)
 
             # ban user
-            await user.ban(reason=reason)
+            await user.ban(reason=reason, delete_message_days=0)
 
             # respond to interaction
             await interaction.followup.send(embed=doneBanEmbed)
@@ -742,7 +742,7 @@ class BanView(discord.ui.View):
             await interaction.followup.send(embed=self.doneBanEmbed)
 
             # ban user
-            await self.user.ban(reason=self.reason)
+            await self.user.ban(reason=self.reason, delete_message_days=0)
 
 
     @discord.ui.button(label="Remove Vote", style=discord.ButtonStyle.blurple)
