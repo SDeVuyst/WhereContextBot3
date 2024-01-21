@@ -49,7 +49,7 @@ async def autoroles(bot, member):
         # zeb
         756527409876041859: ["titanfood", "degeneratevandejaar", "cringe", "notcultured", "fakonepiece", "spooderman", "genshin", "waifubot", "retarded", "minecraft"],
         # lendar
-        527916521754722315: ["mongwongs", "meng", "cummaster", "cultured", "perms", "gent", "waifubot", "minecraft"],
+        # 527916521754722315: ["mongwongs", "meng", "cummaster", "cultured", "perms", "gent", "waifubot", "minecraft"],
         # xander
         548544519793016861: ["titanfood", "cultured", "gent", "waifubot", "minecraft"],
         # gible
