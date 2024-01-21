@@ -368,6 +368,8 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.command(name="ban", description="Ban someone", extras={'cog': 'admin'})
     @app_commands.describe(user="Which user")
     @app_commands.describe(reason="Reason for the ban")
+    @app_commands.checks.cooldown(rate=1, per=100)
+    @checks.not_in_dm()
     @checks.not_blacklisted()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
         """Ban someone
@@ -377,6 +379,14 @@ class Admin(commands.Cog, name="admin"):
             user
         """
         await interaction.response.defer()
+
+        # cant ban a bot
+        if user.bot:
+            notBotEmbed = discord.Embed(
+                title="❌ You can't ban a bot!",
+                color=self.bot.errorColor
+            )
+            return await interaction.followup.send(embed=notBotEmbed)
 
         banNumberTreshold = 3 # TODO determine amounts of votes needed
 
@@ -437,7 +447,7 @@ class Admin(commands.Cog, name="admin"):
         extras={'cog': 'admin'}
     )
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=2, per=3600)
+    @app_commands.checks.cooldown(rate=2, per=300)
     @checks.cost_nword(500)
     async def unban(self, interaction) -> None:
         """Unban a user
