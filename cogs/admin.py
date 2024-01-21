@@ -14,7 +14,7 @@ from discord.ext import commands
 from helpers import checks, db_manager
 from discord.ext.commands import has_permissions
 from datetime import datetime
-from exceptions import CogLoadError
+
 
 
 class Admin(commands.Cog, name="admin"):
