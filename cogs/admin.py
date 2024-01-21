@@ -416,6 +416,11 @@ class Admin(commands.Cog, name="admin"):
             ableToBan = True
 
         if ableToBan:
+            
+            banned_embed.add_field(
+                name="Banned by",
+                value=self.bot.get_user(interaction.user.id).mention
+            )
             # send ban message to user
             await user.send(embed=banned_embed)
 
@@ -423,21 +428,21 @@ class Admin(commands.Cog, name="admin"):
             await user.ban(reason=reason, delete_message_days=0)
 
             # respond to interaction
-            await interaction.followup.send(embed=doneBanEmbed)
+            return await interaction.followup.send(embed=doneBanEmbed)
 
-        else:
-            # respond to interaction
-            voteEmbed = discord.Embed(
-                title=f"🔨 Vote to ban {user.display_name}",
-                description=f"This vote succeeds at {banNumberTreshold} votes in favour of banning.\n You have 5 minutes to vote.",
-                color=self.bot.defaultColor
-            )
 
-            voteEmbed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+        # respond to interaction
+        voteEmbed = discord.Embed(
+            title=f"🔨 Vote to ban {user.display_name}",
+            description=f"This vote succeeds at {banNumberTreshold} votes in favour of banning.\n You have 5 minutes to vote.",
+            color=self.bot.defaultColor
+        )
 
-            voteEmbed.add_field(name="Current votes", value=f"```1/{banNumberTreshold}```")
+        voteEmbed.add_field(name="Reason", value=f"```{reason}```", inline=False)
 
-            await interaction.followup.send(embed=voteEmbed, view=BanView(self.bot, interaction.user.id, user, banNumberTreshold, reason, doneBanEmbed, voteEmbed))
+        voteEmbed.add_field(name="Current votes", value=f"```1/{banNumberTreshold}```")
+
+        await interaction.followup.send(embed=voteEmbed, view=BanView(self.bot, interaction.user.id, user, banNumberTreshold, reason, doneBanEmbed, voteEmbed))
 
 
 
