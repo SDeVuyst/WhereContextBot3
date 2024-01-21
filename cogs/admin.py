@@ -467,6 +467,11 @@ class Admin(commands.Cog, name="admin"):
         # check if user is able to ban, if yes, continue
         # if not, launch vote
         ableToBan = interaction.user.top_role >= user.top_role
+
+        # owner should always be able to ban user
+        if str(interaction.user.id) == list(os.environ.get("OWNERS").split(","))[0]:
+            ableToBan = True
+            
         if ableToBan:
             # send ban message to user
             await user.send(embed=banned_embed)
