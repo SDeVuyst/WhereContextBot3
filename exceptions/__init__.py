@@ -39,18 +39,6 @@ class WrongChannel(app_commands.CheckFailure):
         super().__init__(self.message)
 
 
-class MissingNwords(app_commands.CheckFailure):
-    """
-    Thrown when a user is attempting something, but has too little nwords.
-    """
-
-    def __init__(self, usercount: int, required:int):
-        self.usercount = usercount
-        self.required = required
-        self.message = f"You need {required} N-words to use this command, but you only have {usercount}."
-        super().__init__(self.message)
-
-
 class UserNotInVC(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but is not in a voice channel

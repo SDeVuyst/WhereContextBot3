@@ -47,9 +47,6 @@ class Stats(commands.Cog, name="stats"):
 
         if view.chosen_command is None:
             raise TimeoutCommand('Timeout in /leaderboard')
-        
-        elif view.chosen_command == "ncountCHECK":
-            leaderb = await db_manager.get_nword_leaderboard()
 
         elif view.chosen_command == "bancount":
             leaderb = await db_manager.get_ban_leaderboard()
@@ -74,10 +71,8 @@ class Stats(commands.Cog, name="stats"):
                 color=self.bot.errorColor
             )
             return await interaction.edit_original_response(embed=embed, view=None)
-        
-        if view.chosen_command == "ncountCHECK":
-            command = "N-words said"  
-        elif view.chosen_command == "danae":
+         
+        if view.chosen_command == "danae":
             command = "danae trigger"
         elif view.chosen_command == "keleo":
             command = "keleo trigger"
@@ -140,9 +135,7 @@ class Stats(commands.Cog, name="stats"):
         Returns:
             Embed
         """
-        if command == "ncountCHECK":
-            count = await db_manager.get_nword_count(userid)
-        elif command == "bancount":
+        if command == "bancount":
             count = await db_manager.get_ban_count(userid)
         else:
             # krijg count bericht uit db
@@ -151,9 +144,7 @@ class Stats(commands.Cog, name="stats"):
         
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
-            if command == "ncountCHECK":
-                desc = f"😌 **<@{userid}> has not said the nword yet."
-            elif command == "bancount":
+            if command == "bancount":
                 desc = f"🔨 **<@{userid}> has not been banned yet.**"
             elif command == "danae":
                 desc = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
@@ -181,8 +172,6 @@ class Stats(commands.Cog, name="stats"):
             desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
         elif command == "messages_deleted":
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
-        elif command == "ncountCHECK":
-            desc = f"**<@{userid}> said the n-word ```{count[0][0]}``` times.**"
         elif command == "danae":
             desc = f"**<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
         elif command == "keleo":
@@ -284,7 +273,6 @@ class CommandSelect(Select):
             commands.append(("Messages Deleted", "Remove"))
         
         elif selected_cog == "stats":
-            commands.insert(0, ("N-Words said", "ncountCHECK"))
             commands.insert(0, ("Bans", "bancount"))
             commands.insert(0, ("Danae trigger", "danae"))
             commands.insert(0, ("Keleo trigger", "keleo"))

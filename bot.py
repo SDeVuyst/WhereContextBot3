@@ -493,14 +493,6 @@ async def on_tree_error(interaction, error):
             color=bot.errorColor,
         )
 
-    elif isinstance(error, exceptions.MissingNwords):
-        embed = discord.Embed(
-            title="🪙 You don't have enough N-words!",
-            # We need to capitalize because the command arguments have no capital letter in the code.
-            description=str(error).capitalize(),
-            color=bot.errorColor,
-        )
-
     elif isinstance(error, exceptions.UserNotInVC):
         embed = discord.Embed(
             title=f"🔇 You are not in a voice channel",

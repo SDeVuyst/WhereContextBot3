@@ -292,11 +292,10 @@ class PodiumBuilder:
                 if "shinyPodiumLocation" in defined_art and order[i] in defined_art.get("shinyPodiums", []):
                     
                     # TODO uncomment
-                    # await db_manager.increment_or_add_nword(int(user_id), 500)
 
                     embed = discord.Embed(
                         title='🎉 Congratulations!',
-                        description=f"A shiny version of your podium has been pulled! You have been awarded 500 n-words.",
+                        description=f"A shiny version of your podium has been pulled!",
                         color=self.bot.succesColor,
                     )
 

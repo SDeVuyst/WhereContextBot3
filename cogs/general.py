@@ -146,7 +146,6 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=1, per=20)
     @checks.not_in_dm()
-    @checks.cost_nword(3)
     @app_commands.describe(user="What user to DM")
     @app_commands.describe(content="What to DM to the user")
     async def dm(self, interaction, user: discord.User, content: str) -> None:
@@ -165,9 +164,6 @@ class General(commands.Cog, name="general"):
         owner = int(list(os.environ.get("OWNERS").split(","))[0])
         admin = await self.bot.fetch_user(owner)
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -3)
         
         # stuur confirmatie
         await interaction.response.send_message(content="✅ done.", ephemeral=True)
@@ -226,7 +222,6 @@ class General(commands.Cog, name="general"):
     @app_commands.command(name="impersonate", description="Send a message diguised as a user (10🪙)", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @checks.cost_nword(10)
     @app_commands.describe(user="Who to impersonate")
     @app_commands.describe(message="What to say")
     async def impersonate(self, interaction, user: discord.User, message: str) -> None:
@@ -252,8 +247,6 @@ class General(commands.Cog, name="general"):
             color=self.bot.succesColor
         )
 
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -10)
         # stuur het antwoord
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

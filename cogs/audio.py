@@ -59,7 +59,6 @@ class Audio(commands.Cog, name="audio"):
     @checks.not_in_dm()
     @checks.user_in_vc()
     @checks.bot_in_vc()
-    @checks.cost_nword(5)
     @app_commands.describe(effect="Which effect to play")
     async def soundboard(self, interaction, effect: discord.app_commands.Choice[str]):
         """ Play a soundboard effect in vc
@@ -68,40 +67,27 @@ class Audio(commands.Cog, name="audio"):
             interaction (Interaction): Users interaction
             effect (discord.app_commands.Choice[str]): Which effect to play
         """
-        try:
-            vc = interaction.guild.voice_client
-            # pauzeer reeds spelende audio
-            if vc.is_playing():
-                vc.pause()
+        vc = interaction.guild.voice_client
+        # pauzeer reeds spelende audio
+        if vc.is_playing():
+            vc.pause()
 
-            # speel soundboard af
-            vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
-                after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
-            )
-            
-            # resume de vorige spelende audio
-            if vc.is_paused():
-                vc.resume()
-            
-            # confirmatie 
-            embed = discord.Embed(
-                title=f"📻 played {effect.name}!",
-                color=self.bot.succesColor
-            )
+        # speel soundboard af
+        vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
+            after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
+        )
+        
+        # resume de vorige spelende audio
+        if vc.is_paused():
+            vc.resume()
+        
+        # confirmatie 
+        embed = discord.Embed(
+            title=f"📻 played {effect.name}!",
+            color=self.bot.succesColor
+        )
 
-            #update ncount
-            await db_manager.increment_or_add_nword(interaction.user.id, -5)
-
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-
-        # error
-        except Exception as e:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=e,
-                color=self.bot.errorColor
-            )
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 

@@ -29,7 +29,6 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.checks.cooldown(rate=1, per=300) # 1 per 5 minutes
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @checks.cost_nword(10)
     @app_commands.describe(status="What do you want the status of the bot to be")
     async def status(self, interaction, status: app_commands.Range[str, 1, 50]) -> None:
         """Set the status of the bot
@@ -51,9 +50,6 @@ class Admin(commands.Cog, name="admin"):
             color=self.bot.succesColor
         )
 
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -10)
-
         # send response
         await interaction.followup.send(embed=embed)
 
@@ -63,7 +59,6 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @checks.cost_nword(125)
     @app_commands.describe(user="Who to block")
     async def anti_gif(self, interaction, user: discord.User) -> None:
         """Prevent a user from using gifs for 1 hour
@@ -85,9 +80,6 @@ class Admin(commands.Cog, name="admin"):
             description=f"<@{user.id}> is now banned from using gifs.",
             color=self.bot.succesColor
         )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -125)
 
         # stuur het antwoord
         await interaction.followup.send(embed=embed)
@@ -530,7 +522,6 @@ class Admin(commands.Cog, name="admin"):
     )
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=2, per=300)
-    @checks.cost_nword(250)
     async def unban(self, interaction) -> None:
         """Unban a user
 
@@ -546,11 +537,6 @@ class Admin(commands.Cog, name="admin"):
                 description=f"No banned users..", color=self.bot.defaultColor
             )
             await interaction.response.send_message(embed=embed)
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -250)
-
-
 
     @app_commands.command(
         name="nickname",
@@ -647,13 +633,6 @@ class Admin(commands.Cog, name="admin"):
             name="📛 Default Nickname",
             value="```None```" if nick in [-1, None] else f"```{nick[0]}```",
             inline=False
-        )
-
-        ncount = await db_manager.get_nword_count(user.id)
-        embed.add_field(
-            name="🥷🏿 N-Count",
-            value=f"```{normalizeCount(ncount)}```",
-            inline=True
         )
 
         bancount = await db_manager.get_ban_count(user.id)
