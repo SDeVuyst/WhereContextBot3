@@ -610,6 +610,7 @@ class Admin(commands.Cog, name="admin"):
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=1, per=10)
     @app_commands.describe(user="Which user")
+    @checks.not_in_dm()
     @checks.is_owner() # TODO remove
     async def profile(self, interaction, user: discord.User=None) -> None:
         """View someones bot profile
@@ -657,7 +658,7 @@ class Admin(commands.Cog, name="admin"):
 
         bancount = await db_manager.get_ban_count(user.id)
         embed.add_field(
-            name="🔨 Amount of Bans",
+            name="🔨 Bans",
             value=f"```{normalizeCount(bancount)}```",
             inline=True
         )

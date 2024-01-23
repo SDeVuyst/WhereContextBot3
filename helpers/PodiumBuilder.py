@@ -11,6 +11,17 @@ class PodiumBuilder:
     def __init__(self, bot) -> None:
         self.bot = bot
 
+        # possible keys:
+        #   <required> podiumLocation - location of the podiums
+        #   shinyPodiumLocation - location of shiny podiums
+        #   shinyPodiums - which podiums can be shiny
+        #   poseLocation - location of custom poses
+        #   poseOffset - offset in coords for poses
+        #   amountOfCustomPoses - amount of custom poses
+        #   allPosesLocation - location of prerendered image of all the poses together to speed things up
+        #   badgePasteCoords - coords of where on the podium the 1/2/3 badge should be pasted
+        
+        
         self.definedArt = {
             "334371900170043402": {
                 "podiumLocation": "arion/ArionPodium",
@@ -30,6 +41,7 @@ class PodiumBuilder:
                 "shinyPodiumLocation": "gible/ShinyGiblePodium",
                 "shinyPodiums": [1, 2, 3],
                 "poseLocation": "gible/GiblePose",
+                "allPosesLocation": "gible/GibleAllPoses",
                 "amountOfCustomPoses": 5,
                 "badgePasteCoords": [(515, 1050), (370, 1130), (330, 1320)],  
             },
@@ -66,7 +78,6 @@ class PodiumBuilder:
                 "podiumLocation": "yachja/YachjaPodium",
                 "shinyPodiumLocation": "yachja/ShinyYachjaPodium",
                 "shinyPodiums": [3],
-
                 "badgePasteCoords": [(1070, 1340), (320, 1130), (300, 1310)],
                 "poseOffset": [(0, 400), (0, 200), (0, 340)]
             },  
@@ -233,8 +244,8 @@ class PodiumBuilder:
 
         # paste badge to fix 3d realness of character standing on podium
         pasteCoords = defined_art.get("badgePasteCoords", [(255, 1050), (255, 1130), (255, 1320)])
-        badgeImage = Image.open(f"media/images/Badge{place}.png")
-        #badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/Badge{place}.png")
+        badgeImage = Image.open(f"media/images/badges/Badge{place}.png")
+        #badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/badges/Badge{place}.png")
         bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
 
         # bg.show()
@@ -325,6 +336,22 @@ class PodiumBuilder:
 
     async def getAllPosesImage(self, user_id):
         defined_art = self.definedArt.get(str(user_id), {})
+
+        # prerenderd of default all poses
+        if defined_art == {}:
+            return discord.File(
+                "media/images/default/DefaultAllPoses.png",
+                'poses.png'
+            ) 
+        
+        # prerendered of custom all poses
+        if "allPosesLocation" in defined_art:
+            return discord.File(
+                f"media/images/{defined_art.get('allPosesLocation')}.png",
+                'poses.png'
+            ) 
+        
+        # not prerendered, create it
         location = defined_art.get("poseLocation", "default/DefaultPose")
         poses = [
             remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
