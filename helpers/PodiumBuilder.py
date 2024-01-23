@@ -14,6 +14,8 @@ class PodiumBuilder:
         self.definedArt = {
             "334371900170043402": {
                 "podiumLocation": "arion/ArionPodium",
+                "poseLocation": "arion/ArionPose",
+                "amountOfCustomPoses": 10,
                 "badgePasteCoords": [(300, 1050), (340, 1130), (290, 1320)],  
             },
             "273503117348306944": {
@@ -328,37 +330,91 @@ class PodiumBuilder:
             remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
             for i in range(self.getAmountOfPoses(user_id))
         ]
-        dst = get_concat_h_multi_blank(poses, 150)
 
-        # add poses to bg image
-        bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
-        bg.paste(dst, (0,0))
+        # build poses in groups of 5
+        i = 0
+        poses_dst = []
+        while len(poses) >= 5:
+            poses_to_build = poses[:5]
+            poses = poses[5:]
 
-        draw = ImageDraw.Draw(bg)
-        font = ImageFont.truetype("media/fonts/contb.ttf", size=200)
+            # build 5 poses image
+            dst = get_concat_h_multi_blank(poses_to_build, 150)
+            bg = add_numbering_to_poses(dst, i, 5)
+            
+            poses_dst.append(bg)
 
-        offsetPerPose = int(bg.width / (len(poses)+1)) + 450
-        yPaste = int(dst.height + (bg.height - dst.height) // 2)
+            i += 5
 
-        # add numbering of poses
-        for i in range(len(poses)+1):
-            draw.text(
-                (offsetPerPose*i, yPaste),
-                text=str(i+1),
-                align='center', font=font, anchor='mm', fill=(255, 104, 1)
-            )
+        # leftover poses
+        if len(poses) > 0:
+            dst = get_concat_h_multi_blank(poses, 150)
+            bg = add_numbering_to_poses(dst, i, len(poses))
+            
+            poses_dst.append(bg)
+
+        # add the images together vertically
+        total = vertical_concat_multi(poses_dst)
 
         # create buffer
         buffer = io.BytesIO()
 
         # save PNG in buffer
-        bg.save(buffer, format='PNG')    
+        total.save(buffer, format='PNG')    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
         return discord.File(buffer, 'poses.png')   
     
+
+
+def add_numbering_to_poses(dst, startNumber, numberOfPoses):
+    # add poses to bg image
+    bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
+    bg.paste(dst, (0,0))
+
+    draw = ImageDraw.Draw(bg)
+    font = ImageFont.truetype("media/fonts/contb.ttf", size=200)
+
+    offsetPerPose = int(bg.width / numberOfPoses)
+    yPaste = int(dst.height + (bg.height - dst.height) // 2)
+
+    # add numbering of poses
+    for i, number in enumerate(range(startNumber, startNumber+numberOfPoses)):
+        draw.text(
+            (450 + offsetPerPose*i, yPaste),
+            text=str(number+1),
+            align='center', font=font, anchor='mm', fill=(255, 104, 1)
+        )
+
+    return bg
+
+
+
+def vertical_concat_multi(images):
+    _im = images.pop(0)
+    for im in images:
+        _im = vertical_concat(_im, im)
+    return _im  
+
+
+
+def vertical_concat(im1, im2):
+    width1, height1 = im1.size
+    width2, height2 = im2.size
+
+    # Create a new image with the combined width and the height of the tallest image
+    new_width = max(width1, width2)
+    new_height = height1 + height2
+    new_image = Image.new("RGB", (new_width, new_height), (44, 45, 47))
+
+    # Paste the two images onto the new image
+    new_image.paste(im1, (0, 0))
+    new_image.paste(im2, (0, height1))
+
+    return new_image
+
 
 
 # concat multiple images with overlap (only if all 3 podiums present)
@@ -383,12 +439,14 @@ def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
     return dst
 
 
+
 # concat multiple images
 def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
     _im = im_list.pop(0)
     for im in im_list:
         _im = get_concat_h_blank(_im, im, padding, color)
     return _im
+
 
 
 # concat 2 images
@@ -400,12 +458,14 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
     return dst
 
 
+
 def remove_transparency(im, color=(44, 45, 47)):
     im = im.convert("RGBA")
     new_image = Image.new("RGBA", im.size, color)
     new_image.paste(im, mask=im)
 
     return new_image.convert("RGB")
+
 
 
 def resize_image(im, width, max_height=1000):
@@ -419,6 +479,7 @@ def resize_image(im, width, max_height=1000):
         width = int((float(im.size[0]) * float(hpercent)))
 
     return im.resize((width, hsize), Image.Resampling.LANCZOS)
+
 
 
 # get number in human format
