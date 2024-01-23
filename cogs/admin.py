@@ -25,7 +25,7 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'admin'})
+    @app_commands.command(name="status", description="Set the status of the bot for 1 hour", extras={'cog': 'admin'})
     @app_commands.checks.cooldown(rate=1, per=300) # 1 per 5 minutes
     @checks.not_blacklisted()
     @checks.not_in_dm()
@@ -55,7 +55,7 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'admin'})
+    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour", extras={'cog': 'admin'})
     @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
     @checks.not_blacklisted()
     @checks.not_in_dm()
@@ -517,7 +517,7 @@ class Admin(commands.Cog, name="admin"):
 
     @app_commands.command(
         name="unban",
-        description="Unban a user (250🪙)",
+        description="Unban a user",
         extras={'cog': 'admin'}
     )
     @checks.not_blacklisted()

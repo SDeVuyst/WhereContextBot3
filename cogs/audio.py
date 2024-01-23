@@ -40,7 +40,7 @@ class Audio(commands.Cog, name="audio"):
 
 
 
-    @app_commands.command(name="soundboard", description="Play effect from soundboard (5🪙)", extras={'cog': 'audio'})
+    @app_commands.command(name="soundboard", description="Play effect from soundboard", extras={'cog': 'audio'})
     @app_commands.choices(effect=[
         discord.app_commands.Choice(name="hentai Xander", value="hentai.mp3"),
         discord.app_commands.Choice(name="alexa... shut the fuck up", value="alexa.mp3"),

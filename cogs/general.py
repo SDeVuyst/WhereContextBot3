@@ -78,12 +78,6 @@ class General(commands.Cog, name="general"):
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
                 data.append("Rechtermuisklik -> Apps -> Remove Context - Remove message")
             
-            elif c == "general":
-                embed.add_field(
-                    name = "🪙 N-Word Cost",
-                    value="Sommige commands kosten N-Words, bv. voor een command dat 2 N-Words kost, staat er (2🪙) bij de beschrijving",
-                    inline=False
-                )
 
             help_text = "\n".join(data)
             if len(help_text) > 0:
@@ -142,7 +136,7 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="dm", description="let the bot DM a user (3🪙)", extras={'cog': 'general'})
+    @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @app_commands.checks.cooldown(rate=1, per=20)
     @checks.not_in_dm()
@@ -219,7 +213,7 @@ class General(commands.Cog, name="general"):
         await interaction.response.send_message(embed=embed)
 
 
-    @app_commands.command(name="impersonate", description="Send a message diguised as a user (10🪙)", extras={'cog': 'general'})
+    @app_commands.command(name="impersonate", description="Send a message diguised as a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @app_commands.describe(user="Who to impersonate")
