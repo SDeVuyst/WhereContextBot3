@@ -821,6 +821,12 @@ class ConfigureView(discord.ui.View):
         self.nickname = 'None'
         self.user_id = int(user_id)
 
+        self.waitingEmbed = discord.Embed(
+            title="⏳ Loading...",
+            description="This can take a while.",
+            color=bot.defaultColor
+        )
+
         super().__init__(timeout=500)
 
 
@@ -848,6 +854,8 @@ class ConfigureView(discord.ui.View):
     async def add_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
 
+        waiting_message = await interaction.followup.send(embed=self.waitingEmbed)
+
         autoroles = await db_manager.get_autoroles(interaction.guild_id, self.user_id)
         if autoroles is not None:
             autoroles = [int(role_id) for role_id in autoroles[0]]
@@ -864,7 +872,7 @@ class ConfigureView(discord.ui.View):
         all_roles = await interaction.guild.fetch_roles()
         all_roles = list(filter(lambda r: not r.is_bot_managed(), all_roles))
 
-        await interaction.followup.send(
+        await waiting_message.edit(
             embed=embed,
             view=RolesSelectView(
                 interaction.guild.get_member(self.user_id),
@@ -880,12 +888,16 @@ class ConfigureView(discord.ui.View):
 
         await interaction.response.defer()
 
+        waiting_message = await interaction.followup.send(embed=self.waitingEmbed)
+
         builder = PodiumBuilder.PodiumBuilder(self.bot)
         file = await builder.getAllPosesImage(self.user_id)
         amountOfPoses = builder.getAmountOfPoses(self.user_id)
 
         # get previously selected poses
         selectedPoses = []
+
+        # 1, 2, 3
         for i in range(1, 4):
             poses = await db_manager.get_poses(self.user_id, i)
             if poses is not None:
@@ -902,7 +914,7 @@ class ConfigureView(discord.ui.View):
         )
         embed.set_image(url="attachment://poses.png")
 
-        await interaction.followup.send(
+        await waiting_message.edit(
             embed=embed,
             view=PosesSelectView(
                 self.bot,
@@ -910,7 +922,7 @@ class ConfigureView(discord.ui.View):
                 selectedPoses,
                 interaction.guild.get_member(self.user_id),
             ),
-            files=[file]
+            attachments=[file]
         )
 
 
