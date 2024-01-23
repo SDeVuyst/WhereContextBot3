@@ -455,7 +455,15 @@ class Admin(commands.Cog, name="admin"):
             )
             return await interaction.followup.send(embed=notBotEmbed)
 
+        # check if user is server owner
+        if user.id == interaction.guild.owner_id:
+            notOwnerEmbed = discord.Embed(
+                title="❌ You can't ban the server owner!",
+                color=self.bot.errorColor
+            )
+            return await interaction.followup.send(embed=notOwnerEmbed)
 
+        
         banNumberTreshold = 3 # TODO determine amounts of votes needed
 
         banned_embed = discord.Embed(
