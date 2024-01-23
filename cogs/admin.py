@@ -881,11 +881,14 @@ class ConfigureView(discord.ui.View):
             color=self.bot.defaultColor
         )
 
+        all_roles = await interaction.guild.fetch_roles()
+        all_roles = list(filter(lambda r: not r.is_bot_managed(), all_roles))
+
         await interaction.followup.send(
             embed=embed,
             view=RolesSelectView(
                 interaction.guild.get_member(self.user_id),
-                await interaction.guild.fetch_roles(),
+                all_roles,
                 self.bot,
                 autoroles
             )
@@ -1046,6 +1049,7 @@ class RolesSelect(discord.ui.Select):
 
         # get available roles for the user
         highest_role = discord.utils.find(lambda role: role in all_roles, reversed(user.roles))
+        # Mong role the highest autorole
         available_roles = [role for role in all_roles if role <= highest_role]
         available_roles = list(filter(lambda r: r.name != '@everyone', available_roles))
 
