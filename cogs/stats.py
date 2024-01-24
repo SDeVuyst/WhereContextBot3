@@ -79,12 +79,12 @@ class Stats(commands.Cog, name="stats"):
         else:
             command = f'/{view.chosen_command}'
         
-        builder = ArtBuilder.PodiumBuilder(self.bot)
+        builder = ArtBuilder.LeaderboardBuilder(self.bot)
 
         top = await builder.getTopLeaderboard(leaderb, command)
         await interaction.edit_original_response(attachments=[top], view=None, embed=None)
 
-        bottom = await builder.getBottomLeaderboard(leaderb, command)
+        bottom = await builder.getBottomLeaderboard(leaderb)
         await secondMessage.add_files(bottom)
 
 

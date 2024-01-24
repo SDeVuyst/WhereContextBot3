@@ -1111,7 +1111,7 @@ class PosesSelectView(discord.ui.View):
             color=self.bot.succesColor,
         )
 
-        await interaction.edit_original_response(embed=embed, view=None)
+        await interaction.edit_original_response(embed=embed, view=None, attachments=None)
 
 
 

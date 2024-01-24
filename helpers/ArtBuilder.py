@@ -7,6 +7,8 @@ import random
 
 from helpers import db_manager
 
+#BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/'
+BASE_LOCATION = ''
 
 class LeaderboardBuilder:
     def __init__(self, bot) -> None:
@@ -18,10 +20,11 @@ class LeaderboardBuilder:
 
     async def getTopLeaderboard(self, leaderboard, command):
         #  load background
-        bg = Image.open('media/images/LeaderboardTop.png')
+        bg = Image.open(BASE_LOCATION + 'media/images/LeaderboardTop.png')
+        bg = bg.convert('RGBA')
 
         # load fonts
-        fontb = ImageFont.truetype("media/fonts/contb.ttf", size=150)
+        fontb = ImageFont.truetype(BASE_LOCATION + "media/fonts/contb.ttf", size=150)
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
@@ -46,7 +49,7 @@ class LeaderboardBuilder:
         podiumImage = resize_image(podiumImage, 2000, 1800)
         remaining_width = bg.width - podiumImage.width
 
-        bg.paste(podiumImage, (remaining_width//2, bg.height - podiumImage.height - 150))
+        bg.paste(podiumImage, (remaining_width//2, bg.height - podiumImage.height - 150), podiumImage)
     
         # draw title    
         draw.text(
@@ -68,12 +71,12 @@ class LeaderboardBuilder:
     
 
 
-    async def getBottomLeaderboard(self, leaderboard, command):
+    async def getBottomLeaderboard(self, leaderboard):
         #  load background
-        bg = Image.open('media/images/LeaderboardBottom.png')
+        bg = Image.open(BASE_LOCATION + 'media/images/LeaderboardBottom.png')
 
         # load fonts
-        fontm = ImageFont.truetype("media/fonts/contm.ttf", size=120)
+        fontm = ImageFont.truetype(BASE_LOCATION + "media/fonts/contm.ttf", size=120)
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
@@ -90,18 +93,18 @@ class LeaderboardBuilder:
             # profile picture
             pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
             pfp = pfp.resize((240, 240))
-            bg.paste(pfp, (550, 400 + i*350))
+            bg.paste(pfp, (530, 330 + i*340))
 
             # username
             name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
             draw.text(
-                (1275, 400 + i*350), 
+                (1275, 420 + i*340), 
                 text=name, 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
             # count
             draw.text(
-                (2050, 350 + i*350), 
+                (2050, 440 + i*340), 
                 text=str(count), 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
@@ -187,8 +190,8 @@ class CharacterBuilder:
         customCharacterLocation = defined_art.get("poseLocation", "default/DefaultPose")
 
         # load the character image
-        #characterImage = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{customCharacterLocation}{poseNumber}.png')
-        characterImage = Image.open(f'media/images/{customCharacterLocation}{poseNumber}.png')
+        characterImage = Image.open(f'{BASE_LOCATION}media/images/{customCharacterLocation}{poseNumber}.png')
+        
         # resize it
         characterImage = resize_image(characterImage, 700)
 
@@ -208,8 +211,7 @@ class CharacterBuilder:
 
         # paste badge to fix 3d realness of character standing on podium
         pasteCoords = defined_art.get("badgePasteCoords", [(255, 1050), (255, 1130), (255, 1320)])
-        badgeImage = Image.open(f"media/images/badges/Badge{place}.png")
-        #badgeImage = Image.open(f"C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/badges/Badge{place}.png")
+        badgeImage = Image.open(f"{BASE_LOCATION}media/images/badges/Badge{place}.png")
         bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
 
         return bg
@@ -228,21 +230,21 @@ class CharacterBuilder:
         # prerenderd of default all poses
         if defined_art == {}:
             return discord.File(
-                "media/images/default/DefaultAllPoses.png",
+                BASE_LOCATION + "media/images/default/DefaultAllPoses.png",
                 'poses.png'
             ) 
         
         # prerendered of custom all poses
         if "posesPreRender" in defined_art:
             return discord.File(
-                f"media/images/{defined_art.get('posesPreRender')}.png",
+                f"{BASE_LOCATION}media/images/{defined_art.get('posesPreRender')}.png",
                 'poses.png'
             ) 
         
         # not prerendered, create it
         location = defined_art.get("poseLocation", "default/DefaultPose")
         poses = [
-            remove_transparency(Image.open(f"media/images/{location}{i+1}.png"))
+            remove_transparency(Image.open(f"{BASE_LOCATION}media/images/{location}{i+1}.png"))
             for i in range(self.getAmountOfPoses(user_id))
         ]
 
@@ -290,7 +292,7 @@ class CharacterBuilder:
         bg.paste(dst, (0,0))
 
         draw = ImageDraw.Draw(bg)
-        font = ImageFont.truetype("media/fonts/contb.ttf", size=200)
+        font = ImageFont.truetype(BASE_LOCATION + "media/fonts/contb.ttf", size=200)
 
         offsetPerPose = int(bg.width / numberOfPoses)
         yPaste = int(dst.height + (bg.height - dst.height) // 2)
@@ -383,8 +385,7 @@ class PodiumBuilder:
             location = defined_art.get("shinyPodiumLocation")
         
         # load the selected image
-        image = Image.open(f'media/images/{location}{place}.png')
-        #image = Image.open(f'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/{location}{place}.png')
+        image = Image.open(f'{BASE_LOCATION}media/images/{location}{place}.png')
         
         return image
     
@@ -444,7 +445,7 @@ class PodiumBuilder:
 
         # paste podiums on correct location
         if len(podiums) == 3:
-            dst = get_concat(podiums[1], podiums[0], podiums[2], color=color)
+            dst = get_concat(podiums[1], podiums[0], podiums[2])
         else:
             dst = get_concat_h_multi_blank(podiums, padding, color)
 
@@ -493,7 +494,7 @@ def vertical_concat(im1, im2):
 
 
 # concat multiple images with overlap (only if all 3 podiums present)
-def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
+def get_concat(main_image, left_image, right_image):
     # calculate padding
     padding = min(main_image.width//3, 220)
     
@@ -501,8 +502,7 @@ def get_concat(main_image, left_image, right_image, color=(44, 45, 47)):
     dst = Image.new(
         'RGBA', 
         (min(left_image.width, right_image.width) *3 + padding*2,
-        max(left_image.height, main_image.height, right_image.height)),
-        color
+        max(left_image.height, main_image.height, right_image.height))
     )
 
     # paste the podiums onto the bg
@@ -526,8 +526,8 @@ def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
 
 # concat 2 images
 def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
-    im1, im2 = remove_transparency(im1, color), remove_transparency(im2, color)
-    dst = Image.new('RGB', (im1.width + im2.width + padding, im1.height), color)
+    # im1, im2 = remove_transparency(im1, color), remove_transparency(im2, color)
+    dst = Image.new('RGBA', (im1.width + im2.width + padding, im1.height), color)
     dst.paste(im1, (0, 0))
     dst.paste(im2, (im1.width + padding, 0))
     return dst
@@ -543,7 +543,7 @@ def remove_transparency(im, color=(44, 45, 47)):
 
 
 
-def resize_image(im, width, max_height=1000):
+def resize_image(im, width, max_height=1000, color=(44, 45, 47)):
     wpercent = (width / float(im.size[0]))
     hsize = int((float(im.size[1]) * float(wpercent)))
 
