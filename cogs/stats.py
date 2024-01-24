@@ -13,7 +13,7 @@ from discord.ext import commands
 from discord.interactions import Interaction
 from discord.ui import Select, View
 
-from helpers import checks, db_manager, PodiumBuilder
+from helpers import ArtBuilder, checks, db_manager
 from exceptions import TimeoutCommand
 
 
@@ -79,7 +79,7 @@ class Stats(commands.Cog, name="stats"):
         else:
             command = f'/{view.chosen_command}'
         
-        builder = PodiumBuilder.PodiumBuilder(self.bot)
+        builder = ArtBuilder.PodiumBuilder(self.bot)
 
         top = await builder.getTopLeaderboard(leaderb, command)
         await interaction.edit_original_response(attachments=[top], view=None, embed=None)

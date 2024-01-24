@@ -11,7 +11,7 @@ import os
 import random
 from discord import app_commands
 from discord.ext import commands
-from helpers import checks, db_manager, PodiumBuilder
+from helpers import ArtBuilder, checks, db_manager
 from discord.ext.commands import has_permissions
 from datetime import datetime
 from exceptions import CogLoadError
@@ -666,7 +666,7 @@ class Admin(commands.Cog, name="admin"):
         )
 
         # show podiums if user has one
-        builder = PodiumBuilder.PodiumBuilder(self.bot)
+        builder = ArtBuilder.PodiumBuilder(self.bot)
         if builder.userHasPodium(user.id):
             file = await builder.getAllPodiumsImage([user.id, user.id, user.id], padding=100, add_characters=False)
             embed.set_image(url="attachment://podium.png")
@@ -890,7 +890,7 @@ class ConfigureView(discord.ui.View):
 
         waiting_message = await interaction.followup.send(embed=self.waitingEmbed)
 
-        builder = PodiumBuilder.PodiumBuilder(self.bot)
+        builder = ArtBuilder.CharacterBuilder(self.bot)
         file = await builder.getAllPosesImage(self.user_id)
         amountOfPoses = builder.getAmountOfPoses(self.user_id)
 
