@@ -53,7 +53,7 @@ class LeaderboardBuilder:
     
         # draw title    
         draw.text(
-            (1330, 240),
+            (1330, 245),
             text=command,
             align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
         )
@@ -162,6 +162,8 @@ class CharacterBuilder:
                 "badgePasteCoords": [(295, 1050), (300, 1130), (295, 1320)],
             },
             "464400950702899211": {
+                "poseLocation": "pingy/PingyPose",
+                "amountOfCustomPoses": 5,
                 "badgePasteCoords": [(340, 1050), (350, 1130), (295, 1320)],
             },
             "462932133170774036": {
