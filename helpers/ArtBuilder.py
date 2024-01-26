@@ -2,13 +2,14 @@ from PIL import Image, ImageDraw, ImageFont
 
 import discord
 import io
+import os
 import requests
 import random
 
 from helpers import db_manager
 
-#BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/'
-BASE_LOCATION = ''
+#BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
+BASE_LOCATION = 'media/images/'
 
 class LeaderboardBuilder:
     def __init__(self, bot) -> None:
@@ -20,7 +21,7 @@ class LeaderboardBuilder:
 
     async def getTopLeaderboard(self, leaderboard, command):
         #  load background
-        bg = Image.open(BASE_LOCATION + 'media/images/LeaderboardTop.png')
+        bg = Image.open(BASE_LOCATION + 'LeaderboardTop.png')
         bg = bg.convert('RGBA')
 
         # load fonts
@@ -73,7 +74,7 @@ class LeaderboardBuilder:
 
     async def getBottomLeaderboard(self, leaderboard):
         #  load background
-        bg = Image.open(BASE_LOCATION + 'media/images/LeaderboardBottom.png')
+        bg = Image.open(BASE_LOCATION + 'LeaderboardBottom.png')
 
         # load fonts
         fontm = ImageFont.truetype(BASE_LOCATION + "media/fonts/contm.ttf", size=120)
@@ -128,25 +129,17 @@ class CharacterBuilder:
         self.bot = bot
 
         # possible keys:
-        #   <required> poseLocation - location of custom poses
         #   poseOffset - offset in coords for poses
-        #   amountOfCustomPoses - amount of custom poses
-        #   posesPreRender - location of prerendered image of all the poses together to speed things up
         #   badgePasteCoords - coords of where on the podium the 1/2/3 badge should be pasted
-      
+        # TODO deze gegevens wegkrijgen (metadata?)
         self.definedArt = {
             "334371900170043402": {
-                "poseLocation": "arion/ArionPose",
-                "amountOfCustomPoses": 10,
                 "badgePasteCoords": [(300, 1050), (340, 1130), (290, 1320)],  
             },
             "273503117348306944": {
                 "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
             },
             "559715606014984195": {
-                "poseLocation": "gible/GiblePose",
-                "posesPreRender": "gible/GibleAllPoses",
-                "amountOfCustomPoses": 5,
                 "badgePasteCoords": [(515, 1050), (370, 1130), (330, 1320)],  
             },
             "494508091283603462": {
@@ -162,8 +155,6 @@ class CharacterBuilder:
                 "badgePasteCoords": [(295, 1050), (300, 1130), (295, 1320)],
             },
             "464400950702899211": {
-                "poseLocation": "pingy/PingyPose",
-                "amountOfCustomPoses": 5,
                 "badgePasteCoords": [(340, 1050), (350, 1130), (295, 1320)],
             },
             "462932133170774036": {
@@ -189,10 +180,13 @@ class CharacterBuilder:
         defined_art = self.definedArt.get(user_id, {})
 
         # get location of the character
-        customCharacterLocation = defined_art.get("poseLocation", "default/DefaultPose")
+        if os.path.exists(self.getPoseLocation(user_id, poseNumber)):
+            customCharacterLocation = f"{BASE_LOCATION}{str(user_id)}/Pose{poseNumber}.png"
+        else:
+            customCharacterLocation = f"{BASE_LOCATION}default/Pose{poseNumber}.png"
 
         # load the character image
-        characterImage = Image.open(f'{BASE_LOCATION}media/images/{customCharacterLocation}{poseNumber}.png')
+        characterImage = Image.open(customCharacterLocation)
         
         # resize it
         characterImage = resize_image(characterImage, 700)
@@ -213,7 +207,7 @@ class CharacterBuilder:
 
         # paste badge to fix 3d realness of character standing on podium
         pasteCoords = defined_art.get("badgePasteCoords", [(255, 1050), (255, 1130), (255, 1320)])
-        badgeImage = Image.open(f"{BASE_LOCATION}media/images/badges/Badge{place}.png")
+        badgeImage = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
         bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
 
         return bg
@@ -221,32 +215,37 @@ class CharacterBuilder:
 
 
     def getAmountOfPoses(self, user_id):
-        user_art = self.definedArt.get(str(user_id), {})
-        return user_art.get("amountOfCustomPoses", 5)
+        # user does not have custom pose, so default 5 poses
+        if not self.hasCustomPoses(user_id, 1):
+            return 5
+        
+        i = 2 # start at 2 since we already checked pose 1
+        while self.hasCustomPoses(user_id, i):
+            i+=1
+
+        return i-1
     
 
 
     async def getAllPosesImage(self, user_id):
-        defined_art = self.definedArt.get(str(user_id), {})
 
         # prerenderd of default all poses
-        if defined_art == {}:
+        if not self.hasCustomPoses(user_id, 1):
             return discord.File(
-                BASE_LOCATION + "media/images/default/DefaultAllPoses.png",
+                BASE_LOCATION + "default/AllPoses.png",
                 'poses.png'
             ) 
         
         # prerendered of custom all poses
-        if "posesPreRender" in defined_art:
+        if self.hasPreRenderOfPoses(user_id):
             return discord.File(
-                f"{BASE_LOCATION}media/images/{defined_art.get('posesPreRender')}.png",
-                'poses.png'
-            ) 
+                f"{BASE_LOCATION}{str(user_id)}/AllPoses.png",
+                "poses.png"
+            )
         
         # not prerendered, create it
-        location = defined_art.get("poseLocation", "default/DefaultPose")
         poses = [
-            remove_transparency(Image.open(f"{BASE_LOCATION}media/images/{location}{i+1}.png"))
+            remove_transparency(Image.open(self.getPoseLocation(user_id, i+1)))
             for i in range(self.getAmountOfPoses(user_id))
         ]
 
@@ -288,13 +287,27 @@ class CharacterBuilder:
     
     
 
+    def hasCustomPoses(self, user_id, place):
+        return os.path.exists(self.getPoseLocation(user_id, place))
+
+
+
+    def getPoseLocation(self, user_id, place):
+        return f"{BASE_LOCATION}{str(user_id)}/Pose{place}.png"
+
+
+    def hasPreRenderOfPoses(self, user_id):
+        return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/AllPoses.png")
+    
+
+
     def add_numbering_to_poses(self, dst, startNumber, numberOfPoses):
         # add poses to bg image
         bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
         bg.paste(dst, (0,0))
 
         draw = ImageDraw.Draw(bg)
-        font = ImageFont.truetype(BASE_LOCATION + "media/fonts/contb.ttf", size=200)
+        font = ImageFont.truetype("media/fonts/contb.ttf", size=200)
 
         offsetPerPose = int(bg.width / numberOfPoses)
         yPaste = int(dst.height + (bg.height - dst.height) // 2)
@@ -317,77 +330,31 @@ class PodiumBuilder:
 
         self.characterBuilder = CharacterBuilder(bot)
 
-        # possible keys:
-        #   <required> podiumLocation - location of the podiums
-        #   shinyPodiumLocation - location of shiny podiums
-        #   shinyPodiums - which podiums can be shiny
-        
-        self.definedArt = {
-            "334371900170043402": {
-                "podiumLocation": "arion/ArionPodium",
-            },
-            "273503117348306944": {
-                "podiumLocation": "arno/ArnoPodium",
-            },
-            "222415043550117888": {
-                "podiumLocation": "ba/BaPodium",
-            },
-            "559715606014984195": {
-                "podiumLocation": "gible/GiblePodium",
-                "shinyPodiumLocation": "gible/ShinyGiblePodium",
-                "shinyPodiums": [1, 2, 3],
-            },
-            "494508091283603462": {
-                "podiumLocation": "jacko/JackoPodium",
-            },
-            "339820557086228490": {
-                "podiumLocation": "jakob/JakobPodium",
-            },
-            "527916521754722315": {
-                "podiumLocation": "leander/LeanderPodium",
-            },
-            "512256261459542019": {
-                "podiumLocation": "meng/MengPodium",
-            },
-            "464400950702899211": {
-                "podiumLocation": "pingy/PingyPodium",
-            },
-            "462932133170774036": {
-                "podiumLocation": "silas/SolosPodium",
-            },
-            "453136562885099531": {
-                "podiumLocation": "wouter/WouterPodium",
-            },
-            "733845345225670686": {
-                "podiumLocation": "yachja/YachjaPodium",
-                "shinyPodiumLocation": "yachja/ShinyYachjaPodium",
-                "shinyPodiums": [3],
-            },  
-            "756527409876041859": {
-                "podiumLocation": "zeb/ZebPodium", 
-            },
-        }
 
 
-
-    def userHasPodium(self, user_id):
-        return str(user_id) in self.definedArt
+    def userHasPodium(self, user_id, place=1, shiny=False):
+        if not shiny:
+            return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/Podium{place}.png")
     
+        return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/ShinyPodium{place}.png")
+
 
 
     async def getPodiumImage(self, user_id, place, alwaysShiny = False):
-        # get object that contains info about the arts done
-        defined_art = self.definedArt.get(str(user_id), {})
 
         # get location of the podium
-        location = defined_art.get("podiumLocation", "default/DefaultPodium")
+        if self.userHasPodium(user_id, place):
+            location = f"{BASE_LOCATION}{str(user_id)}/Podium{place}.png"
+        else:
+            location = f"{BASE_LOCATION}default/Podium{place}.png"
+
 
         # check if podium can be shiny and if it should be
-        if "shinyPodiumLocation" in defined_art and place in defined_art.get("shinyPodiums", []) and alwaysShiny:
-            location = defined_art.get("shinyPodiumLocation")
+        if alwaysShiny and self.userHasPodium(user_id, place, shiny=True):
+            location = f"{BASE_LOCATION}{str(user_id)}/ShinyPodium{place}.png"
         
         # load the selected image
-        image = Image.open(f'{BASE_LOCATION}media/images/{location}{place}.png')
+        image = Image.open(location)
         
         return image
     
@@ -424,25 +391,6 @@ class PodiumBuilder:
                 podiumImage = await self.characterBuilder.addCharacterToPodium(podiumImage, str(id), pose, order[i])
 
             podiums.append(podiumImage)
-
-        
-        # dm user if podium is shiny
-        if alwaysShiny:
-            for i, user_id in enumerate(user_ids):
-                defined_art = self.definedArt.get(str(user_id), {})
-                if "shinyPodiumLocation" in defined_art and order[i] in defined_art.get("shinyPodiums", []):
-                    
-                    # TODO uncomment
-
-                    embed = discord.Embed(
-                        title='🎉 Congratulations!',
-                        description=f"A shiny version of your podium has been pulled!",
-                        color=self.bot.succesColor,
-                    )
-
-                    user = self.bot.get_user(int(user_id))
-                    # TODO uncomment 
-                    # await user.send(embed=embed)
 
 
         # paste podiums on correct location

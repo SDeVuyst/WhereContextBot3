@@ -19,7 +19,7 @@ from discord.ext import commands
 
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
-from helpers import checks, db_manager
+from helpers import checks, db_manager, ArtBuilder
 
 
 
@@ -133,6 +133,21 @@ class General(commands.Cog, name="general"):
 
  
         await interaction.response.send_message(embed=embed)
+
+
+
+    @app_commands.command(name="podium", description="generate a podium", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    @checks.is_owner()
+    @checks.not_in_dm()
+    async def podium(self, interaction, first: discord.User, second: discord.User, third: discord.User) -> None:
+
+        await interaction.response.defer()
+
+        builder = ArtBuilder.PodiumBuilder(self.bot)
+        file = await builder.getAllPodiumsImage([second.id, first.id, third.id])
+        
+        await interaction.followup.send(files=[file])
 
 
 

@@ -456,7 +456,8 @@ class Admin(commands.Cog, name="admin"):
             return await interaction.followup.send(embed=notOwnerEmbed)
 
         
-        banNumberTreshold = 3 # TODO determine amounts of votes needed
+        banNumberTreshold = 3 # TODO determine amounts of votes needed 
+        # TODO maak env var
 
         banned_embed = discord.Embed(
             title=f"🔨 You have been banned from {interaction.guild.name}!",
