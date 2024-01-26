@@ -5,6 +5,7 @@ import io
 import os
 import requests
 import random
+import csv
 
 from helpers import db_manager
 
@@ -128,56 +129,43 @@ class CharacterBuilder:
     def __init__(self, bot):
         self.bot = bot
 
-        # possible keys:
-        #   poseOffset - offset in coords for poses
-        #   badgePasteCoords - coords of where on the podium the 1/2/3 badge should be pasted
-        # TODO deze gegevens wegkrijgen (metadata?)
-        self.definedArt = {
-            "334371900170043402": {
-                "badgePasteCoords": [(300, 1050), (340, 1130), (290, 1320)],  
-            },
-            "273503117348306944": {
-                "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
-            },
-            "559715606014984195": {
-                "badgePasteCoords": [(515, 1050), (370, 1130), (330, 1320)],  
-            },
-            "494508091283603462": {
-                "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
-            },
-            "339820557086228490": {
-                "badgePasteCoords": [(295, 1050), (300, 1130), (295, 1320)],
-            },
-            "527916521754722315": {
-                "badgePasteCoords": [(295, 1050), (350, 1130), (295, 1320)],
-            },
-            "512256261459542019": {
-                "badgePasteCoords": [(295, 1050), (300, 1130), (295, 1320)],
-            },
-            "464400950702899211": {
-                "badgePasteCoords": [(340, 1050), (350, 1130), (295, 1320)],
-            },
-            "462932133170774036": {
-                "badgePasteCoords": [(415, 1050), (420, 1130), (420, 1315)],
-                "poseOffset": [(20, 100), (20, 220), (40, 400)]
-            },
-            "453136562885099531": {
-                "badgePasteCoords": [(365, 1050), (350, 1130), (295, 1320)],  
-            },
-            "733845345225670686": {
-                "badgePasteCoords": [(1070, 1340), (320, 1130), (300, 1310)],
-                "poseOffset": [(0, 400), (0, 200), (0, 340)]
-            },  
-            "756527409876041859": {
-                "badgePasteCoords": [(290, 1050), (300, 1130), (295, 1320)],
-            },
-        }
+
+
+    def getExtraData(self, user_id):
+        # check if extra data exists
+        if not os.path.exists(f"{BASE_LOCATION}{str(user_id)}/PodiumData.csv"):
+            return {}
+
+        with open(f"{BASE_LOCATION}{str(user_id)}/PodiumData.csv") as f:
+            reader = csv.DictReader(f, delimiter=",")
+            data = list(reader)[0]
+
+            # make badge paste coords correct format
+            coords = data["badgePasteCoords"].split(";")
+            data["badgePasteCoords"] = [
+                (int(coords[0]), int(coords[1])),
+                (int(coords[2]), int(coords[3])),
+                (int(coords[4]), int(coords[5])),
+            ]
+
+            # make pose offset correct format
+            if data["poseOffset"] == "None":
+                del data["poseOffset"]
+            else:
+                offsets = data["poseOffset"].split(";")
+                data["poseOffset"] = [
+                    (int(offsets[0]), int(offsets[1])),
+                    (int(offsets[2]), int(offsets[3])),
+                    (int(offsets[4]), int(offsets[5])),
+                ]
+
+        return data
 
 
 
     async def addCharacterToPodium(self, podiumImage, user_id, poseNumber, place):
         # get object that contains info about the arts done
-        defined_art = self.definedArt.get(user_id, {})
+        defined_art = self.getExtraData(user_id)
 
         # get location of the character
         if os.path.exists(self.getPoseLocation(user_id, poseNumber)):
@@ -206,7 +194,10 @@ class CharacterBuilder:
         )
 
         # paste badge to fix 3d realness of character standing on podium
-        pasteCoords = defined_art.get("badgePasteCoords", [(255, 1050), (255, 1130), (255, 1320)])
+        pasteCoords = defined_art.get(
+            "badgePasteCoords", 
+            [(255, 1050), (255, 1130), (255, 1320)]
+        )
         badgeImage = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
         bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
 
