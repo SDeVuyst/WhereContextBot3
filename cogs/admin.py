@@ -42,7 +42,7 @@ class Admin(commands.Cog, name="admin"):
 
         # set the status
         self.bot.status_manual = datetime.now()
-        await self.bot.change_presence(activity=discord.Game(status))
+        await self.bot.change_presence(activity=discord.CustomActivity(name=status))
 
         embed = discord.Embed(
             title="✅ Status changed!",

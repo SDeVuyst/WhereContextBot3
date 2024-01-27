@@ -12,6 +12,8 @@ from helpers import db_manager
 #BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
 BASE_LOCATION = 'media/images/'
 
+
+
 class LeaderboardBuilder:
     def __init__(self, bot) -> None:
         self.bot = bot

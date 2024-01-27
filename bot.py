@@ -161,9 +161,11 @@ async def status_task() -> None:
         statuses = [
             f"📈 {amount} berichten in Out-of-Context!",
             f"🦾 Update 2 out now!",
-            f'🦮 /help'
+            f'🦮 /help',
         ]
-        await bot.change_presence(activity=discord.Game(random.choice(statuses)))
+
+        picked_status = random.choice(statuses)
+        await bot.change_presence(activity=discord.CustomActivity(name=picked_status))
 
 
 @tasks.loop(seconds=30)
