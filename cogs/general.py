@@ -16,6 +16,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+import embeds
+
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
 from helpers import checks, db_manager, ArtBuilder
@@ -52,10 +54,9 @@ class General(commands.Cog, name="general"):
         
         for i, c in enumerate(self.bot.cogs):
 
-            embed = discord.Embed(
-                title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
-                color=self.bot.default_color
+            embed = embeds.DefaultEmbed(
+                f"**Help - {cog_to_title.get(c.lower())}**", 
+                f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
             )
 
             cog = self.bot.get_cog(c.lower())
@@ -107,23 +108,19 @@ class General(commands.Cog, name="general"):
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
-            title = f"⌛ Time till {os.environ.get('COUNTDOWN_TITLE')}"
-            desc = f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!"
-            kleur = self.bot.succes_color
+            embed = embeds.OperationSucceededEmbed(
+                f" Time till {os.environ.get('COUNTDOWN_TITLE')}", 
+                f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!",
+                emoji="⌛"
+            )
         else:
-            title = f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
-            kleur = self.bot.default_color
+            embed = embeds.DefaultEmbed(
+                f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}",
+                f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"
+            )
             
-
-        embed = discord.Embed(
-            title=title,
-            description=desc,
-            color=kleur
-        )
-
         embed.set_thumbnail(
             url=os.environ.get('COUNTDOWN_URL')
         )
@@ -162,6 +159,7 @@ class General(commands.Cog, name="general"):
             user (discord.User): Which user to dm
             content (str): What to dm the user
         """
+        await interaction.response.defer()
 
         # stuur dm naar gebruiker
         await user.send(content=content)
@@ -172,7 +170,9 @@ class General(commands.Cog, name="general"):
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
         
         # stuur confirmatie
-        await interaction.response.send_message(content="✅ done.", ephemeral=True)
+        await interaction.followup.send(embed=embeds.OperationSucceededEmbed(
+            "Done!"
+        ), ephemeral=True)
    
 
 
@@ -197,32 +197,23 @@ class General(commands.Cog, name="general"):
             'DEFAULT_LANGUAGES': ["en", "nl"]
         })
 
-        if t is None:
-            embed = discord.Embed(
-                title="⏰ Geen geldig tijdstip",
-                description=f"{wanneer} is geen geldig tijdstip",
-                color=self.bot.error_color
-            )
-        elif t < datetime.now():
-            embed = discord.Embed(
-                title="⏰ Geen geldig tijdstip",
-                description=f"{wanneer} is in het verleden",
-                color=self.bot.error_color
-            )
-        else:
+        if t is None or t < datetime.now():
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
+                "Geen geldig tijdstip"
+            ))
+        
+        # zet reminder in db
+        succes = await db_manager.set_reminder(interaction.user.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
 
-            # zet reminder in db
-            succes = await db_manager.set_reminder(interaction.user.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
+        
+        desc = f"I will remind you at ```{t.strftime('%d/%m/%y %H:%M:%S')} CEST``` for ```{waarover}```" if succes else "Something went wrong!"
 
-            
-            desc = f"I will remind you at ```{t.strftime('%d/%m/%y %H:%M:%S')} CEST``` for ```{waarover}```" if succes else "Something went wrong!"
-            embed = discord.Embed(
-                title="⏳ Reminder set!" if succes else "Oops!",
-                description=desc,
-                color=self.bot.succes_color if succes else self.bot.error_color
-            )
-
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(
+            embed=embeds.OperationSucceededEmbed(
+                "Reminder set!", desc, emoji="⏳"
+            ) if succes else embeds.OperationFailedEmbed(
+                "Oops!", desc
+            ))
 
 
     @app_commands.command(name="impersonate", description="Send a message diguised as a user", extras={'cog': 'general'})
@@ -247,14 +238,10 @@ class General(commands.Cog, name="general"):
 
         await webhook.delete()
 
-        embed = discord.Embed(
-            title="✅ Done!",
-            description=f"😈",
-            color=self.bot.succes_color
-        )
-
         # stuur het antwoord
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Done!", "😈"
+        ), ephemeral=True)
 
 
     @app_commands.command(name="poll", description="Create a poll", extras={'cog': 'general'})
@@ -274,10 +261,8 @@ class General(commands.Cog, name="general"):
             options (str): possible answers
         """
 
-        embed = discord.Embed(
-            title=f'Build your poll!', 
-            color = self.bot.default_color,
-            timestamp=datetime.utcnow()
+        embed = embeds.DefaultEmbed(
+            "Build your poll!"
         )
         embed.add_field(name='❓ Question', value=question, inline=False)
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
@@ -410,11 +395,9 @@ class PollMenuBuilder(discord.ui.View):
             await msg.add_reaction(self.reactions[i])
 
         # send confirmation
-        embed = discord.Embed(
-            title="🗳️ Poll is live!",
-            color=self.bot.succes_color
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Poll is live!", emoji="🗳️"
+        ), ephemeral=True)
 
 
     @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
@@ -430,11 +413,9 @@ class PollMenuBuilder(discord.ui.View):
         await interaction.message.delete()
 
         # send confirmation
-        embed = discord.Embed(
-            title="🛑 Stopped!",
-            color=self.bot.default_color
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.DefaultEmbed(
+            "🛑 Stopped!"
+        ), ephemeral=True)
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -476,9 +457,8 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
             return await interaction.response.send_message("poll is not active...")
 
         # create embed
-        embed = discord.Embed(
-            title="🗳️ Votes",
-            color=0xF4900D
+        embed = embeds.DefaultEmbed(
+            "🗳️ Votes"
         )
 
         numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
@@ -521,12 +501,9 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.options.append(self.answer.value)
-        embed = discord.Embed(
-            title="💾 Option added!",
-            description=f'```{self.answer.value}```',
-            color=self.poll_builder.bot.succes_color
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Option added!", f'```{self.answer.value}```', emoji="💾"
+        ), ephemeral=True)
 
 
 
@@ -544,12 +521,10 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.description = self.answer.value
-        embed = discord.Embed(
-            title="💾 Description set!",
-            description=f'```{self.answer.value}```',
-            color=self.poll_builder.bot.succes_color
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Description set!", f'```{self.answer.value}```', emoji="💾"
+            
+        ), ephemeral=True)
 
 
 

@@ -12,7 +12,7 @@ from discord.components import SelectOption
 from discord.ext import commands
 from discord.interactions import Interaction
 from discord.ui import Select, View
-
+import embeds
 from helpers import ArtBuilder, checks, db_manager
 from exceptions import TimeoutCommand
 
@@ -28,6 +28,7 @@ class Stats(commands.Cog, name="stats"):
             extras={'cog': 'stats'}
     )
     @checks.not_blacklisted()
+    @checks.not_in_dm()
     @checks.is_owner() # TODO remove
     @app_commands.checks.cooldown(rate=1, per=10)
     async def leaderboard(self,interaction):
@@ -57,20 +58,15 @@ class Stats(commands.Cog, name="stats"):
         
         # Geen berichten
         if len(leaderb) == 0:
-            embed = discord.Embed(
-                description=f"❌ **This command has not been used yet.**",
-                color=self.bot.default_color
-            )
-            return await interaction.edit_original_response(embed=embed, view=None)
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "**This command has not been used yet.**"
+            ), view=None)
         
         # error
         elif leaderb[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=leaderb[1],
-                color=self.bot.error_color
-            )
-            return await interaction.edit_original_response(embed=embed, view=None)
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", leaderb[1]
+            ), view=None)
          
         if view.chosen_command == "danae":
             command = "danae trigger"
@@ -145,28 +141,21 @@ class Stats(commands.Cog, name="stats"):
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
             if command == "bancount":
-                desc = f"🔨 **<@{userid}> has not been banned yet.**"
+                title = f"🔨 **<@{userid}> has not been banned yet.**"
             elif command == "danae":
-                desc = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
+                title = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
             elif command == "keleo":
-                desc = f"✌️ **<@{userid}> has not triggered the keleo feature yet.**"
+                title = f"✌️ **<@{userid}> has not triggered the keleo feature yet.**"
             else:
-                desc = f"❌ **<@{userid}> didn't use /{command} yet.**"
+                title = f"❌ **<@{userid}> didn't use /{command} yet.**"
 
-            embed = discord.Embed(
-                description=desc,
-                color=self.bot.default_color
-            )
-            return embed
+            return embeds.OperationFailedEmbed(title)
         
         # error
-        elif count[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=count[1],
-                color=self.bot.error_color
+        if count[0] == -1:
+            return embeds.OperationFailedEmbed(
+                "Something went wrong...", count[1]
             )
-            return embed
         
         if command == "messages_played":
             desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
@@ -181,13 +170,9 @@ class Stats(commands.Cog, name="stats"):
         else:
             desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
 
-        embed = discord.Embed(
-            title="📊 Individual Statistic",
-            description=desc,
-            color=self.bot.default_color
+        return embeds.DefaultEmbed(
+            "📊 Individual Statistic", desc
         )
-
-        return embed
 
 
 
@@ -246,12 +231,9 @@ class CommandView(View):
             choices (list): What has the user chosen
         """
         self.chosen_command = choices[0]
-        embed = discord.Embed(
-            title="⏳ Loading...",
-            description="This can take a while.",
-            color=self.bot.default_color
-        )
-        await interaction.message.edit(view=None, embed=embed)
+        await interaction.message.edit(view=None, embed=embeds.DefaultEmbed(
+            "⏳ Loading...", "This can take a while."
+        ))
 
         await interaction.response.defer()
         self.stop()

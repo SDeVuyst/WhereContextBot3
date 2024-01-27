@@ -16,6 +16,8 @@ import psycopg2
 import discord
 from discord.ext import tasks
 from discord.ext.commands import Bot
+
+import embeds
 from helpers import WordFinder, db_manager
 import exceptions
 
@@ -202,14 +204,10 @@ async def check_remindme():
             if datetime.strptime(time, '%d/%m/%y %H:%M:%S') - timedelta(hours=2) < datetime.now():
 
                 # stuur reminder
-                embed = discord.Embed(
-                    title="⏰ Reminder!",
-                    description=f"```{subject}```",
-                    color=bot.default_color
-                )
-
                 user = await bot.fetch_user(int(user_id))
-                await user.send(embed=embed)
+                await user.send(embed=embeds.DefaultEmbed(
+                    "⏰ Reminder!", f"```{subject}```"
+                ))
 
                 # verwijder reminder uit db
                 succes = await db_manager.delete_reminder(id)
@@ -366,12 +364,9 @@ async def on_member_join(member):
         description += f"You got your roles back!"
 
     # send welcome to user
-    embed = discord.Embed(
-        title=f"Welcome to {member.guild.name}!",
-        description=description,
-        color=bot.default_color,
-    )
-    await member.send(embed=embed)
+    await member.send(embed=embeds.DefaultEmbed(
+        "Welcome to {member.guild.name}!", description
+    ))
     
         
 
@@ -435,9 +430,9 @@ async def on_tree_error(interaction, error):
         minutes, seconds = divmod(error.retry_after, 60)
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
-        embed = discord.Embed(
-            description=f"⏲️ **Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
-            color=bot.error_color,
+        embed = embeds.OperationFailedEmbed(
+            f"**Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
+            emoji="⏲️"
         )
 
     elif isinstance(error, exceptions.UserBlacklisted):
@@ -445,8 +440,8 @@ async def on_tree_error(interaction, error):
         The code here will only execute if the error is an instance of 'UserBlacklisted', which can occur when using
         the @checks.not_blacklisted() check in your command, or you can raise the error by yourself.
         """
-        embed = discord.Embed(
-            description="🛑 You are blacklisted from using the bot!", color=bot.error_color
+        embed = embeds.OperationFailedEmbed(
+            "You are blacklisted from using the bot!",
         )
 
         if interaction.guild:
@@ -462,8 +457,9 @@ async def on_tree_error(interaction, error):
         """
         Same as above, just for the @checks.is_owner() check.
         """
-        embed = discord.Embed(
-            description="🛑 You are not the owner of the bot!", color=bot.error_color
+        embed = embeds.OperationFailedEmbed(
+            "You are not the owner of the bot!",
+            emoji="🛑"
         )
         if interaction.guild:
             bot.logger.warning(
@@ -475,74 +471,68 @@ async def on_tree_error(interaction, error):
             )
 
     elif isinstance(error, discord.app_commands.MissingPermissions):
-        embed = discord.Embed(
-            description="❌ You are missing the permission(s) `"
+        embed = embeds.OperationFailedEmbed(
+            "You are missing the permission(s) `"
             + ", ".join(error.missing_permissions)
             + "` to execute this command!",
-            color=bot.error_color,
         )
 
     elif isinstance(error, discord.app_commands.BotMissingPermissions):
-        embed = discord.Embed(
-            description="❌ I am missing the permission(s) `"
+        embed = embeds.OperationFailedEmbed(
+            "I am missing the permission(s) `"
             + ", ".join(error.missing_permissions)
             + "` to fully perform this command!",
-            color=bot.error_color,
         )
 
     elif isinstance(error, exceptions.WrongChannel):
-        embed = discord.Embed(
-            title="❌ Wrong channel!",
+        embed = embeds.OperationFailedEmbed(
+            "Wrong channel!",
             # We need to capitalize because the command arguments have no capital letter in the code.
-            description=str(error).capitalize(),
-            color=bot.error_color,
+            str(error).capitalize(),
         )
 
     elif isinstance(error, exceptions.UserNotInVC):
-        embed = discord.Embed(
-            title=f"🔇 You are not in a voice channel",
-            color=bot.error_color
+        embed = embeds.OperationFailedEmbed(
+            f"You are not in a voice channel",
+            emoji="🔇"
         ) 
 
     elif isinstance(error, exceptions.BotNotInVC):
-        embed = discord.Embed(
-            title=f"🔇 Bot is not in vc",
-            description="use /join to add bot to vc",
-            color=bot.error_color
+        embed = embeds.OperationFailedEmbed(
+            f" Bot is not in vc",
+            "use /join to add bot to vc",
+            emoji="🔇"
         ) 
 
     elif isinstance(error, exceptions.BotNotPlaying):
-        embed = discord.Embed(
-            title=f"🔇 The bot is not playing anything at the moment.",
-            description="Use /play to play a song or playlist",
-            color=bot.default_color
+        embed = embeds.OperationFailedEmbed(
+            f"The bot is not playing anything at the moment.",
+            "Use /play to play a song or playlist",
+            emoji="🔇"
         )
     
     elif isinstance(error, exceptions.TimeoutCommand):
-        embed = discord.Embed(
-            title="⏲️ You took too long!",
-            color=bot.error_color
+        embed = embeds.OperationFailedEmbed(
+            "You took too long!",
+            emoji="⏲️"
         )
     
     elif isinstance(error, exceptions.CogLoadError):
-        embed = discord.Embed(
-            title="❌ Cog error!",
-            color=bot.error_color
+        embed = embeds.OperationFailedEmbed(
+            title="Cog error!",
         )
     
     elif isinstance(error, discord.HTTPException):
-        embed = discord.Embed(
-            title="❌ Something went wrong!",
+        embed = embeds.OperationFailedEmbed(
+            title="Something went wrong!",
             description="most likely daily application command limits.",
-            color=bot.error_color
         )
 
     else:
-        embed = discord.Embed(
-            title="❌ Error!",
+        embed = embeds.OperationFailedEmbed(
+            title="Error!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
-            color=bot.error_color,
         )
 
     bot.logger.info(error)
