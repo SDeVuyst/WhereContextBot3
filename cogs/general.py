@@ -13,7 +13,6 @@ import re
 from datetime import datetime
 
 import discord
-import io
 from discord import app_commands
 from discord.ext import commands
 
@@ -40,8 +39,6 @@ class General(commands.Cog, name="general"):
             None: Nothing
         """
 
-        admin = list(os.environ.get("OWNERS").split(","))
-
         menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
             "audio": "🎙️ Audio",
@@ -58,7 +55,7 @@ class General(commands.Cog, name="general"):
             embed = discord.Embed(
                 title=f"**Help - {cog_to_title.get(c.lower())}**", 
                 description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
-                color=self.bot.defaultColor
+                color=self.bot.default_color
             )
 
             cog = self.bot.get_cog(c.lower())
@@ -112,13 +109,13 @@ class General(commands.Cog, name="general"):
         if int(diff.total_seconds()) < 0:
             title = f"⌛ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             desc = f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!"
-            kleur = self.bot.succesColor
+            kleur = self.bot.succes_color
         else:
             title = f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}"
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
-            kleur = self.bot.defaultColor
+            kleur = self.bot.default_color
             
 
         embed = discord.Embed(
@@ -145,7 +142,7 @@ class General(commands.Cog, name="general"):
         await interaction.response.defer()
 
         builder = ArtBuilder.PodiumBuilder(self.bot)
-        file = await builder.getAllPodiumsImage([second.id, first.id, third.id])
+        file = await builder.get_all_podiums_image([second.id, first.id, third.id])
         
         await interaction.followup.send(files=[file])
 
@@ -204,13 +201,13 @@ class General(commands.Cog, name="general"):
             embed = discord.Embed(
                 title="⏰ Geen geldig tijdstip",
                 description=f"{wanneer} is geen geldig tijdstip",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
         elif t < datetime.now():
             embed = discord.Embed(
                 title="⏰ Geen geldig tijdstip",
                 description=f"{wanneer} is in het verleden",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
         else:
 
@@ -222,7 +219,7 @@ class General(commands.Cog, name="general"):
             embed = discord.Embed(
                 title="⏳ Reminder set!" if succes else "Oops!",
                 description=desc,
-                color=self.bot.succesColor if succes else self.bot.errorColor
+                color=self.bot.succes_color if succes else self.bot.error_color
             )
 
         await interaction.response.send_message(embed=embed)
@@ -253,7 +250,7 @@ class General(commands.Cog, name="general"):
         embed = discord.Embed(
             title="✅ Done!",
             description=f"😈",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
 
         # stuur het antwoord
@@ -279,7 +276,7 @@ class General(commands.Cog, name="general"):
 
         embed = discord.Embed(
             title=f'Build your poll!', 
-            color = self.bot.defaultColor,
+            color = self.bot.default_color,
             timestamp=datetime.utcnow()
         )
         embed.add_field(name='❓ Question', value=question, inline=False)
@@ -415,7 +412,7 @@ class PollMenuBuilder(discord.ui.View):
         # send confirmation
         embed = discord.Embed(
             title="🗳️ Poll is live!",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -435,7 +432,7 @@ class PollMenuBuilder(discord.ui.View):
         # send confirmation
         embed = discord.Embed(
             title="🛑 Stopped!",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -527,7 +524,7 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
         embed = discord.Embed(
             title="💾 Option added!",
             description=f'```{self.answer.value}```',
-            color=self.poll_builder.bot.succesColor
+            color=self.poll_builder.bot.succes_color
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -550,7 +547,7 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
         embed = discord.Embed(
             title="💾 Description set!",
             description=f'```{self.answer.value}```',
-            color=self.poll_builder.bot.succesColor
+            color=self.poll_builder.bot.succes_color
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

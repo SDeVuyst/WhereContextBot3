@@ -41,13 +41,13 @@ class Admin(commands.Cog, name="admin"):
         await interaction.response.defer()
 
         # set the status
-        self.bot.statusManual = datetime.now()
+        self.bot.status_manual = datetime.now()
         await self.bot.change_presence(activity=discord.Game(status))
 
         embed = discord.Embed(
             title="✅ Status changed!",
             description=f"Changed status to ```{status}```",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
 
         # send response
@@ -78,7 +78,7 @@ class Admin(commands.Cog, name="admin"):
         embed = discord.Embed(
             title="✅ Done!",
             description=f"<@{user.id}> is now banned from using gifs.",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
 
         # stuur het antwoord
@@ -100,21 +100,21 @@ class Admin(commands.Cog, name="admin"):
 
         # kick grom
         try:
-            gromID = int(os.environ.get("GROM"))
-            grom = await interaction.guild.fetch_member(gromID)
+            grom_id = int(os.environ.get("GROM"))
+            grom = await interaction.guild.fetch_member(grom_id)
             await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
 
             embed = discord.Embed(
                 title=":warning: ***LIEN LOCKDOWN*** :warning:",
                 description="<@464400950702899211> has been kicked.",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
         # grom kick error
         except:
             embed = discord.Embed(
                 title=":warning: ***LIEN LOCKDOWN*** :warning:",
                 description="<@464400950702899211> is not in the server.",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
 
         # stuur lockdown bericht
@@ -147,7 +147,7 @@ class Admin(commands.Cog, name="admin"):
 
             embed = discord.Embed(
                 description="Slash commands have been globally synchronized.",
-                color=self.bot.succesColor,
+                color=self.bot.succes_color,
             )
             await interaction.followup.send(embed=embed)
             return
@@ -160,13 +160,13 @@ class Admin(commands.Cog, name="admin"):
 
             embed = discord.Embed(
                 description="Slash commands have been synchronized in this server.",
-                color=self.bot.succesColor,
+                color=self.bot.succes_color,
             )
             await interaction.followup.send(embed=embed)
             return
 
         embed = discord.Embed(
-            description="The scope must be `global` or `server`.", color=self.bot.errorColor
+            description="The scope must be `global` or `server`.", color=self.bot.error_color
         )
         await interaction.followup.send(embed=embed)
 
@@ -194,7 +194,7 @@ class Admin(commands.Cog, name="admin"):
             raise CogLoadError(cog, 0)
 
         embed = discord.Embed(
-            description=f"Successfully loaded the `{cog}` cog.", color=self.bot.succesColor
+            description=f"Successfully loaded the `{cog}` cog.", color=self.bot.succes_color
         )
 
         await interaction.response.send_message(embed=embed)
@@ -222,7 +222,7 @@ class Admin(commands.Cog, name="admin"):
         except Exception:
             raise CogLoadError(cog, 1)
         embed = discord.Embed(
-            description=f"Successfully unloaded the `{cog}` cog.", color=self.bot.succesColor
+            description=f"Successfully unloaded the `{cog}` cog.", color=self.bot.succes_color
         )
 
         await interaction.response.send_message(embed=embed)
@@ -249,7 +249,7 @@ class Admin(commands.Cog, name="admin"):
             raise CogLoadError(cog, 2)
 
         embed = discord.Embed(
-            description=f"Successfully reloaded the `{cog}` cog.", color=self.bot.succesColor
+            description=f"Successfully reloaded the `{cog}` cog.", color=self.bot.succes_color
         )
 
         await interaction.response.send_message(embed=embed)
@@ -270,7 +270,7 @@ class Admin(commands.Cog, name="admin"):
 
         embed = discord.Embed(
             title="Cog info",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
         loaded_fields = "\n".join(list(self.bot.loaded))
         embed.add_field(
@@ -298,7 +298,7 @@ class Admin(commands.Cog, name="admin"):
         Args:
             interaction (Interaction): Users Interaction
         """
-        embed = discord.Embed(description="Restarting. brb :wave:", color=self.bot.defaultColor)
+        embed = discord.Embed(description="Restarting. brb :wave:", color=self.bot.default_color)
         await interaction.response.send_message(embed=embed)
 
         # We shut down the bot, but heroku will automatically restart it.
@@ -323,7 +323,7 @@ class Admin(commands.Cog, name="admin"):
         # Geen blacklisted users
         if len(blacklisted_users) == 0:
             embed = discord.Embed(
-                description="There are currently no blacklisted users.", color=self.bot.defaultColor
+                description="There are currently no blacklisted users.", color=self.bot.default_color
             )
             await interaction.response.send_message(embed=embed)
             return
@@ -333,7 +333,7 @@ class Admin(commands.Cog, name="admin"):
             raise Exception(blacklisted_users[1])
 
         # alles is ok
-        embed = discord.Embed(title="Blacklisted Users", color=self.bot.defaultColor)
+        embed = discord.Embed(title="Blacklisted Users", color=self.bot.default_color)
         users = []
         for bluser in blacklisted_users:
             user = self.bot.get_user(int(bluser[0])) or await self.bot.fetch_user(
@@ -363,7 +363,7 @@ class Admin(commands.Cog, name="admin"):
         if await db_manager.is_blacklisted(user_id):
             embed = discord.Embed(
                 description=f"**{user.name}** is already in the blacklist.",
-                color=self.bot.errorColor,
+                color=self.bot.error_color,
             )
             await interaction.response.send_message(embed=embed)
             return
@@ -376,7 +376,7 @@ class Admin(commands.Cog, name="admin"):
         # alles oke
         embed = discord.Embed(
             description=f"**{user.name}** has been successfully added to the blacklist",
-            color=self.bot.succesColor,
+            color=self.bot.succes_color,
         )
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
@@ -402,7 +402,7 @@ class Admin(commands.Cog, name="admin"):
         user_id = user.id
         if not await db_manager.is_blacklisted(user_id):
             embed = discord.Embed(
-                description=f"**{user.name}** is not in the blacklist.", color=self.bot.errorColor
+                description=f"**{user.name}** is not in the blacklist.", color=self.bot.error_color
             )
             await interaction.response.send_message(embed=embed)
             return
@@ -415,7 +415,7 @@ class Admin(commands.Cog, name="admin"):
         # alles ok
         embed = discord.Embed(
             description=f"**{user.name}** has been successfully removed from the blacklist",
-            color=self.bot.succesColor,
+            color=self.bot.succes_color,
         )
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
@@ -443,7 +443,7 @@ class Admin(commands.Cog, name="admin"):
         if user.bot:
             notBotEmbed = discord.Embed(
                 title="❌ You can't ban a bot!",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             return await interaction.followup.send(embed=notBotEmbed)
 
@@ -451,17 +451,16 @@ class Admin(commands.Cog, name="admin"):
         if user.id == interaction.guild.owner_id:
             notOwnerEmbed = discord.Embed(
                 title="❌ You can't ban the server owner!",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             return await interaction.followup.send(embed=notOwnerEmbed)
 
         
-        banNumberTreshold = 3 # TODO determine amounts of votes needed 
-        # TODO maak env var
+        ban_number_treshold = 4 # TODO determine amounts of votes needed 
 
         banned_embed = discord.Embed(
             title=f"🔨 You have been banned from {interaction.guild.name}!",
-            color=self.bot.defaultColor,
+            color=self.bot.default_color,
             timestamp=datetime.utcnow()
         )
 
@@ -470,21 +469,21 @@ class Admin(commands.Cog, name="admin"):
             value=reason,
         )
 
-        doneBanEmbed = discord.Embed(
+        done_ban_embed = discord.Embed(
             title=f"🔨 {user.display_name} has been banned!",
             description=f"Cooked his ass",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
 
         # check if user is able to ban, if yes, continue
         # if not, launch vote
-        ableToBan = interaction.user.top_role >= user.top_role
+        able_to_ban = interaction.user.top_role >= user.top_role
 
         # owner should always be able to ban user
         if str(interaction.user.id) == list(os.environ.get("OWNERS").split(","))[0]:
-            ableToBan = True
+            able_to_ban = True
             
-        if ableToBan:
+        if able_to_ban:
 
             banned_embed.add_field(
                 name="Banned by",
@@ -498,21 +497,21 @@ class Admin(commands.Cog, name="admin"):
             await user.ban(reason=reason, delete_message_days=0)
 
             # respond to interaction
-            await interaction.followup.send(embed=doneBanEmbed)
+            await interaction.followup.send(embed=done_ban_embed)
 
         else:
             # respond to interaction
-            voteEmbed = discord.Embed(
+            vote_embed = discord.Embed(
                 title=f"🔨 Vote to ban {user.display_name}",
-                description=f"This vote succeeds at {banNumberTreshold} votes in favour of banning.\n You have 5 minutes to vote.",
-                color=self.bot.defaultColor
+                description=f"This vote succeeds at {ban_number_treshold} votes in favour of banning.\n You have 5 minutes to vote.",
+                color=self.bot.default_color
             )
 
-            voteEmbed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+            vote_embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
 
-            voteEmbed.add_field(name="Current votes", value=f"```1/{banNumberTreshold}```")
+            vote_embed.add_field(name="Current votes", value=f"```1/{ban_number_treshold}```")
 
-            await interaction.followup.send(embed=voteEmbed, view=BanView(self.bot, interaction.user.id, user, banNumberTreshold, reason, doneBanEmbed, voteEmbed))
+            await interaction.followup.send(embed=vote_embed, view=BanView(self.bot, interaction.user.id, user, ban_number_treshold, reason, done_ban_embed, vote_embed))
 
 
 
@@ -535,7 +534,7 @@ class Admin(commands.Cog, name="admin"):
             await interaction.response.send_message(view=UnbanView(bans, self.bot))
         else:
             embed = discord.Embed(
-                description=f"No banned users..", color=self.bot.defaultColor
+                description=f"No banned users..", color=self.bot.default_color
             )
             await interaction.response.send_message(embed=embed)
 
@@ -560,7 +559,7 @@ class Admin(commands.Cog, name="admin"):
         embed = discord.Embed(
             title='✅ Done',
             description=f"{user} is now called {nickname}",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
         await interaction.response.send_message(embed=embed)
 
@@ -615,7 +614,7 @@ class Admin(commands.Cog, name="admin"):
         # creeer embed
         embed = discord.Embed(
             title=f"**{user.display_name}'s Profile**",
-            color=self.bot.defaultColor,
+            color=self.bot.default_color,
             timestamp=datetime.utcnow()
         )
 
@@ -639,17 +638,17 @@ class Admin(commands.Cog, name="admin"):
         bancount = await db_manager.get_ban_count(user.id)
         embed.add_field(
             name="🔨 Bans",
-            value=f"```{normalizeCount(bancount)}```",
+            value=f"```{normalize_count(bancount)}```",
             inline=True
         )
 
         # get most used command
-        commandcount = await db_manager.get_most_used_command(user.id)
-        if commandcount is None or commandcount[0] == -1:
+        command_count = await db_manager.get_most_used_command(user.id)
+        if command_count is None or command_count[0] == -1:
             value = f"```No Commands Used```"
         else:
-            com = "Danae Trigger" if commandcount[0] == 'danae' else f"/{commandcount[0]}"
-            value=f"```{com}: {commandcount[1]}```"
+            com = "Danae Trigger" if command_count[0] == 'danae' else f"/{command_count[0]}"
+            value=f"```{com}: {command_count[1]}```"
 
         embed.add_field(
             name="🤖 Most Used Command",
@@ -658,18 +657,18 @@ class Admin(commands.Cog, name="admin"):
         )
 
         # get total amount of commands used
-        totalcommandcount = await db_manager.get_total_used_command(user.id)
-        totalcommandcountvalue = 0 if (totalcommandcount is None or totalcommandcount[0] == -1) else totalcommandcount[0]
+        total_command_count = await db_manager.get_total_used_command(user.id)
+        total_command_count_value = 0 if (total_command_count is None or total_command_count[0] == -1) else total_command_count[0]
         embed.add_field(
             name="🗒️ Total Commands Used",
-            value=f"```{totalcommandcountvalue}```",
+            value=f"```{total_command_count_value}```",
             inline=False
         )
 
         # show podiums if user has one
         builder = ArtBuilder.PodiumBuilder(self.bot)
-        if builder.userHasPodium(user.id):
-            file = await builder.getAllPodiumsImage([user.id, user.id, user.id], padding=100, add_characters=False)
+        if builder.user_has_podium(user.id):
+            file = await builder.get_all_podiums_image([user.id, user.id, user.id], padding=100, add_characters=False)
             embed.set_image(url="attachment://podium.png")
 
             return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
@@ -679,17 +678,17 @@ class Admin(commands.Cog, name="admin"):
 
 
 class BanView(discord.ui.View):
-    def __init__(self, bot, bannerID, user, banNumberTreshold, reason, doneBanEmbed, originalEmbed):
+    def __init__(self, bot, bannerID, user, ban_number_treshold, reason, done_ban_embed, original_embed):
         super().__init__(timeout=300)
 
         self.bot = bot
         self.user = user
-        self.banNumberTreshold = banNumberTreshold
+        self.ban_number_treshold = ban_number_treshold
         self.reason = reason
-        self.doneBanEmbed = doneBanEmbed
-        self.originalEmbed = originalEmbed
+        self.done_ban_embed = done_ban_embed
+        self.original_embed = original_embed
 
-        self.peopleWhoVotedYes = [bannerID]
+        self.members_who_voted_yes = [bannerID]
 
 
     @discord.ui.button(label="Vote Yes", style=discord.ButtonStyle.danger)
@@ -697,37 +696,37 @@ class BanView(discord.ui.View):
         await interaction.response.defer()
 
         # user already voted
-        if interaction.user.id in self.peopleWhoVotedYes:
+        if interaction.user.id in self.members_who_voted_yes:
             embed = discord.Embed(
                 title="❌ You can't vote twice!",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
 
         else:
             # add user to voters
-            self.peopleWhoVotedYes.append(interaction.user.id)
+            self.members_who_voted_yes.append(interaction.user.id)
 
             embed = discord.Embed(
                 title=f"✅ You have voted to kick {self.user.display_name}",
-                color=self.bot.succesColor
+                color=self.bot.succes_color
             )
 
             # edit original embed
-            self.originalEmbed.set_field_at(
-                1, name="Current votes", value=f"```{len(self.peopleWhoVotedYes)}/{self.banNumberTreshold}```"
+            self.original_embed.set_field_at(
+                1, name="Current votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
             )
-            await interaction.edit_original_response(embed=self.originalEmbed)
+            await interaction.edit_original_response(embed=self.original_embed)
 
         # send response (vote succesful?)
         await interaction.followup.send(embed=embed, ephemeral=True)
 
         # check if user needs to be banned
-        if len(self.peopleWhoVotedYes) >= self.banNumberTreshold:
+        if len(self.members_who_voted_yes) >= self.ban_number_treshold:
 
             # send ban message to user
             banned_embed = discord.Embed(
                 title=f"🔨 You have been banned from {interaction.guild.name}!",
-                color=self.bot.defaultColor,
+                color=self.bot.default_color,
                 timestamp=datetime.utcnow()
             )
 
@@ -740,7 +739,7 @@ class BanView(discord.ui.View):
             banned_embed.add_field(
                 name="🪦 People who voted for your demise",
                 value='\n'.join(
-                    [self.bot.get_user(user_id).mention for user_id in self.peopleWhoVotedYes]
+                    [self.bot.get_user(user_id).mention for user_id in self.members_who_voted_yes]
                 ),
                 inline=False                
             )
@@ -750,7 +749,7 @@ class BanView(discord.ui.View):
             await interaction.edit_original_response(view=None)
 
             # send confirmation
-            await interaction.followup.send(embed=self.doneBanEmbed)
+            await interaction.followup.send(embed=self.done_ban_embed)
 
             # ban user
             await self.user.ban(reason=self.reason, delete_message_days=0)
@@ -761,26 +760,26 @@ class BanView(discord.ui.View):
         await interaction.response.defer()
 
         # user already voted
-        if interaction.user.id not in self.peopleWhoVotedYes:
+        if interaction.user.id not in self.members_who_voted_yes:
             embed = discord.Embed(
                 title="❌ You didn't vote yet!",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
 
         else:
             # remove voter from list
-            self.peopleWhoVotedYes.remove(interaction.user.id)
+            self.members_who_voted_yes.remove(interaction.user.id)
 
             embed = discord.Embed(
                 title=f"✅ You have removed your vote to kick {self.user.display_name}",
-                color=self.bot.succesColor
+                color=self.bot.succes_color
             )
 
             # edit original embed
-            self.originalEmbed.set_field_at(
-                1, name="Current votes", value=f"```{len(self.peopleWhoVotedYes)}/{self.banNumberTreshold}```"
+            self.original_embed.set_field_at(
+                1, name="Current votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
             )
-            await interaction.edit_original_response(embed=self.originalEmbed)
+            await interaction.edit_original_response(embed=self.original_embed)
     
         # send response (vote removal succesful?)
         await interaction.followup.send(embed=embed, ephemeral=True)
@@ -808,7 +807,7 @@ class UnbanDropdown(discord.ui.Select):
         embed = discord.Embed(
             title='✅ Done',
             description=f"{user} is now unbanned",
-            color=self.bot.succesColor,
+            color=self.bot.succes_color,
         )
         await interaction.message.edit(embed=embed, view=None)
         await interaction.response.defer()
@@ -822,10 +821,10 @@ class ConfigureView(discord.ui.View):
         self.nickname = 'None'
         self.user_id = int(user_id)
 
-        self.waitingEmbed = discord.Embed(
+        self.waiting_embed = discord.Embed(
             title="⏳ Loading...",
             description="This can take a while.",
-            color=bot.defaultColor
+            color=bot.default_color
         )
 
         super().__init__(timeout=500)
@@ -855,7 +854,7 @@ class ConfigureView(discord.ui.View):
     async def add_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
 
-        waiting_message = await interaction.followup.send(embed=self.waitingEmbed)
+        waiting_message = await interaction.followup.send(embed=self.waiting_embed)
 
         autoroles = await db_manager.get_autoroles(interaction.guild_id, self.user_id)
         if autoroles is not None:
@@ -867,7 +866,7 @@ class ConfigureView(discord.ui.View):
             title="📝 Select your default roles",
             description="""Please select which roles you want to have automatically added when you join this server.\n
             Note that you can do this for every server WCB3 is in, and can only select roles lower than your current role.\n""",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
 
         all_roles = await interaction.guild.fetch_roles()
@@ -889,14 +888,14 @@ class ConfigureView(discord.ui.View):
 
         await interaction.response.defer()
 
-        waiting_message = await interaction.followup.send(embed=self.waitingEmbed)
+        waiting_message = await interaction.followup.send(embed=self.waiting_embed)
 
         builder = ArtBuilder.CharacterBuilder(self.bot)
-        file = await builder.getAllPosesImage(self.user_id)
-        amountOfPoses = builder.getAmountOfPoses(self.user_id)
+        file = await builder.get_all_poses_image(self.user_id)
+        amount_of_poses = builder.get_amount_of_poses(self.user_id)
 
         # get previously selected poses
-        selectedPoses = []
+        selected_poses = []
 
         # 1, 2, 3
         for i in range(1, 4):
@@ -905,13 +904,13 @@ class ConfigureView(discord.ui.View):
                 poses = [int(pose) for pose in poses[0]]
             else:
                 poses = []
-            selectedPoses.append(poses)
+            selected_poses.append(poses)
 
         embed = discord.Embed(
             title="👥 Select your Poses",
             description="""You can pick different poses for each position on your podium.\n
             If you select multiple poses, one will be selected at random every time your podium is displayed.""",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
         embed.set_image(url="attachment://poses.png")
 
@@ -919,8 +918,8 @@ class ConfigureView(discord.ui.View):
             embed=embed,
             view=PosesSelectView(
                 self.bot,
-                amountOfPoses,
-                selectedPoses,
+                amount_of_poses,
+                selected_poses,
                 interaction.guild.get_member(self.user_id),
             ),
             attachments=[file]
@@ -976,7 +975,7 @@ class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
         embed = discord.Embed(
             title="💾Default nickname set!",
             description=f'```{self.answer.value}```',
-            color=self.configure_view.bot.succesColor
+            color=self.configure_view.bot.succes_color
         )
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
@@ -987,7 +986,7 @@ class RolesSelectView(discord.ui.View):
         self.user = user
         self.all_roles = all_roles
         self.bot = bot
-        self.selectedRoles = None
+        self.selected_roles = None
 
         super().__init__(timeout=timeout)
         self.add_item(RolesSelect(user, all_roles, bot, self, autoroles))
@@ -998,7 +997,7 @@ class RolesSelectView(discord.ui.View):
     async def close_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         embed = discord.Embed(
             title=f"Cancelled!",
-            color=self.bot.defaultColor,
+            color=self.bot.default_color,
         )
         await interaction.response.edit_message(embed=embed, view=None, delete_after=10)
 
@@ -1007,7 +1006,7 @@ class RolesSelectView(discord.ui.View):
     async def submit_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         # defer in case processing the selected data takes a while
         await interaction.response.defer()
-        selected_roles = [discord.utils.get(self.all_roles, name=role) for role in self.selectedRoles]
+        selected_roles = [discord.utils.get(self.all_roles, name=role) for role in self.selected_roles]
 
         # save roles in db
         succes = await db_manager.set_autoroles(
@@ -1028,7 +1027,7 @@ class RolesSelectView(discord.ui.View):
         embed = discord.Embed(
             title=f"✅ Edited default Roles!",
             description=desc,
-            color=self.bot.succesColor,
+            color=self.bot.succes_color,
         )
 
         await interaction.edit_original_response(embed=embed, view=None)
@@ -1038,7 +1037,7 @@ class RolesSelectView(discord.ui.View):
 class RolesSelect(discord.ui.Select):
     def __init__(self, user, all_roles, bot, view, autoroles):
         self.bot = bot
-        self.roleView = view
+        self.role_view = view
 
         # get available roles for the user
         highest_role = discord.utils.find(lambda role: role in all_roles, reversed(user.roles))
@@ -1053,22 +1052,22 @@ class RolesSelect(discord.ui.Select):
 
 
     async def callback(self, interaction: discord.Interaction):
-        self.roleView.selectedRoles = self.values
+        self.role_view.selected_roles = self.values
         await interaction.response.defer()
 
 
 
 class PosesSelectView(discord.ui.View):
-    def __init__(self, bot, amountOfPoses, selectedPoses, user, timeout = 180):
+    def __init__(self, bot, amount_of_poses, selected_poses, user, timeout = 180):
         self.bot = bot
-        self.amountOfPoses = amountOfPoses
-        self.selectedPoses = selectedPoses
+        self.amount_of_poses = amount_of_poses
+        self.selected_poses = selected_poses
         self.user = user
 
         super().__init__(timeout=timeout)
-        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[0], user, 1))
-        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[1], user, 2))
-        self.add_item(PosesSelect(self, bot, amountOfPoses, selectedPoses[2], user, 3))
+        self.add_item(PosesSelect(self, bot, amount_of_poses, selected_poses[0], user, 1))
+        self.add_item(PosesSelect(self, bot, amount_of_poses, selected_poses[1], user, 2))
+        self.add_item(PosesSelect(self, bot, amount_of_poses, selected_poses[2], user, 3))
 
     # a cancel button
     # will keep the message but remove the view and replace the text with "Cancelled"
@@ -1076,7 +1075,7 @@ class PosesSelectView(discord.ui.View):
     async def close_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         embed = discord.Embed(
             title=f"Cancelled!",
-            color=self.bot.defaultColor,
+            color=self.bot.default_color,
         )
         await interaction.response.edit_message(embed=embed, view=None, delete_after=10, attachments=[])
 
@@ -1088,7 +1087,7 @@ class PosesSelectView(discord.ui.View):
 
         for place in range(1, 4):
 
-            poses = [int(i) for i in self.selectedPoses[place-1]]
+            poses = [int(i) for i in self.selected_poses[place-1]]
             if len(poses) > 0:
                 # save poses in db
                 succes = await db_manager.set_poses(
@@ -1109,7 +1108,7 @@ class PosesSelectView(discord.ui.View):
 
         embed = discord.Embed(
             title=f"✅ Saved active poses!",
-            color=self.bot.succesColor,
+            color=self.bot.succes_color,
         )
 
         await interaction.edit_original_response(embed=embed, view=None, attachments=None)
@@ -1117,19 +1116,19 @@ class PosesSelectView(discord.ui.View):
 
 
 class PosesSelect(discord.ui.Select):
-    def __init__(self, view, bot, amountOfPoses, selectedPoses, user, place):
-        self.poseView = view
+    def __init__(self, view, bot, amount_of_poses, selected_poses, user, place):
+        self.pose_view = view
         self.bot = bot
-        self.amountOfPoses = amountOfPoses
-        self.selectedPoses = selectedPoses
+        self.amount_of_poses = amount_of_poses
+        self.selected_poses = selected_poses
         self.user = user
         self.place = place
 
         # generate the options
         options = [
             discord.SelectOption(
-                label=f"Pose {i+1}", default=i+1 in selectedPoses, value=i+1
-            ) for i in range(amountOfPoses)
+                label=f"Pose {i+1}", default=i+1 in selected_poses, value=i+1
+            ) for i in range(amount_of_poses)
         ]
 
         # readable format
@@ -1137,7 +1136,7 @@ class PosesSelect(discord.ui.Select):
 
         super().__init__(
             placeholder=f"Select your active poses ({places[place-1]} Place)",
-            max_values=amountOfPoses,
+            max_values=amount_of_poses,
             min_values=0,
             options=options
         )
@@ -1146,7 +1145,7 @@ class PosesSelect(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         # save the selected poses
         poses = [1,0,2]
-        self.poseView.selectedPoses[poses[self.place-1]] = self.values
+        self.pose_view.selected_poses[poses[self.place-1]] = self.values
         await interaction.response.defer()
 
 
@@ -1157,7 +1156,7 @@ async def setup(bot):
 
 
 # gives correct int based off db output
-def normalizeCount(count):
+def normalize_count(count):
     if len(count) == 0 or int(count[0][0]) == 0 or count[0] == -1:
         return 0
     else:

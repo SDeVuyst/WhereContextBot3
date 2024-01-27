@@ -31,14 +31,14 @@ bot = Bot(
     help_command=None,
 )
 
-bot.defaultColor = 0xF4900D
-bot.errorColor = 0xE02B2B
-bot.succesColor = 0x39AC39
+bot.default_color = 0xF4900D
+bot.error_color = 0xE02B2B
+bot.succes_color = 0x39AC39
 
 bot.loaded = set()
 bot.unloaded = set()
 
-bot.statusManual = None
+bot.status_manual = None
 bot.gif_prohibited = []
 
 def save_ids_func(cmds):
@@ -150,16 +150,19 @@ async def status_task() -> None:
     """
 
     # check if someone used the status command
-    if bot.statusManual is not None:
-
+    if bot.status_manual is not None:
         # longer than 1 hour ago
-        time_diff = datetime.now() - bot.statusManual 
+        time_diff = datetime.now() - bot.status_manual 
         if time_diff.total_seconds() > 3600:
-            bot.statusManual = None
+            bot.status_manual = None
 
-    if bot.statusManual is None:
+    if bot.status_manual is None:
         amount = await db_manager.messages_in_ooc()
-        statuses = ["Ora et Labora", f"{amount} berichten in outofcontext", "met ba zijn gevoelens", "with Astolfo", "Minecraft", "with gible z'n ma", "with grom z'n ma", "🚨 Scanning for n-words 🚨"]
+        statuses = [
+            f"{amount} berichten in Out-of-Context",
+            f"Update 2 out now!",
+            f'/help'
+        ]
         await bot.change_presence(activity=discord.Game(random.choice(statuses)))
 
 
@@ -200,7 +203,7 @@ async def check_remindme():
                 embed = discord.Embed(
                     title="⏰ Reminder!",
                     description=f"```{subject}```",
-                    color=bot.defaultColor
+                    color=bot.default_color
                 )
 
                 user = await bot.fetch_user(int(user_id))
@@ -364,7 +367,7 @@ async def on_member_join(member):
     embed = discord.Embed(
         title=f"Welcome to {member.guild.name}!",
         description=description,
-        color=bot.defaultColor,
+        color=bot.default_color,
     )
     await member.send(embed=embed)
     
@@ -432,7 +435,7 @@ async def on_tree_error(interaction, error):
         hours = hours % 24
         embed = discord.Embed(
             description=f"⏲️ **Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
-            color=bot.errorColor,
+            color=bot.error_color,
         )
 
     elif isinstance(error, exceptions.UserBlacklisted):
@@ -441,7 +444,7 @@ async def on_tree_error(interaction, error):
         the @checks.not_blacklisted() check in your command, or you can raise the error by yourself.
         """
         embed = discord.Embed(
-            description="🛑 You are blacklisted from using the bot!", color=bot.errorColor
+            description="🛑 You are blacklisted from using the bot!", color=bot.error_color
         )
 
         if interaction.guild:
@@ -458,7 +461,7 @@ async def on_tree_error(interaction, error):
         Same as above, just for the @checks.is_owner() check.
         """
         embed = discord.Embed(
-            description="🛑 You are not the owner of the bot!", color=bot.errorColor
+            description="🛑 You are not the owner of the bot!", color=bot.error_color
         )
         if interaction.guild:
             bot.logger.warning(
@@ -474,7 +477,7 @@ async def on_tree_error(interaction, error):
             description="❌ You are missing the permission(s) `"
             + ", ".join(error.missing_permissions)
             + "` to execute this command!",
-            color=bot.errorColor,
+            color=bot.error_color,
         )
 
     elif isinstance(error, discord.app_commands.BotMissingPermissions):
@@ -482,7 +485,7 @@ async def on_tree_error(interaction, error):
             description="❌ I am missing the permission(s) `"
             + ", ".join(error.missing_permissions)
             + "` to fully perform this command!",
-            color=bot.errorColor,
+            color=bot.error_color,
         )
 
     elif isinstance(error, exceptions.WrongChannel):
@@ -490,46 +493,46 @@ async def on_tree_error(interaction, error):
             title="❌ Wrong channel!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
-            color=bot.errorColor,
+            color=bot.error_color,
         )
 
     elif isinstance(error, exceptions.UserNotInVC):
         embed = discord.Embed(
             title=f"🔇 You are not in a voice channel",
-            color=bot.errorColor
+            color=bot.error_color
         ) 
 
     elif isinstance(error, exceptions.BotNotInVC):
         embed = discord.Embed(
             title=f"🔇 Bot is not in vc",
             description="use /join to add bot to vc",
-            color=bot.errorColor
+            color=bot.error_color
         ) 
 
     elif isinstance(error, exceptions.BotNotPlaying):
         embed = discord.Embed(
             title=f"🔇 The bot is not playing anything at the moment.",
             description="Use /play to play a song or playlist",
-            color=bot.defaultColor
+            color=bot.default_color
         )
     
     elif isinstance(error, exceptions.TimeoutCommand):
         embed = discord.Embed(
             title="⏲️ You took too long!",
-            color=bot.errorColor
+            color=bot.error_color
         )
     
     elif isinstance(error, exceptions.CogLoadError):
         embed = discord.Embed(
             title="❌ Cog error!",
-            color=bot.errorColor
+            color=bot.error_color
         )
     
     elif isinstance(error, discord.HTTPException):
         embed = discord.Embed(
             title="❌ Something went wrong!",
             description="most likely daily application command limits.",
-            color=bot.errorColor
+            color=bot.error_color
         )
 
     else:
@@ -537,7 +540,7 @@ async def on_tree_error(interaction, error):
             title="❌ Error!",
             # We need to capitalize because the command arguments have no capital letter in the code.
             description=str(error).capitalize(),
-            color=bot.errorColor,
+            color=bot.error_color,
         )
 
     bot.logger.info(error)

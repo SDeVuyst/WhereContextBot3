@@ -84,7 +84,7 @@ class Audio(commands.Cog, name="audio"):
         # confirmatie 
         embed = discord.Embed(
             title=f"📻 played {effect.name}!",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -132,8 +132,8 @@ class Audio(commands.Cog, name="audio"):
                     if track.find("list=") != -1:
                         vid_urls = Playlist(track)
                     else:
-                        spToYt = SpotifyToYT.SpotifyToYT()
-                        vid_urls = spToYt.spotifyToYoutubeURLs(track)
+                        spotify_to_youtube = SpotifyToYT.SpotifyToYT()
+                        vid_urls = spotify_to_youtube.spotifyToYoutubeURLs(track)
 
 
                     for i, vid_url in enumerate(vid_urls):
@@ -149,7 +149,7 @@ class Audio(commands.Cog, name="audio"):
                     embed = discord.Embed(
                         title=f"🎶 Added to Queue!",
                         description=desc,
-                        color=self.bot.succesColor
+                        color=self.bot.succes_color
                     )
                     await interaction.followup.send(embed=embed)
                     
@@ -161,7 +161,7 @@ class Audio(commands.Cog, name="audio"):
             elif track.find("https://soundcloud.com") != -1 and track.find("/sets") != -1:
                 embed = discord.Embed(
                     title=f"SoundCloud playlists are not (yet) supported!",
-                    color=self.bot.errorColor
+                    color=self.bot.error_color
                 )
                 await interaction.followup.send(embed=embed)
                 return
@@ -182,7 +182,7 @@ class Audio(commands.Cog, name="audio"):
                     embed = discord.Embed(
                         title=f"🎵 Added to Queue",
                         description=f"[{tr.title}]({tr.url}) by {tr.author}",
-                        color=self.bot.defaultColor
+                        color=self.bot.default_color
                     )
                     
                     # set thumbnail
@@ -204,7 +204,7 @@ class Audio(commands.Cog, name="audio"):
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
                 description=f"ben je zeker dat dit een geldige input is?\n{track}\n{e}",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             await interaction.followup.send(embed=embed)
             return
@@ -226,7 +226,7 @@ class Audio(commands.Cog, name="audio"):
         if len(self.queue) == 0:
             embed = discord.Embed(
                 title=f"📝 Queue is empty!",
-                color=self.bot.defaultColor
+                color=self.bot.default_color
             )
 
         # toon lijst van videos in queue
@@ -239,7 +239,7 @@ class Audio(commands.Cog, name="audio"):
             embed = discord.Embed(
                 title=f"📝 Queue",
                 description=desc,
-                color=self.bot.defaultColor
+                color=self.bot.default_color
             )
 
         await interaction.response.send_message(embed=embed)
@@ -264,7 +264,7 @@ class Audio(commands.Cog, name="audio"):
         self.pause_time = datetime.now()
         embed = discord.Embed(
             title=f"⏸️ Paused!",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
         await interaction.response.send_message(embed=embed)
 
@@ -296,7 +296,7 @@ class Audio(commands.Cog, name="audio"):
         vc.resume()
         embed = discord.Embed(
             title=f"▶️ Resumed!",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
         await interaction.response.send_message(embed=embed)
 
@@ -315,7 +315,6 @@ class Audio(commands.Cog, name="audio"):
         Args:
             interaction (Interaction): Users Interaction
         """
-        vc = interaction.guild.voice_client
 
         # currently playing track should also be included in the loop
         if (self.queue or [None])[-1] != self.track_playing:
@@ -326,7 +325,7 @@ class Audio(commands.Cog, name="audio"):
 
         embed = discord.Embed(
             title="🔁 Looping enabled!" if self.looping else "🔁 Looping disabled!",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
         await interaction.response.send_message(embed=embed)
 
@@ -358,7 +357,7 @@ class Audio(commands.Cog, name="audio"):
         
         embed = discord.Embed(
             title=f"⏭️ Skipped!",
-            color=self.bot.succesColor
+            color=self.bot.succes_color
         )
         await interaction.response.send_message(embed=embed)
 
@@ -386,7 +385,7 @@ class Audio(commands.Cog, name="audio"):
         vc.stop()
         embed = discord.Embed(
             title=f"⏹️ Stopped!",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
         await interaction.response.send_message(embed=embed)
 
@@ -412,12 +411,12 @@ class Audio(commands.Cog, name="audio"):
             await channel.connect()
             embed = discord.Embed(
                 title=f"✅ Joined channel {channel.name}!",
-                color=self.bot.succesColor
+                color=self.bot.succes_color
             )
         except discord.ClientException:
             embed = discord.Embed(
                 title=f"🎧 Already in voice channel",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             
         await interaction.response.send_message(embed=embed)
@@ -441,7 +440,7 @@ class Audio(commands.Cog, name="audio"):
             await vc.disconnect()
             embed = discord.Embed(
                 title=f"🤖 left channel!",
-                color=self.bot.succesColor
+                color=self.bot.succes_color
             )
             await interaction.response.send_message(embed=embed)
 
@@ -464,7 +463,7 @@ class Audio(commands.Cog, name="audio"):
             random.shuffle(self.queue)
             embed = discord.Embed(
                 title=f"🔀 Shuffled!",
-                color=self.bot.succesColor
+                color=self.bot.succes_color
             )
             await interaction.response.send_message(embed=embed)
 
@@ -494,7 +493,7 @@ class Audio(commands.Cog, name="audio"):
             if tr.length is not None and tr.length > 900:
                 embed = discord.Embed(
                     title=f"Video must be less than 15 minutes long.",
-                    color=self.bot.errorColor
+                    color=self.bot.error_color
                 )
                 if first_player:
                     await interaction.followup.send(embed=embed)
@@ -513,7 +512,7 @@ class Audio(commands.Cog, name="audio"):
             embed = discord.Embed(
                 title=f"Er is iets misgegaan",
                 description=f"ben je zeker dat dit een geldige url is?\n{tr.url}",
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             if first_player:
                 await interaction.followup.send(embed=embed)
@@ -535,7 +534,7 @@ class Audio(commands.Cog, name="audio"):
             embed = discord.Embed(
                 title=f"🎵 Playing music!",
                 description=f"[{tr.title}]({tr.url}) by {tr.author}\n{bardata} - {self.format_seconds_to_mmss(0)} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}",
-                color=self.bot.succesColor
+                color=self.bot.succes_color
             )
 
             try:

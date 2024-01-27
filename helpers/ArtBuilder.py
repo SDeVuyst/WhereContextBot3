@@ -16,11 +16,11 @@ class LeaderboardBuilder:
     def __init__(self, bot) -> None:
         self.bot = bot
 
-        self.podiumBuilder = PodiumBuilder(bot)
+        self.podium_builder = PodiumBuilder(bot)
 
 
 
-    async def getTopLeaderboard(self, leaderboard, command):
+    async def get_top_leaderboard(self, leaderboard, command):
         #  load background
         bg = Image.open(f"{BASE_LOCATION}leaderboard/LeaderboardTop.png")
         bg = bg.convert('RGBA')
@@ -47,11 +47,11 @@ class LeaderboardBuilder:
                 podiums.append((user_id, count))
 
         # add podium
-        podiumImage = await self.podiumBuilder.getAllPodiumsImage([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
-        podiumImage = resize_image(podiumImage, 2000, 1800)
-        remaining_width = bg.width - podiumImage.width
+        podium_image = await self.podium_builder.get_all_podiums_image([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
+        podium_image = resize_image(podium_image, 2000, 1800)
+        remaining_width = bg.width - podium_image.width
 
-        bg.paste(podiumImage, (remaining_width//2, bg.height - podiumImage.height - 150), podiumImage)
+        bg.paste(podium_image, (remaining_width//2, bg.height - podium_image.height - 150), podium_image)
     
         # draw title    
         draw.text(
@@ -73,7 +73,7 @@ class LeaderboardBuilder:
     
 
 
-    async def getBottomLeaderboard(self, leaderboard):
+    async def get_bottom_leaderboard(self, leaderboard):
         #  load background
         bg = Image.open(f"{BASE_LOCATION}leaderboard/LeaderboardBottom.png")
 
@@ -131,7 +131,7 @@ class CharacterBuilder:
 
 
 
-    def getExtraData(self, user_id):
+    def get_extra_data(self, user_id):
         # check if extra data exists
         if not os.path.exists(f"{BASE_LOCATION}{str(user_id)}/PodiumData.csv"):
             return {}
@@ -163,72 +163,72 @@ class CharacterBuilder:
 
 
 
-    async def addCharacterToPodium(self, podiumImage, user_id, poseNumber, place):
+    async def add_character_to_podium(self, podium_image, user_id, poseNumber, place):
         # get object that contains info about the arts done
-        defined_art = self.getExtraData(user_id)
+        defined_art = self.get_extra_data(user_id)
 
         # get location of the character
-        if os.path.exists(self.getPoseLocation(user_id, poseNumber)):
-            customCharacterLocation = f"{BASE_LOCATION}{str(user_id)}/Pose{poseNumber}.png"
+        if os.path.exists(self.get_pose_location(user_id, poseNumber)):
+            custom_character_location = f"{BASE_LOCATION}{str(user_id)}/Pose{poseNumber}.png"
         else:
-            customCharacterLocation = f"{BASE_LOCATION}default/Pose{poseNumber}.png"
+            custom_character_location = f"{BASE_LOCATION}default/Pose{poseNumber}.png"
 
         # load the character image
-        characterImage = Image.open(customCharacterLocation)
+        character_image = Image.open(custom_character_location)
         
         # resize it
-        characterImage = resize_image(characterImage, 700)
+        character_image = resize_image(character_image, 700)
 
         # create empty bg to add podium and character to
-        bg = Image.new('RGBA', (podiumImage.width, podiumImage.height + characterImage.height))
+        bg = Image.new('RGBA', (podium_image.width, podium_image.height + character_image.height))
         
         # paste podium
-        bg.paste(podiumImage, (0, characterImage.height), podiumImage)
+        bg.paste(podium_image, (0, character_image.height), podium_image)
 
         # paste character
         offset = defined_art.get("poseOffset", [(0, 110), (0, 200), (0, 370)])[place-1]
         bg.paste(
-            characterImage,
-            ((bg.width - characterImage.width)//2 + offset[0], offset[1]), 
-            characterImage
+            character_image,
+            ((bg.width - character_image.width)//2 + offset[0], offset[1]), 
+            character_image
         )
 
         # paste badge to fix 3d realness of character standing on podium
-        pasteCoords = defined_art.get(
+        paste_coords = defined_art.get(
             "badgePasteCoords", 
             [(255, 1050), (255, 1130), (255, 1320)]
         )
-        badgeImage = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
-        bg.paste(badgeImage, pasteCoords[place-1], badgeImage)
+        badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
+        bg.paste(badge_image, paste_coords[place-1], badge_image)
 
         return bg
     
 
 
-    def getAmountOfPoses(self, user_id):
+    def get_amount_of_poses(self, user_id):
         # user does not have custom pose, so default 5 poses
-        if not self.hasCustomPoses(user_id, 1):
+        if not self.has_custom_poses(user_id, 1):
             return 5
         
         i = 2 # start at 2 since we already checked pose 1
-        while self.hasCustomPoses(user_id, i):
+        while self.has_custom_poses(user_id, i):
             i+=1
 
         return i-1
     
 
 
-    async def getAllPosesImage(self, user_id):
+    async def get_all_poses_image(self, user_id):
 
         # prerenderd of default all poses
-        if not self.hasCustomPoses(user_id, 1):
+        if not self.has_custom_poses(user_id, 1):
             return discord.File(
                 f"{BASE_LOCATION}default/AllPoses.png",
                 'poses.png'
             ) 
         
         # prerendered of custom all poses
-        if self.hasPreRenderOfPoses(user_id):
+        if self.has_prerender_of_poses(user_id):
             return discord.File(
                 f"{BASE_LOCATION}{str(user_id)}/AllPoses.png",
                 "poses.png"
@@ -236,8 +236,8 @@ class CharacterBuilder:
         
         # not prerendered, create it
         poses = [
-            remove_transparency(Image.open(self.getPoseLocation(user_id, i+1)))
-            for i in range(self.getAmountOfPoses(user_id))
+            remove_transparency(Image.open(self.get_pose_location(user_id, i+1)))
+            for i in range(self.get_amount_of_poses(user_id))
         ]
 
         # build poses in groups of n
@@ -288,22 +288,22 @@ class CharacterBuilder:
     
     
 
-    def hasCustomPoses(self, user_id, place):
-        return os.path.exists(self.getPoseLocation(user_id, place))
+    def has_custom_poses(self, user_id, place):
+        return os.path.exists(self.get_pose_location(user_id, place))
 
 
 
-    def getPoseLocation(self, user_id, place):
+    def get_pose_location(self, user_id, place):
         return f"{BASE_LOCATION}{str(user_id)}/Pose{place}.png"
 
 
 
-    def hasPreRenderOfPoses(self, user_id):
+    def has_prerender_of_poses(self, user_id):
         return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/AllPoses.png")
     
 
 
-    def add_numbering_to_poses(self, dst, startNumber, numberOfPoses, padding):
+    def add_numbering_to_poses(self, dst, start_number, number_of_poses, padding):
         # add poses to bg image
         bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
         bg.paste(dst, (0,0))
@@ -311,13 +311,13 @@ class CharacterBuilder:
         draw = ImageDraw.Draw(bg)
         font = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contb.ttf", size=200)
 
-        offsetPerPose = 450 + padding + 450
-        yPaste = int(dst.height + (bg.height - dst.height) // 2)
+        offset_per_pose = 450 + padding + 450
+        y_paste = int(dst.height + (bg.height - dst.height) // 2)
 
         # add numbering of poses
-        for i, number in enumerate(range(startNumber, startNumber+numberOfPoses)):
+        for i, number in enumerate(range(start_number, start_number+number_of_poses)):
             draw.text(
-                (450 + offsetPerPose*i, yPaste),
+                (450 + offset_per_pose*i, y_paste),
                 text=str(number+1),
                 align='center', font=font, anchor='mm', fill=(255, 104, 1)
             )
@@ -330,11 +330,11 @@ class PodiumBuilder:
     def __init__(self, bot) -> None:
         self.bot = bot
 
-        self.characterBuilder = CharacterBuilder(bot)
+        self.character_builder = CharacterBuilder(bot)
 
 
 
-    def userHasPodium(self, user_id, place=1, shiny=False):
+    def user_has_podium(self, user_id, place=1, shiny=False):
         if not shiny:
             return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/Podium{place}.png")
     
@@ -342,17 +342,17 @@ class PodiumBuilder:
 
 
 
-    async def getPodiumImage(self, user_id, place, alwaysShiny = False):
+    async def get_podium_image(self, user_id, place, always_shiny = False):
 
         # get location of the podium
-        if self.userHasPodium(user_id, place):
+        if self.user_has_podium(user_id, place):
             location = f"{BASE_LOCATION}{str(user_id)}/Podium{place}.png"
         else:
             location = f"{BASE_LOCATION}default/Podium{place}.png"
 
 
         # check if podium can be shiny and if it should be
-        if alwaysShiny and self.userHasPodium(user_id, place, shiny=True):
+        if always_shiny and self.user_has_podium(user_id, place, shiny=True):
             location = f"{BASE_LOCATION}{str(user_id)}/ShinyPodium{place}.png"
         
         # load the selected image
@@ -362,7 +362,7 @@ class PodiumBuilder:
     
 
     
-    async def getAllPodiumsImage(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True):
+    async def get_all_podiums_image(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True):
         # create normalised images for every given podium
         if len(user_ids) == 1:
             order = [1]
@@ -372,13 +372,13 @@ class PodiumBuilder:
             order = [2, 1, 3]
         
         # 1 in 12 chance that the podiums are shiny (if possible)
-        alwaysShiny = random.randint(1, 12) == 2
+        always_shiny = random.randint(1, 12) == 2
 
         podiums = []
         # for every available user (top 3)
         for i, id in enumerate(user_ids):
             # get podium
-            podiumImage = await self.getPodiumImage(id, order[i], alwaysShiny)
+            podium_image = await self.get_podium_image(id, order[i], always_shiny)
 
             if add_characters: 
 
@@ -387,12 +387,12 @@ class PodiumBuilder:
                 if poses is not None:
                     pose = random.choice([int(pose) for pose in poses[0]])
                 else:
-                    pose = random.randint(1, self.characterBuilder.getAmountOfPoses(str(id)))
+                    pose = random.randint(1, self.character_builder.get_amount_of_poses(str(id)))
 
                 # add character
-                podiumImage = await self.characterBuilder.addCharacterToPodium(podiumImage, str(id), pose, order[i])
+                podium_image = await self.character_builder.add_character_to_podium(podium_image, str(id), pose, order[i])
 
-            podiums.append(podiumImage)
+            podiums.append(podium_image)
 
 
         # paste podiums on correct location
@@ -460,8 +460,8 @@ def get_concat(main_image, left_image, right_image):
     )
 
     # paste the podiums onto the bg
-    pasteWidth = (dst.width - main_image.width)//2
-    dst.paste(main_image, (pasteWidth, 0), main_image)
+    paste_width = (dst.width - main_image.width)//2
+    dst.paste(main_image, (paste_width, 0), main_image)
     dst.paste(left_image, (0, dst.height - left_image.height), left_image)
     dst.paste(right_image, (dst.width - right_image.width, dst.height - left_image.height), right_image)
     

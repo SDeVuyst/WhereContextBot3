@@ -59,7 +59,7 @@ class Stats(commands.Cog, name="stats"):
         if len(leaderb) == 0:
             embed = discord.Embed(
                 description=f"❌ **This command has not been used yet.**",
-                color=self.bot.defaultColor
+                color=self.bot.default_color
             )
             return await interaction.edit_original_response(embed=embed, view=None)
         
@@ -68,7 +68,7 @@ class Stats(commands.Cog, name="stats"):
             embed = discord.Embed(
                 title=f"Something went wrong",
                 description=leaderb[1],
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             return await interaction.edit_original_response(embed=embed, view=None)
          
@@ -81,10 +81,10 @@ class Stats(commands.Cog, name="stats"):
         
         builder = ArtBuilder.LeaderboardBuilder(self.bot)
 
-        top = await builder.getTopLeaderboard(leaderb, command)
+        top = await builder.get_top_leaderboard(leaderb, command)
         await interaction.edit_original_response(attachments=[top], view=None, embed=None)
 
-        bottom = await builder.getBottomLeaderboard(leaderb)
+        bottom = await builder.get_bottom_leaderboard(leaderb)
         await secondMessage.add_files(bottom)
 
 
@@ -155,7 +155,7 @@ class Stats(commands.Cog, name="stats"):
 
             embed = discord.Embed(
                 description=desc,
-                color=self.bot.defaultColor
+                color=self.bot.default_color
             )
             return embed
         
@@ -164,7 +164,7 @@ class Stats(commands.Cog, name="stats"):
             embed = discord.Embed(
                 title=f"Something went wrong",
                 description=count[1],
-                color=self.bot.errorColor
+                color=self.bot.error_color
             )
             return embed
         
@@ -184,7 +184,7 @@ class Stats(commands.Cog, name="stats"):
         embed = discord.Embed(
             title="📊 Individual Statistic",
             description=desc,
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
 
         return embed
@@ -249,7 +249,7 @@ class CommandView(View):
         embed = discord.Embed(
             title="⏳ Loading...",
             description="This can take a while.",
-            color=self.bot.defaultColor
+            color=self.bot.default_color
         )
         await interaction.message.edit(view=None, embed=embed)
 

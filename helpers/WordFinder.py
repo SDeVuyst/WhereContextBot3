@@ -33,7 +33,7 @@ class WordFinder:
             embed = Embed(
                 title="One piece talk! 🗣️",
                 description=f"[Go to message]({message.jump_url})",
-                color=bot.defaultColor,
+                color=bot.default_color,
             )
 
             bot.logger.info(f"yachja trigger: {message.content}")
