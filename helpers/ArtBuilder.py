@@ -22,11 +22,11 @@ class LeaderboardBuilder:
 
     async def getTopLeaderboard(self, leaderboard, command):
         #  load background
-        bg = Image.open(BASE_LOCATION + 'LeaderboardTop.png')
+        bg = Image.open(f"{BASE_LOCATION}leaderboard/LeaderboardTop.png")
         bg = bg.convert('RGBA')
 
         # load fonts
-        fontb = ImageFont.truetype(BASE_LOCATION + "media/fonts/contb.ttf", size=150)
+        fontb = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contb.ttf", size=150)
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
@@ -75,10 +75,10 @@ class LeaderboardBuilder:
 
     async def getBottomLeaderboard(self, leaderboard):
         #  load background
-        bg = Image.open(BASE_LOCATION + 'LeaderboardBottom.png')
+        bg = Image.open(f"{BASE_LOCATION}leaderboard/LeaderboardBottom.png")
 
         # load fonts
-        fontm = ImageFont.truetype(BASE_LOCATION + "media/fonts/contm.ttf", size=120)
+        fontm = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contm.ttf", size=120)
 
         # create object for drawing
         draw = ImageDraw.Draw(bg)
@@ -223,7 +223,7 @@ class CharacterBuilder:
         # prerenderd of default all poses
         if not self.hasCustomPoses(user_id, 1):
             return discord.File(
-                BASE_LOCATION + "default/AllPoses.png",
+                f"{BASE_LOCATION}default/AllPoses.png",
                 'poses.png'
             ) 
         
@@ -240,25 +240,35 @@ class CharacterBuilder:
             for i in range(self.getAmountOfPoses(user_id))
         ]
 
-        # build poses in groups of 5
+        # build poses in groups of n
+        # determine n
+        if len(poses)%5==0 or len(poses) > 15:
+            chunksize = 5
+        elif len(poses)%4==0 or len(poses) > 9:
+            chunksize = 4
+        else:
+            chunksize = 3
+
         i = 0
         poses_dst = []
-        while len(poses) >= 5:
-            poses_to_build = poses[:5]
-            poses = poses[5:]
+        # build list of groups of poses
+        while len(poses) >= chunksize:
+            poses_to_build = poses[:chunksize]
+            poses = poses[chunksize:]
 
-            # build 5 poses image
+            # build poses image with n poses
             dst = get_concat_h_multi_blank(poses_to_build, 150)
-            bg = self.add_numbering_to_poses(dst, i, 5)
+            bg = self.add_numbering_to_poses(dst, i, chunksize, 150)
             
             poses_dst.append(bg)
 
-            i += 5
+            i += chunksize
+
 
         # leftover poses
         if len(poses) > 0:
             dst = get_concat_h_multi_blank(poses, 150)
-            bg = self.add_numbering_to_poses(dst, i, len(poses))
+            bg = self.add_numbering_to_poses(dst, i, len(poses), 150)
             
             poses_dst.append(bg)
 
@@ -287,20 +297,21 @@ class CharacterBuilder:
         return f"{BASE_LOCATION}{str(user_id)}/Pose{place}.png"
 
 
+
     def hasPreRenderOfPoses(self, user_id):
         return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/AllPoses.png")
     
 
 
-    def add_numbering_to_poses(self, dst, startNumber, numberOfPoses):
+    def add_numbering_to_poses(self, dst, startNumber, numberOfPoses, padding):
         # add poses to bg image
         bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
         bg.paste(dst, (0,0))
 
         draw = ImageDraw.Draw(bg)
-        font = ImageFont.truetype("media/fonts/contb.ttf", size=200)
+        font = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contb.ttf", size=200)
 
-        offsetPerPose = int(bg.width / numberOfPoses)
+        offsetPerPose = 450 + padding + 450
         yPaste = int(dst.height + (bg.height - dst.height) // 2)
 
         # add numbering of poses
@@ -428,7 +439,9 @@ def vertical_concat(im1, im2):
 
     # Paste the two images onto the new image
     new_image.paste(im1, (0, 0))
-    new_image.paste(im2, (0, height1))
+    # center second image
+    remaining_width = new_width - width2
+    new_image.paste(im2, (remaining_width//2, height1))
 
     return new_image
 
@@ -467,7 +480,6 @@ def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
 
 # concat 2 images
 def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
-    # im1, im2 = remove_transparency(im1, color), remove_transparency(im2, color)
     dst = Image.new('RGBA', (im1.width + im2.width + padding, im1.height), color)
     dst.paste(im1, (0, 0))
     dst.paste(im2, (im1.width + padding, 0))
