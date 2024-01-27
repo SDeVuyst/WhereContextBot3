@@ -159,9 +159,9 @@ async def status_task() -> None:
     if bot.status_manual is None:
         amount = await db_manager.messages_in_ooc()
         statuses = [
-            f"{amount} berichten in Out-of-Context",
-            f"Update 2 out now!",
-            f'/help'
+            f"📈 {amount} berichten in Out-of-Context!",
+            f"🦾 Update 2 out now!",
+            f'🦮 /help'
         ]
         await bot.change_presence(activity=discord.Game(random.choice(statuses)))
 
