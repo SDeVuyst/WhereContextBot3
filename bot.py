@@ -160,7 +160,7 @@ async def status_task() -> None:
         amount = await db_manager.messages_in_ooc()
         statuses = [
             f"📈 {amount} berichten in Out-of-Context!",
-            f"🦾 Update 2 out now!",
+            f"🦾 The Art Update out now!",
             f'🦮 /help',
         ]
 
