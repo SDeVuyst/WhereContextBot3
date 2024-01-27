@@ -943,14 +943,15 @@ k
             f"<@{interaction.user.id}> it's on sight now",
         ]
 
-        try:
-            is_possible = (interaction.user.id == self.user_id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
-            if not is_possible:
-                await interaction.response.send_message(random.choice(responses))
-            return is_possible
-
-        except:
-            return False
+        
+        # can only be triggered by the profile owner or an owner
+        is_possible = (interaction.user.id == self.user_id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        
+        # send message if usr cannot interact with button
+        if not is_possible:
+            await interaction.response.send_message(random.choice(responses))
+        
+        return is_possible
 
 
 

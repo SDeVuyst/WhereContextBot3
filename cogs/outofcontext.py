@@ -459,15 +459,12 @@ class Menu(discord.ui.View):
             bool
         """
 
-        try:
-            is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
-            # stuur dm naar user als niet author is
-            if not is_possible:
-                await interaction.user.send('nt')
-            return is_possible
+        is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        # stuur dm naar user als niet author is
+        if not is_possible:
+            await interaction.user.send('nt')
+        return is_possible
         
-        except:
-            return False
         
 
     async def on_timeout(self) -> None:
