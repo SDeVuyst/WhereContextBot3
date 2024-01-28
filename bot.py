@@ -33,10 +33,6 @@ bot = Bot(
     help_command=None,
 )
 
-bot.default_color = 0xF4900D
-bot.error_color = 0xE02B2B
-bot.succes_color = 0x39AC39
-
 bot.loaded = set()
 bot.unloaded = set()
 

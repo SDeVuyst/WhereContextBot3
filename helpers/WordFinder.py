@@ -1,7 +1,6 @@
 from . import db_manager
-import re
+import embeds
 import os
-from discord import Embed
 import random
 
 class WordFinder:
@@ -30,15 +29,12 @@ class WordFinder:
 
             # send dm to yachja 
             yachja = await bot.fetch_user(int(os.environ.get("YACHJA")))
-            embed = Embed(
-                title="One piece talk! 🗣️",
-                description=f"[Go to message]({message.jump_url})",
-                color=bot.default_color,
-            )
 
             bot.logger.info(f"yachja trigger: {message.content}")
 
-            await yachja.send(embed=embed)
+            await yachja.send(embed=embeds.DefaultEmbed(
+                "One piece talk! 🗣️", f"[Go to message]({message.jump_url})"
+            ))
 
 
     async def check_danae(self, bot, message):
