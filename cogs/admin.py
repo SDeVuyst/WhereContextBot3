@@ -8,7 +8,6 @@ Version: 5.5.0
 
 import discord
 import os
-import random
 import embeds
 
 from discord import app_commands
@@ -422,62 +421,24 @@ class Admin(commands.Cog, name="admin"):
                 "You can't ban a bot!"
             ))
 
-        # check if user is server owner
+        # cant ban the server owner
         if user.id == interaction.guild.owner_id:
             return await interaction.followup.send(embed=embeds.OperationFailedEmbed(
                 "You can't ban the server owner!"
             ))
 
         
-        ban_number_treshold = 4 # TODO determine amounts of votes needed
+        ban_number_treshold = int(os.environ.get("BANTRESHOLD")) # determine amounts of votes needed
 
-        banned_embed = embeds.DefaultEmbed(
-            f"🔨 You have been banned from {interaction.guild.name}!"
+        # respond to interaction
+        vote_embed = embeds.DefaultEmbed(
+            f"🔨 Vote to ban {user.display_name}",
+            f"This vote succeeds at {ban_number_treshold} votes in favour of banning.\n You have 5 minutes to vote.",
         )
+        vote_embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
+        vote_embed.add_field(name="Current votes", value=f"```1/{ban_number_treshold}```")
 
-        banned_embed.add_field(
-            name="Reason",
-            value=reason,
-        )
-
-        done_ban_embed = embeds.DefaultEmbed(
-            f"🔨 {user.display_name} has been banned!",
-            "Cooked his ass"
-        )
-
-        # check if user is able to ban, if yes, continue
-        # if not, launch vote
-        able_to_ban = interaction.user.top_role >= user.top_role
-
-        # owner should always be able to ban user
-        if str(interaction.user.id) == list(os.environ.get("OWNERS").split(","))[0]:
-            able_to_ban = True
-            
-        if able_to_ban:
-            banned_embed.add_field(
-                name="Banned by",
-                value=self.bot.get_user(interaction.user.id).mention
-            )
-
-            # send ban message to user
-            await user.send(embed=banned_embed)
-
-            # ban user
-            await user.ban(reason=reason, delete_message_days=0)
-
-            # respond to interaction
-            await interaction.followup.send(embed=done_ban_embed)
-
-        else:
-            # respond to interaction
-            vote_embed = embeds.DefaultEmbed(
-                f"🔨 Vote to ban {user.display_name}",
-                f"This vote succeeds at {ban_number_treshold} votes in favour of banning.\n You have 5 minutes to vote.",
-            )
-            vote_embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
-            vote_embed.add_field(name="Current votes", value=f"```1/{ban_number_treshold}```")
-
-            await interaction.followup.send(embed=vote_embed, view=BanView(self.bot, interaction.user.id, user, ban_number_treshold, reason, done_ban_embed, vote_embed))
+        await interaction.followup.send(embed=vote_embed, view=BanView(self.bot, interaction.user.id, user, ban_number_treshold, reason, vote_embed))
 
 
 
@@ -546,14 +507,6 @@ class Admin(commands.Cog, name="admin"):
 
         guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         channel = await guild.fetch_channel(int(os.environ.get("CHANNEL")))
-
-        # unban the user
-        if os.environ.get("AUTOUNBAN") == "True":
-            try:
-                await guild.unban(interaction.user)
-                await interaction.user.send("I unbanned you.")
-            except:
-                pass
 
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
@@ -645,14 +598,13 @@ class Admin(commands.Cog, name="admin"):
 
 
 class BanView(discord.ui.View):
-    def __init__(self, bot, bannerID, user, ban_number_treshold, reason, done_ban_embed, original_embed):
+    def __init__(self, bot, bannerID, user, ban_number_treshold, reason, original_embed):
         super().__init__(timeout=300)
 
         self.bot = bot
         self.user = user
         self.ban_number_treshold = ban_number_treshold
         self.reason = reason
-        self.done_ban_embed = done_ban_embed
         self.original_embed = original_embed
 
         self.members_who_voted_yes = [bannerID]
@@ -712,7 +664,10 @@ class BanView(discord.ui.View):
             await interaction.edit_original_response(view=None)
 
             # send confirmation
-            await interaction.followup.send(embed=self.done_ban_embed)
+            await interaction.followup.send(embed=embeds.DefaultEmbed(
+                f"🔨 {self.user.display_name} has been banned!",
+                "Cooked his ass"
+            ))
 
             # ban user
             await self.user.ban(reason=self.reason, delete_message_days=0)
