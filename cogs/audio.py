@@ -497,7 +497,7 @@ class Audio(commands.Cog, name="audio"):
             bardata = ProgressBar(0, 20, 18)
 
             # confirmatie
-            embed = embeds.OperationSucceededEmbed(
+            embed = embeds.DefaultEmbed(
                 title="Playing music!",
                 description=f"[{tr.title}]({tr.url}) by {tr.author}\n{bardata} - {self.format_seconds_to_mmss(0)} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}",
                 emoji="🎵"
@@ -510,13 +510,13 @@ class Audio(commands.Cog, name="audio"):
             except:
                 pass
 
-
             if first_player:
                 playing_message = await interaction.followup.send(embed=embed)
             else:
                 playing_message = await interaction.channel.send(embed=embed)
 
             start_time = datetime.now()
+
             while vc.is_playing() or vc.is_paused():
                 if vc.is_paused():
                     embed.description = "⏸️ **Paused!**\n" + embed.description.replace('⏸️ **Paused!**\n', '')
@@ -529,7 +529,11 @@ class Audio(commands.Cog, name="audio"):
                         time_diff = datetime.now() - start_time
 
                     if tr.length is not None:
-                        bardata = ProgressBar(ceil(time_diff.total_seconds()), tr.length, 18)
+                        bardata = ProgressBar(
+                            # progress made (in seconds) in int, not more than track length
+                            min(ceil(time_diff.total_seconds()), tr.length),
+                            tr.length, 18
+                        )
                     else:
                         bardata = ProgressBar(0, 20, 18)
                     
