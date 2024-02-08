@@ -13,7 +13,7 @@ class WordFinder:
         await self.findNWord(bot, message)
         await self.find_yachja_word(bot, message)
         await self.check_gif(bot, message)
-        await self.check_gf(bot, message)
+        #await self.check_gf(bot, message)
 
  
     async def findNWord(self, bot, message):
