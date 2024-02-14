@@ -10,6 +10,7 @@ import discord
 import os
 import embeds
 import random
+import asyncio
 
 from discord import app_commands
 from discord.ext import commands
@@ -428,19 +429,20 @@ class Admin(commands.Cog, name="admin"):
                 "You can't ban the server owner!"
             ))
 
-        
-        ban_number_treshold = int(os.environ.get("BANTRESHOLD")) # determine amounts of votes needed
-
-        # respond to interaction
-        vote_embed = embeds.DefaultEmbed(
-            f"🔨 Vote to ban {user.display_name}",
-            f"This vote succeeds at {ban_number_treshold} votes in favour of banning.\n You have 5 minutes to vote.",
+        ban_explain_embed = embeds.DefaultEmbed("🔨 Pick your ban type")
+        ban_explain_embed.add_field(
+            name="🎰 Gamble",
+            value=f"This is a 50/50. Either you ({interaction.user.mention}) or {user.mention} are banned.",
+            inline=True
         )
-        vote_embed.add_field(name="Reason", value=f"```{reason}```", inline=False)
-        vote_embed.add_field(name="Current votes", value=f"```1/{ban_number_treshold}```")
+        ban_explain_embed.add_field(
+            name="🗳️ Vote",
+            value=f"Everybody can vote to ban {user.mention}. If {os.environ.get('BANTRESHOLD')} or more people vote yes, then {user.mention} is banned.",
+            inline=True
+        )
 
-        await interaction.followup.send(embed=vote_embed, view=BanView(self.bot, interaction.user.id, user, ban_number_treshold, reason, vote_embed))
-
+        await interaction.followup.send(embed=ban_explain_embed, view=BanTypeView(user, interaction.user, self.bot, reason))
+        
 
 
     @app_commands.command(
@@ -938,6 +940,93 @@ class RolesSelectView(discord.ui.View):
         await interaction.edit_original_response(embed=embeds.OperationSucceededEmbed(
             "Edited default Roles!", desc
         ), view=None)
+
+
+
+class BanTypeView(discord.ui.View):
+    def __init__(self, user, ban_starter, bot, reason, timeout = 180):
+        self.user = user
+        self.ban_starter = ban_starter
+        self.bot = bot
+        self.reason = reason
+        self.selected_roles = None
+
+        super().__init__(timeout=timeout)
+
+
+    @discord.ui.button(label="Gamble", style=discord.ButtonStyle.blurple, row=3, disabled=False, emoji='🎰')
+    async def gamble_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer in case processing the selected data takes a while
+        await interaction.response.defer()
+        urls = [
+            "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExczV5enBkbTVoNGZoZHUwdmdzdDdjbzFoZ3VoMDA4MTVxdDY2Ymo2byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6jqfXikz9yzhS/giphy.gif",
+            "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExemNibW9ra2Njemh5Zm4wZDB4bWQzemhmM2lodjd3cXhyNXZjeXM5eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26uf2YTgF5upXUTm0/giphy.gif",
+            "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWVqeXV3OHRpcHNtemx0ODJ4aHh1ZXdhejZ2aXQwN2o0Z21sdHJ3eiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qNCtzhsWCc7q4D2FB5/giphy.gif",
+            "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmM0am03ejVudHkzejkyODMwaWNjaXg1emtyYThrNGttd2J1cTByYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26ufjXhjqhpFgcONq/giphy.gif",
+            "https://media0.giphy.com/media/l2SqgVwLpAmvIfMCA/giphy.gif?cid=ecf05e47mfvwpbejd07zq4l2jyv74wyppg4ik3wnstsra73d&ep=v1_gifs_related&rid=giphy.gif&ct=g",
+        ]
+
+        gamble_embed = embeds.DefaultEmbed(f"🎰 {self.ban_starter.display_name} 🆚 {self.user.display_name} 🎰")
+        gamble_embed.set_image(url=random.choice(urls))
+        await interaction.edit_original_response(embed=gamble_embed, view=None)
+
+        # wait 4 seconds
+        await asyncio.sleep(4)
+
+        # determine who to ban
+        choices = [self.user, self.ban_starter]
+        to_be_banned = random.choice(choices)
+        choices.remove(to_be_banned)
+        winner = choices[0]
+
+        # send ban message to user
+        banned_embed = embeds.DefaultEmbed(
+            f"🔨 You have been banned from {interaction.guild.name}!",
+        )
+
+        banned_embed.add_field(
+            name="Reason",
+            value=f"```{self.reason}```",
+        )
+
+        # add field to show you lost a 50/50
+        banned_embed.add_field(
+            name="🪦 You have lost a 50/50",
+            value=f"You lost to {winner.mention}",
+            inline=False                
+        )
+        await to_be_banned.send(embed=banned_embed)
+
+
+        result_embed = embeds.DefaultEmbed(
+            f"🏅 {winner} won!", f"{to_be_banned} has been banned"
+        )
+        await interaction.edit_original_response(embed=result_embed)
+        
+        await asyncio.sleep(1)
+        # TODO ban the user
+
+
+
+
+    @discord.ui.button(label="Vote", style=discord.ButtonStyle.blurple, row=3, disabled=False, emoji='🗳️')
+    async def vote_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        # defer in case processing the selected data takes a while
+        await interaction.response.defer()
+
+        ban_number_treshold = int(os.environ.get("BANTRESHOLD")) # determine amounts of votes needed
+
+        # respond to interaction
+        vote_embed = embeds.DefaultEmbed(
+            f"🔨 Vote to ban {self.user.display_name}",
+            f"This vote succeeds at {ban_number_treshold} votes in favour of banning.\n You have 5 minutes to vote.",
+        )
+        vote_embed.add_field(name="Reason", value=f"```{self.reason}```", inline=False)
+        vote_embed.add_field(name="Current votes", value=f"```1/{ban_number_treshold}```")
+
+
+        await interaction.edit_original_response(embed=vote_embed, view=BanView(self.bot, self.ban_starter.id, self.user, ban_number_treshold, self.reason, vote_embed))
+
 
 
 
