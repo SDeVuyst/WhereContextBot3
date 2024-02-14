@@ -9,6 +9,7 @@ Version: 5.5.0
 import os
 import dateparser
 import re
+import random
 
 from datetime import datetime
 
@@ -379,12 +380,20 @@ class PollMenuBuilder(discord.ui.View):
         )
 
         self.embed.title = f'***{self.title}***'      
-
+                       
         # edit original message
-        msg = interaction.message
+        msg = await interaction.message.edit(embed=self.embed)
+
+        # create view to add to message
         view = discord.ui.View(timeout=None)
-        view.add_item(DynamicVotesButton(interaction.user.id))
-        await msg.edit(embed=self.embed, view=view if not self.anonymous else None)
+        # add end poll button
+        view.add_item(EndPollButton(interaction.user.id, msg, self.anonymous))
+        # add see votes button if not anoymous
+        if not self.anonymous:
+            view.add_item(DynamicVotesButton(interaction.user.id))
+        
+        # we have to edit twice because the end poll button needs the new embed
+        await msg.edit(view=view)
         
         # save poll to db
         rcts = ('{' + (len(self.options) * '{"placeholder"}') + '}').replace("}{", "},{")
@@ -449,41 +458,70 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
         return True
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        # get votes from db
-        try:
-            reactions = await db_manager.get_poll_reactions(interaction.message.id)
-            reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
-        except:
-            return await interaction.response.send_message("poll is not active...")
-
-        # create embed
-        embed = embeds.DefaultEmbed(
-            "🗳️ Votes"
-        )
-
-        numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-        
-        # check if poll has votes
-        total_reactions = sum([len(x) for x in reactions])
-        if total_reactions == 0:
-            embed.description = '**This poll has no votes yet...**'
-        
-        else:
-            for i, react in enumerate(reactions):
-                # generate description per reaction
-                desc = ''
-                for r in react:
-                    r = r.replace("'", "")
-                    desc += f'\n<@{int(r)}>'
-
-                embed.add_field(
-                    name=f'**{numbers[i]}**',
-                    value=desc if len(desc) > 0 else 'No votes yet',
-                    inline=True
-                )
-
-        # respond
+        embed = await get_poll_votes_embed(interaction.message.id)
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+
+class EndPollButton(discord.ui.Button):
+    def __init__(self, user_id: int, message, anonymous) -> None:
+        super().__init__(
+            label='End Poll',
+            style=discord.ButtonStyle.red,
+            custom_id=f'button:userb:{user_id}',
+            emoji='⌛',
+        )
+        self.user_id: int = user_id
+        self.message = message
+        self.anonymous = anonymous
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        responses = [
+            f"<@{interaction.user.id}> shatap lil bro",
+            f"<@{interaction.user.id}> you are NOT him",
+            f"<@{interaction.user.id}> blud thinks he's funny",
+            f"<@{interaction.user.id}> imma touch you lil nigga",
+            f"<@{interaction.user.id}> it's on sight now",
+        ]
+
+        
+        # can only be triggered by the profile owner or an owner
+        is_possible = (interaction.user.id == self.user_id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        
+        # send message if usr cannot interact with button
+        if not is_possible:
+            await interaction.response.send_message(random.choice(responses))
+        
+        return is_possible
+    
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        # respond to original message with the final results
+        response = None
+        if not self.anonymous:
+            result_embed = await get_poll_votes_embed(self.message.id, True)
+            response = await self.message.reply(embed=result_embed)
+
+        # edit message to show that poll is closed
+        embed = self.message.embeds[0]
+        has_desc = embed.description is not None
+        if response is not None:
+            embed.description = f"***Closed*** - [See Final votes]({response.jump_url})\n" + (embed.description if has_desc else "")
+        else:
+            embed.description = f"***Closed***\n" + (embed.description if has_desc else "")
+       
+        await self.message.edit(embed=embed, view=None)
+
+        # remove all reactions from poll
+        await self.message.clear_reactions()
+
+        # remove poll from db
+        await db_manager.delete_poll(self.message.id)
+
+        # respond with confirmation
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Closed Poll!"
+        ), ephemeral=True)
 
 
 
@@ -525,6 +563,42 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
             "Description set!", f'```{self.answer.value}```', emoji="💾"
             
         ), ephemeral=True)
+
+
+
+async def get_poll_votes_embed(message_id, is_poll_end=False):
+    # get votes from db
+    reactions = await db_manager.get_poll_reactions(message_id)
+    reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
+
+    # create embed
+    embed = embeds.DefaultEmbed(
+        "🗳️ Final Votes" if is_poll_end else "🗳️ Votes"
+    )
+
+    numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+    
+    # check if poll has votes
+    total_reactions = sum([len(x) for x in reactions])
+    if total_reactions == 0:
+        embed.description = '**The poll ended without votes' if is_poll_end else '**This poll has no votes...**'
+        return embed
+
+    no_votes_str = 'No votes' if is_poll_end else 'No votes yet'
+    for i, react in enumerate(reactions):
+        # generate description per reaction
+        desc = ''
+        for r in react:
+            r = r.replace("'", "")
+            desc += f'\n<@{int(r)}>'
+
+        embed.add_field(
+            name=f'**{numbers[i]}**',
+            value=desc if len(desc) > 0 else no_votes_str,
+            inline=True
+        )
+
+    return embed
 
 
 

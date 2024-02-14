@@ -254,7 +254,8 @@ async def on_raw_reaction_add(payload):
     message = await channel.fetch_message(payload.message_id)
     user = bot.get_user(payload.user_id)
     
-    bot.logger.info(f"{user.display_name} voted {payload.emoji.name}")
+    if not user.bot:
+        bot.logger.info(f"{user.display_name} voted {payload.emoji.name}")
 
     # remove wrong emoji reactions
     if payload.emoji.name not in emojis:

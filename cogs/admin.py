@@ -9,6 +9,7 @@ Version: 5.5.0
 import discord
 import os
 import embeds
+import random
 
 from discord import app_commands
 from discord.ext import commands
