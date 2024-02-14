@@ -992,8 +992,8 @@ class BanTypeView(discord.ui.View):
         # add field to show you lost a 50/50
         banned_embed.add_field(
             name="🪦 You have lost a 50/50",
-            value=f"You lost to {winner.mention}",
-            inline=False                
+            value=f"```You lost to {winner}```",
+            inline=False
         )
         await to_be_banned.send(embed=banned_embed)
 
@@ -1004,8 +1004,9 @@ class BanTypeView(discord.ui.View):
         await interaction.edit_original_response(embed=result_embed)
         
         await asyncio.sleep(1)
-        # TODO ban the user
 
+        # ban the user
+        await to_be_banned.ban(reason=self.reason, delete_message_days=0)
 
 
 

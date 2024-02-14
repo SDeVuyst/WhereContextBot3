@@ -70,8 +70,6 @@ class Stats(commands.Cog, name="stats"):
          
         if view.chosen_command == "danae":
             command = "danae trigger"
-        elif view.chosen_command == "keleo":
-            command = "keleo trigger"
         else:
             command = f'/{view.chosen_command}'
         
@@ -144,8 +142,6 @@ class Stats(commands.Cog, name="stats"):
                 title = f"🔨 **<@{userid}> has not been banned yet.**"
             elif command == "danae":
                 title = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
-            elif command == "keleo":
-                title = f"✌️ **<@{userid}> has not triggered the keleo feature yet.**"
             else:
                 title = f"❌ **<@{userid}> didn't use /{command} yet.**"
 
@@ -163,8 +159,6 @@ class Stats(commands.Cog, name="stats"):
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
         elif command == "danae":
             desc = f"**<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
-        elif command == "keleo":
-            desc = f"**<@{userid}> triggered 'keleo' ```{count[0][0]}``` times.**"
         elif command == "bancount":
             desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
         else:
@@ -257,7 +251,6 @@ class CommandSelect(Select):
         elif selected_cog == "stats":
             commands.insert(0, ("Bans", "bancount"))
             commands.insert(0, ("Danae trigger", "danae"))
-            commands.insert(0, ("Keleo trigger", "keleo"))
         
 
         super().__init__(
