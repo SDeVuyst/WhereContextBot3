@@ -506,7 +506,7 @@ class EndPollButton(discord.ui.Button):
         embed = self.message.embeds[0]
         has_desc = embed.description is not None
         if response is not None:
-            embed.description = f"***Closed*** - [See Final votes]({response.jump_url})\n" + (embed.description if has_desc else "")
+            embed.description = f"***Closed*** - [See Final Votes]({response.jump_url})\n" + (embed.description if has_desc else "")
         else:
             embed.description = f"***Closed***\n" + (embed.description if has_desc else "")
        
