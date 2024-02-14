@@ -966,7 +966,7 @@ class BanTypeView(discord.ui.View):
             "https://media0.giphy.com/media/l2SqgVwLpAmvIfMCA/giphy.gif?cid=ecf05e47mfvwpbejd07zq4l2jyv74wyppg4ik3wnstsra73d&ep=v1_gifs_related&rid=giphy.gif&ct=g",
         ]
 
-        gamble_embed = embeds.DefaultEmbed(f"🎰 {self.ban_starter.display_name} 🆚 {self.user.display_name} 🎰")
+        gamble_embed = embeds.DefaultEmbed(f"**🎰 {self.ban_starter.display_name} vs. {self.user.display_name}**")
         gamble_embed.set_image(url=random.choice(urls))
         await interaction.edit_original_response(embed=gamble_embed, view=None)
 
