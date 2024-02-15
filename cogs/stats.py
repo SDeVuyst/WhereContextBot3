@@ -42,15 +42,31 @@ class Stats(commands.Cog, name="stats"):
 
         secondMessage = await interaction.channel.send('** **')
         
-        await view.wait()
-
-        
+        await view.wait()        
 
         if view.chosen_command is None:
             raise TimeoutCommand('Timeout in /leaderboard')
 
         elif view.chosen_command == "bancount":
             leaderb = await db_manager.get_ban_leaderboard()
+
+        elif command == "current_win_streak":
+            leaderb = await db_manager.get_current_win_streak_leaderboard()
+
+        elif command == "current_loss_streak":
+            leaderb = await db_manager.get_current_loss_streak_leaderboard()
+
+        elif command == "highest_win_streak":
+            leaderb = await db_manager.get_highest_win_streak_leaderboard()
+
+        elif command == "highest_loss_streak":
+            leaderb = await db_manager.get_highest_loss_streak_leaderboard()
+
+        elif command == "ban_total_wins":
+            leaderb = await db_manager.get_ban_total_wins_leaderboard()
+
+        elif command == "ban_total_losses":
+            leaderb = await db_manager.get_ban_total_losses_leaderboard()
 
         else:
             # krijg count bericht uit db
@@ -70,6 +86,25 @@ class Stats(commands.Cog, name="stats"):
          
         if view.chosen_command == "danae":
             command = "danae trigger"
+
+        elif view.chosen_command == "current_win_streak":
+            command = "Ban Gamble - Current Win Streak"
+
+        elif view.chosen_command == "current_loss_streak":
+            command = "Ban Gamble - Current Loss Streak"
+
+        elif view.chosen_command == "highest_win_streak":
+            command = "Ban Gamble - Highest Win Streak"
+
+        elif view.chosen_command == "highest_loss_streak":
+            command = "Ban Gamble - Highest Loss Streak"
+
+        elif view.chosen_command == "ban_total_wins":
+            command = "Ban Gamble - Total Wins"
+
+        elif view.chosen_command == "ban_total_losses":
+            command = "Ban Gamble - Total Losses"
+
         else:
             command = f'/{view.chosen_command}'
         
@@ -131,6 +166,25 @@ class Stats(commands.Cog, name="stats"):
         """
         if command == "bancount":
             count = await db_manager.get_ban_count(userid)
+        
+        elif command == "current_win_streak":
+            count = await db_manager.get_current_win_streak(userid)
+
+        elif command == "current_loss_streak":
+            count = await db_manager.get_current_loss_streak(userid)
+
+        elif command == "highest_win_streak":
+            count = await db_manager.get_highest_win_streak(userid)
+
+        elif command == "highest_loss_streak":
+            count = await db_manager.get_highest_loss_streak(userid)
+
+        elif command == "ban_total_wins":
+            count = await db_manager.get_ban_total_wins(userid)
+
+        elif command == "ban_total_losses":
+            count = await db_manager.get_ban_total_losses(userid)
+
         else:
             # krijg count bericht uit db
             count = await db_manager.get_command_count(userid, command)
@@ -140,8 +194,28 @@ class Stats(commands.Cog, name="stats"):
         if len(count) == 0 or int(count[0][0]) == 0:
             if command == "bancount":
                 title = f"🔨 **<@{userid}> has not been banned yet.**"
+
             elif command == "danae":
                 title = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
+
+            elif command == "current_win_streak":
+                title = f"**<@{userid}> doesn't have a win streak yet.**"
+
+            elif command == "current_loss_streak":
+                title = f"**<@{userid}> doesn't have a loss streak yet.**"
+
+            elif command == "highest_win_streak":
+                title = f"**<@{userid}> doesn't have a highest win streak yet.**"
+
+            elif command == "highest_loss_streak":
+                title = f"**<@{userid}> doesn't have a highest loss streak yet.**"
+
+            elif command == "ban_total_wins":
+                title = f"**<@{userid}> doesn't have a win yet.**"
+
+            elif command == "ban_total_losses":
+                title = f"**<@{userid}> doesn't have a loss yet.**"
+
             else:
                 title = f"❌ **<@{userid}> didn't use /{command} yet.**"
 
@@ -155,12 +229,34 @@ class Stats(commands.Cog, name="stats"):
         
         if command == "messages_played":
             desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
+
         elif command == "messages_deleted":
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
+
         elif command == "danae":
             desc = f"**<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
+
         elif command == "bancount":
             desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
+        
+        elif command == "current_win_streak":
+            desc = f"**<@{userid}> has a current win streak of ```{count[0][0]}```**"
+
+        elif command == "current_loss_streak":
+            desc = f"**<@{userid}> has a current loss streak of ```{count[0][0]}```**"
+
+        elif command == "highest_win_streak":
+            desc = f"**<@{userid}> has a highest win streak of ```{count[0][0]}```**"
+
+        elif command == "highest_loss_streak":
+            desc = f"**<@{userid}> has a highest loss streak of ```{count[0][0]}```**"
+
+        elif command == "ban_total_wins":
+            desc = f"**<@{userid}> total wins```{count[0][0]}```**"
+
+        elif command == "ban_total_losses":
+            desc = f"**<@{userid}> total losses ```{count[0][0]}```**" 
+        
         else:
             desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
 
@@ -252,14 +348,23 @@ class CommandSelect(Select):
             commands.insert(0, ("Bans", "bancount"))
             commands.insert(0, ("Danae trigger", "danae"))
         
+        elif selected_cog == "admin":
+            commands.append("Ban Gamble - Current Win Streak", "current_win_streak")
+            commands.append("Ban Gamble - Current Loss Streak", "current_loss_streak")
+            commands.append("Ban Gamble - Highest Win Streak", "highest_win_streak")
+            commands.append("Ban Gamble - Highest Loss Streak", "highest_loss_streak")
+            commands.append("Ban Gamble - Total Wins", "ban_total_wins")
+            commands.append("Ban Gamble - Total Losses", "ban_total_losses")
 
         super().__init__(
             placeholder="Pick a feature", 
             options=[SelectOption(label=label, value=value) for label, value in commands]
         )
 
+
     async def callback(self, interaction:Interaction):
         await self.view.respond_to_answer2(interaction, self.values)
+
 
 
 async def setup(bot):

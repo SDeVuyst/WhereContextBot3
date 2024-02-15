@@ -1079,7 +1079,7 @@ class BanTypeView(discord.ui.View):
         await asyncio.sleep(1)
 
         # ban the user
-        # todo UNCOMMENT await loser.ban(reason=self.reason, delete_message_days=0) 
+        await loser.ban(reason=self.reason, delete_message_days=0) 
 
         # send ban message to loser
         banned_embed = embeds.DefaultEmbed(

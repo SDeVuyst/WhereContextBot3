@@ -1186,3 +1186,99 @@ async def check_ban_gamble_loss_streak(user_id):
                 
         except:
             return False
+
+
+async def get_current_win_streak_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, current_win_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+
+
+async def get_current_loss_streak_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, current_loss_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_highest_win_streak_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, highest_win_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_highest_loss_streak_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, highest_loss_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_ban_total_wins_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, total_wins FROM bangamble ORDER BY count DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_ban_total_losses_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, total_losses FROM bangamble ORDER BY count DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
