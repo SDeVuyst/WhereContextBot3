@@ -58,3 +58,14 @@ CREATE TABLE IF NOT EXISTS poses (
   active_poses INTEGER[],
   place INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS bangamble (
+  id SERIAL PRIMARY KEY,
+  user_id varchar(20) NOT NULL,
+  current_win_streak INTEGER DEFAULT 0,
+  highest_win_streak INTEGER DEFAULT 0,
+  current_loss_streak INTEGER DEFAULT 0,
+  highest_loss_streak INTEGER DEFAULT 0,
+  total_wins INTEGER DEFAULT 0,
+  total_losses INTEGER DEFAULT 0
+);

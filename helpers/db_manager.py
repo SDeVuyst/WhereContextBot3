@@ -880,3 +880,309 @@ async def remove_poses(user_id, place):
             
     except Exception as err:
         return False
+    
+
+async def increment_ban_gamble_wins(user_id):
+
+    alreadyExists = await is_in_ban_gamble(user_id)
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE bangamble SET current_win_streak = current_win_streak + 1 WHERE user_id=%s;UPDATE bangamble SET total_wins = total_wins + 1 WHERE user_id=%s",
+                        (str(user_id), str(user_id),)
+                    )   
+                else:
+                    cursor.execute(
+                        "INSERT INTO bangamble(user_id, current_win_streak, total_wins) VALUES (%s, %s, %s)",
+                        (str(user_id), 1, 1)
+                    )
+
+                cursor.commit()
+                return True
+                
+        except:
+            return False
+
+
+async def increment_ban_gamble_losses(user_id):
+
+    alreadyExists = await is_in_ban_gamble(user_id)
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE bangamble SET current_loss_streak = current_loss_streak + 1 WHERE user_id=%s;UPDATE bangamble SET total_losses = total_losses + 1 WHERE user_id=%s",
+                        (str(user_id), str(user_id))
+                    )   
+                else:
+                    cursor.execute(
+                        "INSERT INTO bangamble(user_id, current_loss_streak, total_losses) VALUES (%s, %s, %s)",
+                        (str(user_id), 1, 1,)
+                    )
+
+                cursor.commit()
+
+                return True
+                
+        except:
+            return False
+        
+
+async def is_in_ban_gamble(user_id) -> bool:
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT * FROM bangamble WHERE user_id=%s", (str(user_id),)
+                )
+                result = cursor.fetchall()
+                return len(result) > 0
+        # Als er iets misgaat, zeggen we dat user nog niet in ban gamble zit
+        except:
+            return False
+        
+
+async def get_current_win_streak(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT current_win_streak FROM bangamble WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_highest_win_streak(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT highest_win_streak FROM bangamble WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_current_loss_streak(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT current_loss_streak FROM bangamble WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_highest_loss_streak(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT highest_loss_streak FROM bangamble WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_ban_total_wins(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT total_wins FROM bangamble WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_ban_total_losses(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT total_losses FROM bangamble WHERE user_id=%s ", 
+                    (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+
+
+async def reset_ban_gamble_win_streak(user_id):
+
+    alreadyExists = await is_in_ban_gamble(user_id)
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE bangamble SET current_win_streak = 0 WHERE user_id=%s",
+                        (str(user_id),)
+                    )   
+                else:
+                    cursor.execute(
+                        "INSERT INTO bangamble(user_id, current_win_streak) VALUES (%s, %s)",
+                        (str(user_id), 0,)
+                    )
+
+                cursor.commit()
+                return True
+                
+        except:
+            return False
+        
+
+async def reset_ban_gamble_loss_streak(user_id):
+
+    alreadyExists = await is_in_ban_gamble(user_id)
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                if alreadyExists:
+                    cursor.execute(
+                        "UPDATE bangamble SET current_loss_streak = 0 WHERE user_id=%s",
+                        (str(user_id),)
+                    )   
+                else:
+                    cursor.execute(
+                        "INSERT INTO bangamble(user_id, current_loss_streak) VALUES (%s, %s)",
+                        (str(user_id), 0,)
+                    )
+
+                cursor.commit()
+                return True
+                
+        except:
+            return False
+        
+
+
+async def check_ban_gamble_win_streak(user_id):
+    # get loser current streak
+    current_win_streak = await get_current_win_streak(user_id)
+    if current_win_streak[0] == -1:
+        return False
+    current_win_streak = current_win_streak[0][0]
+    
+    # get loser highest streak
+    highest_win_streak = await get_highest_win_streak(user_id)
+    if highest_win_streak[0] == -1:
+        return False
+    highest_win_streak = highest_win_streak[0][0]
+
+    # do nothing if current streak is not higher than highest streak
+    if current_win_streak < highest_win_streak:
+        return False
+
+    # update the highest streak
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE bangamble SET highest_win_streak = %s WHERE user_id=%s",
+                    (current_win_streak, str(user_id),)
+                )   
+                
+                cursor.commit()
+                return True
+                
+        except:
+            return False
+
+
+async def check_ban_gamble_loss_streak(user_id):
+    # get loser current streak
+    current_loss_streak = await get_current_loss_streak(user_id)
+    if current_loss_streak[0] == -1:
+        return False
+    current_loss_streak = current_loss_streak[0][0]
+    
+    # get loser highest streak
+    highest_loss_streak = await get_highest_loss_streak(user_id)
+    if highest_loss_streak[0] == -1:
+        return False
+    highest_loss_streak = highest_loss_streak[0][0]
+
+    # do nothing if current streak is not higher than highest streak
+    if current_loss_streak < highest_loss_streak:
+        return False
+    
+    # update the highest streak
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE bangamble SET highest_loss_streak = %s WHERE user_id=%s",
+                    (current_loss_streak, str(user_id),)
+                )   
+                
+                cursor.commit()
+                return True
+                
+        except:
+            return False

@@ -437,7 +437,7 @@ class Admin(commands.Cog, name="admin"):
         )
         ban_explain_embed.add_field(
             name="🗳️ Vote",
-            value=f"Everybody can vote to ban {user.mention}. If {os.environ.get('BANTRESHOLD')} or more people vote yes, then {user.mention} is banned.",
+            value=f"Everybody can vote to ban {user.mention}. If {int(os.environ.get('BANTRESHOLD'))-1} or more people vote yes, then {user.mention} is banned.",
             inline=True
         )
 
@@ -609,12 +609,13 @@ class BanView(discord.ui.View):
         self.ban_number_treshold = ban_number_treshold
         self.reason = reason
         self.original_embed = original_embed
+        self.vote_succeeded = False
 
         self.members_who_voted_yes = [bannerID]
 
 
-    @discord.ui.button(label="Vote Yes", style=discord.ButtonStyle.danger)
-    async def kick(self, interaction: discord.Interaction, button: discord.ui.Button):
+    @discord.ui.button(label="Yes", style=discord.ButtonStyle.danger)
+    async def yes(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
 
         # user already voted
@@ -633,7 +634,7 @@ class BanView(discord.ui.View):
 
             # edit original embed
             self.original_embed.set_field_at(
-                1, name="Current votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
+                1, name="📋 Current votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
             )
             await interaction.edit_original_response(embed=self.original_embed)
 
@@ -649,7 +650,7 @@ class BanView(discord.ui.View):
             )
 
             banned_embed.add_field(
-                name="Reason",
+                name="💡 Reason",
                 value=f"```{self.reason}```",
             )
 
@@ -665,6 +666,7 @@ class BanView(discord.ui.View):
 
             # disable original vote
             await interaction.edit_original_response(view=None)
+            self.vote_succeeded = True
 
             # send confirmation
             await interaction.followup.send(embed=embeds.DefaultEmbed(
@@ -696,13 +698,26 @@ class BanView(discord.ui.View):
 
             # edit original embed
             self.original_embed.set_field_at(
-                1, name="Current votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
+                1, name="📋 Current votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
             )
             await interaction.edit_original_response(embed=self.original_embed)
     
         # send response (vote removal succesful?)
         await interaction.followup.send(embed=embed, ephemeral=True)
 
+
+    async def on_timeout(self) -> None:
+        if self.vote_succeeded:
+            return
+        
+        # vote failed
+        self.original_embed.title = f"🔨 Vote To Ban {self.user.display_name} Failed"
+        self.original_embed.description = ""
+        self.original_embed.set_field_at(
+            1, name="📋 Final votes", value=f"```{len(self.members_who_voted_yes)}/{self.ban_number_treshold}```"
+        )
+        
+        await self.message.edit(embed=self.original_embed, view=None)
 
 
 class UnbanView(discord.ui.View):
@@ -975,17 +990,104 @@ class BanTypeView(discord.ui.View):
 
         # determine who to ban
         choices = [self.user, self.ban_starter]
-        to_be_banned = random.choice(choices)
-        choices.remove(to_be_banned)
+        loser = random.choice(choices)
+        choices.remove(loser)
         winner = choices[0]
 
-        # send ban message to user
+        # save results to stats
+        await db_manager.increment_ban_gamble_wins(winner.id)
+        await db_manager.increment_ban_gamble_losses(loser.id)
+
+        # reset the streaks
+        await db_manager.reset_ban_gamble_loss_streak(winner.id)
+        await db_manager.reset_ban_gamble_win_streak(loser.id)
+
+        # check if current streaks are higher than best streak
+        await db_manager.check_ban_gamble_win_streak(winner.id)
+        await db_manager.check_ban_gamble_loss_streak(loser.id)
+
+
+        # create embed to show who won
+        result_embed = embeds.DefaultEmbed(
+            f"🏅 {winner} won!", f"{loser.mention} has been banned"
+        )
+
+        # get winner current streak
+        winner_current_streak = await db_manager.get_current_win_streak(winner.id)
+        if winner_current_streak[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", winner_current_streak[1]
+            ))
+        
+        # get winner highest streak
+        highest_win_streak = await db_manager.get_highest_win_streak(winner.id)
+        if highest_win_streak[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", highest_win_streak[1]
+            ))
+        
+        # get winner total wins
+        total_wins = await db_manager.get_ban_total_wins(winner.id)
+        if total_wins[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", total_wins[1]
+            ))
+        
+        # add stats field to embed
+        result_embed.add_field(
+            name="📈 Stats of winner",
+            value=f"""{winner.mention} current win streak```{winner_current_streak[0][0]}```
+            {winner.mention} highest win streak```{highest_win_streak[0][0]}```
+            {winner.mention} total wins```{total_wins[0][0]}```""",
+            inline=True
+        )
+        
+        # get loser current streak
+        loser_current_streak = await db_manager.get_current_loss_streak(loser.id)
+        if loser_current_streak[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", loser_current_streak[1]
+            ))
+        
+        # get loser highest streak
+        highest_loss_streak = await db_manager.get_highest_loss_streak(loser.id)
+        if highest_loss_streak[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", highest_loss_streak[1]
+            ))
+        
+        # get loser total losses
+        total_losses = await db_manager.get_ban_total_losses(loser.id)
+        if total_losses[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", total_losses[1]
+            ))
+        
+        # add stats field to embed
+        result_embed.add_field(
+            name="📉 Stats of loser",
+            value=f"""{loser.mention} current loss streak```{loser_current_streak[0][0]}```
+            {loser.mention} highest loss streak```{highest_loss_streak[0][0]}```
+            {loser.mention} total losses```{total_losses[0][0]}```""",
+            inline=True
+        )
+
+        # edit embed with results of the 50/50
+        await interaction.edit_original_response(embed=result_embed)
+        
+        # wait one second so loser can still see in channel who won/lost
+        await asyncio.sleep(1)
+
+        # ban the user
+        # todo UNCOMMENT await loser.ban(reason=self.reason, delete_message_days=0) 
+
+        # send ban message to loser
         banned_embed = embeds.DefaultEmbed(
             f"🔨 You have been banned from {interaction.guild.name}!",
         )
 
         banned_embed.add_field(
-            name="Reason",
+            name="💡 Reason",
             value=f"```{self.reason}```",
         )
 
@@ -995,18 +1097,8 @@ class BanTypeView(discord.ui.View):
             value=f"```You lost to {winner}```",
             inline=False
         )
-        await to_be_banned.send(embed=banned_embed)
 
-
-        result_embed = embeds.DefaultEmbed(
-            f"🏅 {winner} won!", f"{to_be_banned} has been banned"
-        )
-        await interaction.edit_original_response(embed=result_embed)
-        
-        await asyncio.sleep(1)
-
-        # ban the user
-        await to_be_banned.ban(reason=self.reason, delete_message_days=0)
+        await loser.send(embed=banned_embed)
 
 
 
@@ -1020,13 +1112,14 @@ class BanTypeView(discord.ui.View):
         # respond to interaction
         vote_embed = embeds.DefaultEmbed(
             f"🔨 Vote to ban {self.user.display_name}",
-            f"This vote succeeds at {ban_number_treshold} votes in favour of banning.\n You have 5 minutes to vote.",
+            f"This vote succeeds at {ban_number_treshold} votes in favour of banning.",
         )
-        vote_embed.add_field(name="Reason", value=f"```{self.reason}```", inline=False)
-        vote_embed.add_field(name="Current votes", value=f"```1/{ban_number_treshold}```")
+        vote_embed.add_field(name="💡 Reason", value=f"```{self.reason}```", inline=False)
+        vote_embed.add_field(name="📋 Current votes", value=f"```1/{ban_number_treshold}```")
 
-
-        await interaction.edit_original_response(embed=vote_embed, view=BanView(self.bot, self.ban_starter.id, self.user, ban_number_treshold, self.reason, vote_embed))
+        view = BanView(self.bot, self.ban_starter.id, self.user, ban_number_treshold, self.reason, vote_embed)
+        message = await interaction.edit_original_response(embed=vote_embed, view=view)
+        view.message = message
 
 
 
