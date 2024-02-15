@@ -30,7 +30,7 @@ class Stats(commands.Cog, name="stats"):
     @checks.not_blacklisted()
     @checks.not_in_dm()
     @checks.is_owner() # TODO remove
-    @app_commands.checks.cooldown(rate=1, per=10)
+    @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.guild_id, i.user.id))
     async def leaderboard(self,interaction):
         """Shows the leaderboard for a command
 
@@ -125,7 +125,7 @@ class Stats(commands.Cog, name="stats"):
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=10)
+    @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.guild_id, i.user.id))
     async def statistic(self,interaction, user: discord.User = None) -> None:
         """Shows the individual stats for a user for a given command
 

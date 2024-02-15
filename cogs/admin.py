@@ -55,8 +55,8 @@ class Admin(commands.Cog, name="admin"):
 
 
     @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour", extras={'cog': 'admin'})
-    @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
-    @checks.not_blacklisted()
+    @app_commands.checks.cooldown(rate=1, per=30, key=lambda i: (i.guild_id, i.user.id)) # 1 per 30 sec
+    @checks.not_blacklisted()   
     @checks.not_in_dm()
     @app_commands.describe(user="Who to block")
     async def anti_gif(self, interaction, user: discord.User) -> None:
@@ -83,7 +83,7 @@ class Admin(commands.Cog, name="admin"):
 
     @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'admin'})
     @has_permissions(ban_members=True)
-    @app_commands.checks.cooldown(rate=1, per=180)
+    @app_commands.checks.cooldown(rate=1, per=180, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
     async def lien(self, interaction) -> None:
@@ -405,7 +405,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.command(name="ban", description="Ban someone", extras={'cog': 'admin'})
     @app_commands.describe(user="Which user")
     @app_commands.describe(reason="Reason for the ban")
-    @app_commands.checks.cooldown(rate=1, per=100)
+    @app_commands.checks.cooldown(rate=1, per=100, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
@@ -451,7 +451,7 @@ class Admin(commands.Cog, name="admin"):
         extras={'cog': 'admin'}
     )
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=2, per=300)
+    @app_commands.checks.cooldown(rate=2, per=300, key=lambda i: (i.user.id))
     async def unban(self, interaction) -> None:
         """Unban a user
 
@@ -519,7 +519,7 @@ class Admin(commands.Cog, name="admin"):
 
     @app_commands.command(name="profile", description="See someones profile", extras={'cog': 'admin'})
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=10)
+    @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.user.id))
     @app_commands.describe(user="Which user")
     @checks.not_in_dm()
     @checks.is_owner() # TODO remove

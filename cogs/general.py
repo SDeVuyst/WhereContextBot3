@@ -148,7 +148,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=20)
+    @app_commands.checks.cooldown(rate=1, per=20, key=lambda i: (i.user.id))
     @checks.not_in_dm()
     @app_commands.describe(user="What user to DM")
     @app_commands.describe(content="What to DM to the user")
