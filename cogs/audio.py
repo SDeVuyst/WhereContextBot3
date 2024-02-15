@@ -1,5 +1,6 @@
 from discord.ext import commands
 import os
+import asyncio
 from discord import app_commands
 from math import ceil
 import discord
@@ -156,7 +157,7 @@ class Audio(commands.Cog, name="audio"):
         # soundcloud playlists are not supported
         elif track.find("https://soundcloud.com") != -1 and track.find("/sets") != -1:
             return await interaction.followup.send(embed=embeds.OperationFailedEmbed(
-                f"SoundCloud playlists are not (yet) supported!"
+                f"SoundCloud playlists are not supported!"
             ))
         
         # enkele yt/spotify/soundcloud track
@@ -446,33 +447,29 @@ class Audio(commands.Cog, name="audio"):
         vc = interaction.guild.voice_client
 
         # doe niks zolang player aan het spelen is
-        
         if len(self.queue) == 0: return
 
         # krijg volgende track
         tr = self.queue.pop(0)
 
+        # video mag max 15 min duren
+        if tr.length is not None and tr.length > 900:
+            embed = embeds.OperationFailedEmbed(
+                "Video must be less than 15 minutes long."
+            )
+            if first_player:
+                await interaction.followup.send(embed=embed)
+            else:
+                await interaction.channel.send(embed=embed)
+
+            # skip ahead to next song
+            await self.play_next(interaction)
+            return
+
         # voeg url terug toe aan queue als loop aanstaat
         if self.looping:
             self.queue.append(tr)
 
-        # video mag max 15 min duren
-        try:
-            if tr.length is not None and tr.length > 900:
-                embed = embeds.OperationFailedEmbed(
-                    "Video must be less than 15 minutes long."
-                )
-                if first_player:
-                    await interaction.followup.send(embed=embed)
-                else:
-                    await interaction.channel.send(embed=embed)
-                await self.play_next(interaction)
-                return
-            
-        except Exception as e:
-            self.bot.logger.warning(e)
-            pass
-        
         # maak temp file aan via url
         filename = await ytdl_helper.YTDLSource.from_url(tr.url, loop=self.bot.loop, ytdl=self.ytdl, bot=self.bot)
         if filename is None:
@@ -487,6 +484,8 @@ class Audio(commands.Cog, name="audio"):
             await self.play_next(interaction)
 
         else:
+            # wacht 1 seconde omdat url soms nog ingeladen moet worden in Track object
+            asyncio.sleep(0.5)
             # speel de temp file af
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
 

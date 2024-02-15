@@ -14,22 +14,22 @@ class TrackType(Enum):
 
 class Track():
 
-    def __init__(self, input: str):
+    def __init__(self, input_str: str):
 
         # check als url spotify track is
-        if input.find("open.spotify.com/track") != -1:
+        if input_str.find("open.spotify.com/track") != -1:
             spToYt = SpotifyToYT.SpotifyToYT()
-            self.url = spToYt.spotifyToYoutubeURLs(input)
+            self.url = spToYt.spotifyToYoutubeURLs(input_str)
             self.track_type = TrackType.SPOTIFY
 
         # check als url youtube track is
-        elif re.match(r"^(?:https?:)?(?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]{7,15})(?:[\?&][a-zA-Z0-9\_-]+=[a-zA-Z0-9\_-]+)*$", input):
-            self.url = input
+        elif re.match(r"^(?:https?:)?(?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9\_-]{7,15})(?:[\?&][a-zA-Z0-9\_-]+=[a-zA-Z0-9\_-]+)*$", input_str):
+            self.url = input_str
             self.track_type = TrackType.YOUTUBE
 
         # check als url soundcloud track is
-        elif re.match(r"https://soundcloud.com/([^/]+)/([^/]+)", input):
-            self.url = input
+        elif re.match(r"https://soundcloud.com/([^/]+)/([^/]+)", input_str):
+            self.url = input_str
             self.track_type = TrackType.SOUNDCLOUD
 
         # not a url, look it up on youtube later
@@ -56,7 +56,7 @@ class Track():
 
         # not a url, search on youtube
         else:
-            s = Search(input)
+            s = Search(input_str)
             yt = s.results[0]
 
             self.url = yt.watch_url
