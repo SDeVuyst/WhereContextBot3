@@ -428,7 +428,7 @@ async def on_tree_error(interaction, error):
         hours, minutes = divmod(minutes, 60)
         hours = hours % 24
         embed = embeds.OperationFailedEmbed(
-            f"**Please slow down** - You can use this command again in {f'{round(hours)} hours' if round(hours) > 0 else ''} {f'{round(minutes)} minutes' if round(minutes) > 0 else ''} {f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
+            f"**Please slow down** - You can use this command again in {f'{round(hours)} hours ' if round(hours) > 0 else ''}{f'{round(minutes)} minutes ' if round(minutes) > 0 else ''}{f'{round(seconds)} seconds' if round(seconds) > 0 else ''}.",
             emoji="⏲️"
         )
 
@@ -532,7 +532,7 @@ async def on_tree_error(interaction, error):
             description=str(error).capitalize(),
         )
 
-    bot.logger.info(error)
+    bot.logger.info(error) 
     
     # send out response
     if interaction.response.is_done():
