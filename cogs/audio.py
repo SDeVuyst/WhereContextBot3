@@ -75,7 +75,7 @@ class Audio(commands.Cog, name="audio"):
             vc.pause()
 
         # speel soundboard af
-        vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
+        vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../media/audio_snippets/{effect.value}"), 
             after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
         )
         
