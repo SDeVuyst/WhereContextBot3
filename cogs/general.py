@@ -135,12 +135,17 @@ class General(commands.Cog, name="general"):
     @checks.not_blacklisted()
     @checks.is_owner()
     @checks.not_in_dm()
-    async def podium(self, interaction, first: discord.User, second: discord.User, third: discord.User) -> None:
+    async def podium(self, interaction, first_podium: discord.User, second_podium: discord.User, third_podium: discord.User, first_character: discord.User = None, second_character: discord.User = None, third_character: discord.User = None) -> None:
 
         await interaction.response.defer()
 
         builder = ArtBuilder.PodiumBuilder(self.bot)
-        file = await builder.get_all_podiums_image([second.id, first.id, third.id])
+        characters = [
+            second_character.id  if second_character is not None else None,
+            first_character.id if first_character is not None else None, 
+            third_character.id if third_character is not None else None
+        ]
+        file = await builder.get_all_podiums_image([second_podium.id, first_podium.id, third_podium.id], characters=characters)
         
         await interaction.followup.send(files=[file])
 

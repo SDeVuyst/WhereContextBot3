@@ -165,9 +165,10 @@ class CharacterBuilder:
 
 
 
-    async def add_character_to_podium(self, podium_image, user_id, poseNumber, place):
+    async def add_character_to_podium(self, podium_image, user_id, poseNumber, place, podium_user_id):
         # get object that contains info about the arts done
-        defined_art = self.get_extra_data(user_id)
+        defined_art_user = self.get_extra_data(user_id)
+        defined_art_podium = self.get_extra_data(podium_user_id)
 
         # get location of the character
         if os.path.exists(self.get_pose_location(user_id, poseNumber)):
@@ -188,7 +189,7 @@ class CharacterBuilder:
         bg.paste(podium_image, (0, character_image.height), podium_image)
 
         # paste character
-        offset = defined_art.get("poseOffset", [(0, 110), (0, 200), (0, 370)])[place-1]
+        offset = defined_art_podium.get("poseOffset", [(0, 110), (0, 200), (0, 370)])[place-1]
         bg.paste(
             character_image,
             ((bg.width - character_image.width)//2 + offset[0], offset[1]), 
@@ -196,7 +197,7 @@ class CharacterBuilder:
         )
 
         # paste badge to fix 3d realness of character standing on podium
-        paste_coords = defined_art.get(
+        paste_coords = defined_art_podium.get(
             "badgePasteCoords", 
             [(255, 1050), (255, 1130), (255, 1320)]
         )
@@ -364,7 +365,7 @@ class PodiumBuilder:
     
 
     
-    async def get_all_podiums_image(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True):
+    async def get_all_podiums_image(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True, characters=None):
         # create normalised images for every given podium
         if len(user_ids) == 1:
             order = [1]
@@ -383,16 +384,22 @@ class PodiumBuilder:
             podium_image = await self.get_podium_image(id, order[i], always_shiny)
 
             if add_characters: 
+                
+                if characters is not None:
+                    id_char = characters[i] if characters[i] is not None else id
+                else:
+                    # if characters not defined, take same id as from podium
+                    id_char = id
 
                 # get active pose and pick 1 at random
-                poses = await db_manager.get_poses(str(id), i+1)
+                poses = await db_manager.get_poses(str(id_char), order[i]) # order[i] was i+1
                 if poses is not None:
                     pose = random.choice([int(pose) for pose in poses[0]])
                 else:
-                    pose = random.randint(1, self.character_builder.get_amount_of_poses(str(id)))
+                    pose = random.randint(1, self.character_builder.get_amount_of_poses(str(id_char)))
 
                 # add character
-                podium_image = await self.character_builder.add_character_to_podium(podium_image, str(id), pose, order[i])
+                podium_image = await self.character_builder.add_character_to_podium(podium_image, str(id_char), pose, order[i], str(id))
 
             podiums.append(podium_image)
 
