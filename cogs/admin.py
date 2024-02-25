@@ -1196,7 +1196,7 @@ class PosesSelectView(discord.ui.View):
 
         await interaction.edit_original_response(embed=embeds.OperationSucceededEmbed(
             "Saved active poses!"
-        ), view=None, attachments=None)
+        ), view=None, attachments=[])
 
 
 
