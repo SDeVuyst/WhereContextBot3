@@ -1198,7 +1198,7 @@ class PosesSelectView(discord.ui.View):
             "Saved active poses!"
         ), view=None, attachments=[])
 
-
+           
 
 class PosesSelect(discord.ui.Select):
     def __init__(self, view, bot, amount_of_poses, selected_poses, user, place):

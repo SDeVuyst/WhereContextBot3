@@ -11,3 +11,4 @@ strprogressbar
 spotipy
 google-api-python-client
 pillow
+openai

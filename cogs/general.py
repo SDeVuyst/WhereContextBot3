@@ -10,6 +10,7 @@ import os
 import dateparser
 import re
 import random
+from openai import OpenAI
 
 from datetime import datetime
 
@@ -276,6 +277,53 @@ class General(commands.Cog, name="general"):
 
         view = PollMenuBuilder(question, embed, interaction.user.id, anoniem.value, self.bot)
         await interaction.edit_original_response(embed=embed, view=view)
+
+
+
+    @app_commands.command(name="summary", description="Generate a summary of the latest conversation", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    # @app_commands.checks.cooldown(rate=1, per=300, key=lambda i: (i.user.id)) TODO uncomment
+    @checks.not_in_dm()
+    async def summary(self, interaction) -> None:
+        """Let the bot DM a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user to dm
+            content (str): What to dm the user
+        """
+        await interaction.response.defer()
+
+        messages_str = ""
+        amount_of_messages = 0
+        # get last messages from channel
+        messages = [message async for message in interaction.channel.history(limit=20)]
+        # TODO determine amount of messages
+        # iterate over last messsages and format in a string
+        for message in messages[::-1]:
+            if not message.author.bot:
+                messages_str += f"{message.author}: {message.clean_content}\n"
+                amount_of_messages += 1
+
+
+        # ask gpt to summarize
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Generate a concise, professional summary of the following conversation."},
+                {"role": "user", "content": messages_str},
+            ],
+
+        )
+
+        summary_response = response.choices[0].message.content
+
+        # stuur summary
+        await interaction.followup.send(embed=embeds.DefaultEmbed(
+            f"🗒️ Summary of last {amount_of_messages} messages",
+            summary_response
+        ), ephemeral=True)
         
 
 
