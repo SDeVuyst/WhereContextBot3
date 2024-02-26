@@ -301,8 +301,6 @@ class General(commands.Cog, name="general"):
         messages = messages[::-1]
         message_sent_time = messages[0].created_at
 
-        # TODO determine amount of messages
-
         # iterate over messsages and format in a string
         i = 0
         while i < len(messages) and i < 250:
@@ -311,7 +309,6 @@ class General(commands.Cog, name="general"):
 
             # mark end of conversation if too big of time difference with previous message
             time_difference = divmod((message_sent_time - message.created_at).total_seconds(), 60)
-            self.bot.logger.info(time_difference[0])
             if time_difference[0] >= 2 and i > 20:
                 break
             else: 
@@ -324,7 +321,6 @@ class General(commands.Cog, name="general"):
 
             # check if needed to fetch more messages
             if i == len(messages) -1:
-                self.bot.logger.info("fetching more messages")
                 extra_messages = [m async for m in interaction.channel.history(limit=20, before=message)]
                 messages.extend(extra_messages)
 
