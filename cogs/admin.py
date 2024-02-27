@@ -594,9 +594,9 @@ class Admin(commands.Cog, name="admin"):
             file = await builder.get_all_podiums_image([user.id, user.id, user.id], padding=100, add_characters=False)
             embed.set_image(url="attachment://podium.png")
 
-            return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user.id))
+            return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user))
 
-        await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user.id))
+        await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user))
 
 
 
@@ -750,11 +750,11 @@ class UnbanDropdown(discord.ui.Select):
 
 
 class ConfigureView(discord.ui.View):
-    def __init__(self, bot, embed, user_id):
+    def __init__(self, bot, embed, user):
         self.bot = bot
         self.embed = embed
         self.nickname = 'None'
-        self.user_id = int(user_id)
+        self.user = user
 
         self.waiting_embed = embeds.DefaultEmbed(
             "⏳ Loading...",
@@ -774,7 +774,7 @@ class ConfigureView(discord.ui.View):
         await modal.wait()
 
         # save the nickname
-        await db_manager.set_nickname(interaction.guild_id, self.user_id, self.nickname)
+        await db_manager.set_nickname(interaction.guild_id, self.user.id, self.nickname)
 
         # set description to embed
         self.embed.set_field_at(index=0, name="📛 Default Nickname", value=f"```{self.nickname}```", inline=False)
@@ -790,7 +790,7 @@ class ConfigureView(discord.ui.View):
 
         waiting_message = await interaction.followup.send(embed=self.waiting_embed)
 
-        autoroles = await db_manager.get_autoroles(interaction.guild_id, self.user_id)
+        autoroles = await db_manager.get_autoroles(interaction.guild_id, self.user.id)
         if autoroles is not None:
             autoroles = [int(role_id) for role_id in autoroles[0]]
         else:
@@ -807,7 +807,7 @@ class ConfigureView(discord.ui.View):
         await waiting_message.edit(
             embed=embed,
             view=RolesSelectView(
-                interaction.guild.get_member(self.user_id),
+                interaction.guild.get_member(self.user.id),
                 all_roles,
                 self.bot,
                 autoroles
@@ -823,15 +823,15 @@ class ConfigureView(discord.ui.View):
         waiting_message = await interaction.followup.send(embed=self.waiting_embed)
 
         builder = ArtBuilder.CharacterBuilder(self.bot)
-        file = await builder.get_all_poses_image(self.user_id)
-        amount_of_poses = builder.get_amount_of_poses(self.user_id)
+        file = await builder.get_all_poses_image(self.user.id)
+        amount_of_poses = builder.get_amount_of_poses(self.user.id)
 
         # get previously selected poses
         selected_poses = []
 
         # 1, 2, 3
         for i in range(1, 4):
-            poses = await db_manager.get_poses(self.user_id, i)
+            poses = await db_manager.get_poses(self.user.id, i)
             if poses is not None:
                 poses = [int(pose) for pose in poses[0]]
             else:
@@ -843,14 +843,14 @@ class ConfigureView(discord.ui.View):
             "You can pick different poses for each position on your podium.\nIf you select multiple poses, one will be selected at random every time your podium is displayed."
         )
         embed.set_image(url="attachment://poses.png")
-
+        
         await waiting_message.edit(
             embed=embed,
             view=PosesSelectView(
                 self.bot,
                 amount_of_poses,
                 selected_poses,
-                interaction.guild.get_member(self.user_id),
+                self.user,
             ),
             attachments=[file]
         )
@@ -875,7 +875,7 @@ k
 
         
         # can only be triggered by the profile owner or an owner
-        is_possible = (interaction.user.id == self.user_id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        is_possible = (interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
         
         # send message if usr cannot interact with button
         if not is_possible:
@@ -1229,8 +1229,7 @@ class PosesSelect(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         # save the selected poses
-        poses = [1,0,2]
-        self.pose_view.selected_poses[poses[self.place-1]] = self.values
+        self.pose_view.selected_poses[self.place-1] = self.values
         await interaction.response.defer()
 
 
