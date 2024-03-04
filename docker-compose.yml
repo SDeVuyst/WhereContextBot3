@@ -3,9 +3,7 @@ services:
   wcb3:
     container_name: wcb3_container
     pull_policy: build
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: always
     restart: unless-stopped
     env_file: stack.env
     entrypoint: ['python', 'bot.py']
