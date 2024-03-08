@@ -162,12 +162,48 @@ class CharacterBuilder:
                 ]
 
         return data
+    
+
+    def get_extra_pose_data(self, user_id):
+
+        amount_of_poses = self.get_amount_of_poses(user_id)
+
+        # check if extra data exists
+        if not os.path.exists(f"{BASE_LOCATION}{str(user_id)}/PoseData.csv"):
+            return [None] * amount_of_poses
+        
+        with open(f"{BASE_LOCATION}{str(user_id)}/PoseData.csv") as f:
+            reader = csv.DictReader(f, delimiter=",")
+            data = list(reader)[0]
+            data_list = []
+            data_badge_list = []
+
+            for i in range(1, amount_of_poses+1):
+                # make pose offset correct format
+                if data[str(i)] == "None":
+                    data_list.append(None)
+                    data_badge_list.append([True] *3)
+
+                else:
+                    offsets = data[str(i)].split(";")
+                    data_list.append([
+                        (int(offsets[0]), int(offsets[1])),
+                        (int(offsets[3]), int(offsets[4])),
+                        (int(offsets[6]), int(offsets[7])),
+                    ])
+                    data_badge_list.append([
+                        eval(offsets[2]),
+                        eval(offsets[5]),
+                        eval(offsets[8])
+                    ])
+
+        return (data_list, data_badge_list)
 
 
 
     async def add_character_to_podium(self, podium_image, user_id, poseNumber, place, podium_user_id):
         # get object that contains info about the arts done
-        defined_art_user = self.get_extra_data(user_id)
+        defined_art_user = self.get_extra_pose_data(user_id)
         defined_art_podium = self.get_extra_data(podium_user_id)
 
         # get location of the character
@@ -190,6 +226,10 @@ class CharacterBuilder:
 
         # paste character
         offset = defined_art_podium.get("poseOffset", [(0, 110), (0, 200), (0, 370)])[place-1]
+        # different offset for specific pose
+        if defined_art_user[0][poseNumber-1] is not None:
+            offset = defined_art_user[0][poseNumber-1][place-1]
+
         bg.paste(
             character_image,
             ((bg.width - character_image.width)//2 + offset[0], offset[1]), 
@@ -197,12 +237,13 @@ class CharacterBuilder:
         )
 
         # paste badge to fix 3d realness of character standing on podium
-        paste_coords = defined_art_podium.get(
-            "badgePasteCoords", 
-            [(255, 1050), (255, 1130), (255, 1320)]
-        )
-        badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
-        bg.paste(badge_image, paste_coords[place-1], badge_image)
+        if defined_art_user[1][poseNumber-1][place-1]:
+            paste_coords = defined_art_podium.get(
+                "badgePasteCoords", 
+                [(255, 1050), (255, 1130), (255, 1320)]
+            )
+            badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
+            bg.paste(badge_image, paste_coords[place-1], badge_image)
 
         return bg
     
