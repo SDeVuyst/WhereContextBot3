@@ -7,6 +7,9 @@ Version: 5.5.0
 """
 
 import discord
+
+import requests
+from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.components import SelectOption
 from discord.ext import commands
@@ -151,6 +154,47 @@ class Stats(commands.Cog, name="stats"):
         embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
         
         await interaction.edit_original_response(embed=embed, view=None)
+
+
+
+    @app_commands.command(
+        name="fortnite",
+        description="See statistic about a fortnite creative map",
+        extras={'cog': 'stats'}
+    )
+    @app_commands.choices(map=[
+        discord.app_commands.Choice(name="Naruto Box PVP", value="3216-2522-9844"),
+    ])   
+    @checks.not_blacklisted()
+    async def fortnite(self, interaction, map: discord.app_commands.Choice[str]) -> None:
+        await interaction.response.defer()
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(f"https://fortnite.gg/island?code={map.value}", headers=headers)
+
+        if response.status_code == 200:
+            # Parse the HTML content of the page
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            embed = embeds.DefaultEmbed(
+                f'🎮 {map.name}', map.value
+            )
+
+            player_stats_titles = soup.find_all('div', class_='chart-stats-title')
+
+            embed.add_field(name="Players Right Now", value=f"```{player_stats_titles[0].text}```")
+            embed.add_field(name="All Time Peak", value=f"```{player_stats_titles[2].text}```")
+
+            embed.set_image(url=str(soup.find(id='island-img')["src"]))
+
+            await interaction.followup.send(embed=embed)
+
+        else:
+            return interaction.followup.send(embed=embeds.OperationFailedEmbed(
+                "Something went wrong", response.status_code
+            ))
 
 
 
