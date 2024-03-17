@@ -164,6 +164,7 @@ class Stats(commands.Cog, name="stats"):
     )
     @app_commands.choices(map=[
         discord.app_commands.Choice(name="Naruto Box PVP", value="3216-2522-9844"),
+        discord.app_commands.Choice(name="📦STARWARS BOX PVP🔥", value="1630-9217-6519"),
     ])   
     @checks.not_blacklisted()
     async def fortnite(self, interaction, map: discord.app_commands.Choice[str]) -> None:

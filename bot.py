@@ -12,10 +12,14 @@ import os
 import platform
 import random
 import psycopg2
+import requests
+from bs4 import BeautifulSoup
 
 import discord
 from discord.ext import tasks
 from discord.ext.commands import Bot
+from discord import Webhook
+import aiohttp
 
 import embeds
 from helpers import WordFinder, db_manager
@@ -32,6 +36,19 @@ bot = Bot(
     intents=intents,
     help_command=None,
 )
+
+FORTNITE_MAPS = {
+    "Naruto Box PVP": {
+        "mapcode": "3216-2522-9844",
+    },
+    "📦STARWARS BOX PVP🔥": {
+        "mapcode": "1630-9217-6519",
+    }
+}
+
+WEBHOOK_URLS_FORTNITE = [
+    "https://discord.com/api/webhooks/1218834508703596554/p8SOyOe7jRZ8Ed0o5OzUQ5XuCqLznr4V1y4dqfowXvLT1RYqnlRtUZRBi-0623Fq6QcC"
+]
 
 bot.loaded = set()
 bot.unloaded = set()
@@ -134,8 +151,13 @@ async def on_ready() -> None:
     bot.logger.info(f"Python version: {platform.python_version()}")
     bot.logger.info(f"Running on: {platform.system()} {platform.release()} ({os.name})")
     bot.logger.info("-------------------")
+
+    await init_fortnite_player_peak()
+
+    check_fortnite_player_peak.start()
     status_task.start()
     check_remindme.start()
+
 
     cmds = await bot.tree.sync()
     bot.save_ids(cmds)
@@ -211,6 +233,30 @@ async def check_remindme():
                     bot.logger.info(f"Sent out a reminder ({subject})")
                 else:
                     bot.logger.warning("could not delete reminder")
+
+
+@tasks.loop(seconds=60)
+async def check_fortnite_player_peak():
+    for naam, map_info in FORTNITE_MAPS.items():
+        peak = await get_fortnite_player_peak(map_info["mapcode"])
+        
+        if peak > map_info["max"]:
+            map_info["max"] = peak
+            FORTNITE_MAPS[naam] = map_info
+
+            # notify user
+            logger.info(f"new {FORTNITE_MAPS[naam]} max player count found")
+
+            embed = embeds.DefaultEmbed(
+                f"{naam} has a new player peak!",
+                f"New Peak: {peak}"
+            )
+
+            async with aiohttp.ClientSession() as session:
+                for webhook_url in WEBHOOK_URLS_FORTNITE:
+                    webhook = Webhook.from_url(webhook_url, session=session)
+                    await webhook.send(embed=embed)
+
 
 
 @bot.event
@@ -321,7 +367,6 @@ async def on_raw_reaction_add(payload):
     # update the message with the edited embed
     await message.edit(embed=e)
 
-        
 
 
 @bot.event
@@ -569,7 +614,31 @@ async def load_cogs() -> None:
                 bot.unloaded.add(extension)
 
 
+async def init_fortnite_player_peak():
+    bot.fornite_peaks = {}
+
+    for naam, map_info in FORTNITE_MAPS.items():
+        map_info["max"] = await get_fortnite_player_peak(map_info["mapcode"])
     
+
+async def get_fortnite_player_peak(mapcode):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    response = requests.get(f"https://fortnite.gg/island?code={mapcode}", headers=headers)
+
+    if response.status_code == 200:
+        # Parse the HTML content of the page
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        player_stats_titles = soup.find_all('div', class_='chart-stats-title')
+
+        return int(player_stats_titles[2].text)
+
+    else:
+        return 0
+
+
 
 init_db()
 asyncio.run(load_cogs())
