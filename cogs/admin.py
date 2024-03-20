@@ -592,7 +592,7 @@ class Admin(commands.Cog, name="admin"):
         builder = ArtBuilder.PodiumBuilder(self.bot)
         if builder.user_has_podium(user.id):
             file = await builder.get_all_podiums_image([user.id, user.id, user.id], padding=100, add_characters=False)
-            embed.set_image(url="attachment://podium.png")
+            embed.set_image(url="attachment://podium.gif")
 
             return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user))
 

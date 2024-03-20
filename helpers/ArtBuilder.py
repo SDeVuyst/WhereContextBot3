@@ -7,7 +7,7 @@ import requests
 import random
 import csv
 
-# from helpers import db_manager
+from helpers import db_manager
 
 # BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
 BASE_LOCATION = 'media/images/'
@@ -65,13 +65,13 @@ class LeaderboardBuilder:
         # create buffer
         buffer = io.BytesIO()
 
-        # save PNG in buffer
-        bg.save(buffer, format='PNG')    
+        # save GIF in buffer
+        bg.save(buffer, format='GIF')    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
-        return discord.File(buffer, 'leaderboardtop.png')
+        return discord.File(buffer, 'leaderboardtop.gif')
     
 
 
@@ -164,13 +164,14 @@ class CharacterBuilder:
         return data
     
 
+
     def get_extra_pose_data(self, user_id):
 
         amount_of_poses = self.get_amount_of_poses(user_id)
 
         # check if extra data exists
         if not os.path.exists(f"{BASE_LOCATION}{str(user_id)}/PoseData.csv"):
-            return [None] * amount_of_poses
+            return ([None] * amount_of_poses, None)
         
         with open(f"{BASE_LOCATION}{str(user_id)}/PoseData.csv") as f:
             reader = csv.DictReader(f, delimiter=",")
@@ -201,52 +202,72 @@ class CharacterBuilder:
 
 
 
-    async def add_character_to_podium(self, podium_image, user_id, poseNumber, place, podium_user_id):
+    async def add_character_to_podium(self, podium_image, user_id, pose_number, place, podium_user_id):
         # get object that contains info about the arts done
         defined_art_user = self.get_extra_pose_data(user_id)
         defined_art_podium = self.get_extra_data(podium_user_id)
 
         # get location of the character
-        if os.path.exists(self.get_pose_location(user_id, poseNumber)):
-            custom_character_location = f"{BASE_LOCATION}{str(user_id)}/Pose{poseNumber}.png"
+        if self.has_custom_poses(user_id, pose_number):
+            custom_character_location = self.get_pose_location(user_id, pose_number)
         else:
-            custom_character_location = f"{BASE_LOCATION}default/Pose{poseNumber}.png"
+            custom_character_location = f"{BASE_LOCATION}default/Pose{pose_number}.png"
 
         # load the character image
         character_image = Image.open(custom_character_location)
         
         # resize it
-        character_image = resize_image(character_image, 700)
+        # character_image = resize_image(character_image, 700) TESTING
 
         # create empty bg to add podium and character to
-        bg = Image.new('RGBA', (podium_image.width, podium_image.height + character_image.height))
+        background = Image.new('RGBA', (podium_image.width, podium_image.height + character_image.height))
         
-        # paste podium
-        bg.paste(podium_image, (0, character_image.height), podium_image)
-
-        # paste character
         offset = defined_art_podium.get("poseOffset", [(0, 110), (0, 200), (0, 370)])[place-1]
         # different offset for specific pose
-        if defined_art_user[0][poseNumber-1] is not None:
-            offset = defined_art_user[0][poseNumber-1][place-1]
+        if defined_art_user[0][pose_number-1] is not None:
+            offset = defined_art_user[0][pose_number-1][place-1]
 
-        bg.paste(
-            character_image,
-            ((bg.width - character_image.width)//2 + offset[0], offset[1]), 
-            character_image
+        paste_coords = defined_art_podium.get(
+            "badgePasteCoords", 
+            [(255, 1050), (255, 1130), (255, 1320)]
         )
+        badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
 
-        # paste badge to fix 3d realness of character standing on podium
-        if defined_art_user[1][poseNumber-1][place-1]:
-            paste_coords = defined_art_podium.get(
-                "badgePasteCoords", 
-                [(255, 1050), (255, 1130), (255, 1320)]
+        frames = []
+        for frame in ImageSequence.Iterator(character_image):
+            
+            output = background.copy()
+
+            # paste podium
+            output.paste(podium_image, (0, character_image.height), podium_image) 
+            
+            # paste character
+            background.paste(
+                frame,
+                ((background.width - frame.width)//2 + offset[0], offset[1]), 
+                mask=frame.convert("LA")
             )
-            badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
-            bg.paste(badge_image, paste_coords[place-1], badge_image)
 
-        return bg
-    
+            # paste badge to fix 3d realness of character standing on podium
+            if defined_art_user[1] is not None:
+                if defined_art_user[1][pose_number-1][place-1]:
+                    background.paste(badge_image, paste_coords[place-1], badge_image)        
+            
+            b = io.BytesIO()
+            output.save(b, format="GIF")
+            output = Image.open(b)
+
+            frames.append(output)
+
+
+        # create buffer
+        buffer = io.BytesIO()
+
+        # save GIF in buffer
+        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+
+        return Image.open(buffer)
+        
 
 
     def get_amount_of_poses(self, user_id):
@@ -267,15 +288,15 @@ class CharacterBuilder:
         # prerenderd of default all poses
         if not self.has_custom_poses(user_id):
             return discord.File(
-                f"{BASE_LOCATION}default/AllPoses.png",
+                f"{BASE_LOCATION}default/AllPoses.gif", # TODO make this file
                 'poses.png'
             ) 
         
         # prerendered of custom all poses
         if self.has_prerender_of_poses(user_id):
             return discord.File(
-                f"{BASE_LOCATION}{str(user_id)}/AllPoses.png",
-                "poses.png"
+                f"{BASE_LOCATION}{str(user_id)}/AllPoses.gif",
+                "poses.gif"
             )
         
         # not prerendered, create it
@@ -329,6 +350,7 @@ class CharacterBuilder:
         return discord.File(buffer, 'poses.gif')   
     
     
+
     def get_pose_concat(self, poses, padding, start_number, color=(44, 45, 47)):
         new_width = sum([im.width for im in poses]) + padding*(len(poses) - 1)
         background = Image.new('RGBA', (new_width, poses[0].height + 400), color)
@@ -394,7 +416,7 @@ class CharacterBuilder:
 
 
     def has_prerender_of_poses(self, user_id):
-        return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/AllPoses.png")
+        return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/AllPoses.gif")
      
 
 
@@ -486,13 +508,13 @@ class PodiumBuilder:
         # create buffer
         buffer = io.BytesIO()
 
-        # save PNG in buffer
-        dst.save(buffer, format='PNG')    
+        # save GIF in buffer
+        dst.save(buffer, format='GIF')    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
-        return discord.File(buffer, 'podium.png')   
+        return discord.File(buffer, 'podium.gif')   
 
 
 
@@ -545,7 +567,7 @@ def vertical_concat(im1, im2):
     # create buffer
     buffer = io.BytesIO()
 
-    # save PNG in buffer
+    # save GIF in buffer
     frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
 
     return Image.open(buffer)
@@ -557,19 +579,49 @@ def get_concat(main_image, left_image, right_image):
     padding = min(main_image.width//3, 220)
     
     # create bg image with correct dimensions
-    dst = Image.new(
+    background = Image.new(
         'RGBA', 
         (min(left_image.width, right_image.width) *3 + padding*2,
         max(left_image.height, main_image.height, right_image.height))
     )
 
-    # paste the podiums onto the bg
-    paste_width = (dst.width - main_image.width)//2
-    dst.paste(main_image, (paste_width, 0), main_image)
-    dst.paste(left_image, (0, dst.height - left_image.height), left_image)
-    dst.paste(right_image, (dst.width - right_image.width, dst.height - left_image.height), right_image)
-    
-    return dst
+    paste_width = (background.width - main_image.width)//2
+
+    total_frame_count = max(main_image.n_frames, left_image.n_frames, right_image.n_frames)
+
+    frames = []
+    for i in range(total_frame_count):
+        
+        output = background.copy()
+
+        # paste the podiums onto the bg
+        main_image.seek(min(i, main_image.n_frames))
+        main_image_frame = main_image.copy()
+        output.paste(main_image_frame, (paste_width, 0), mask=main_image_frame.convert("LA"))
+
+        left_image.seek(min(i, main_image.n_frames))
+        left_image_frame = left_image.copy()
+        output.paste(left_image_frame, (0, output.height - left_image_frame.height), mask=left_image_frame.convert("LA"))
+
+        right_image.seek(min(i, main_image.n_frames))
+        right_image_frame = right_image.copy()
+        output.paste(right_image, (output.width - right_image_frame.width, output.height - left_image_frame.height), mask=right_image_frame.convert("LA"))
+
+
+        b = io.BytesIO()
+        output.save(b, format="GIF")
+        output = Image.open(b)
+
+        frames.append(output)
+
+
+    # create buffer
+    buffer = io.BytesIO()
+
+    # save GIF in buffer
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+
+    return Image.open(buffer)
 
 
 
@@ -587,33 +639,34 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
 
     background = Image.new('RGBA', (im1.width + im2.width + padding, im1.height), color)
     
+    total_frame_count = max(im1.n_frames, im2.n_frames)
     frames = []
-    for frame in ImageSequence.Iterator(im1):
+    for i in range(total_frame_count):
+        
         output = background.copy()
-        output.paste(frame, (0, 0), mask=frame.convert("LA"))
+
+        im1.seek(i)
+        frame1 = im1.copy()
+
+        # Paste the two images onto the new image
+        output.paste(frame1, (0, 0), mask=frame1.convert("LA"))
+
+        im2.seek(i)
+        frame2 = im2.copy()
+        output.paste(frame2, (im1.width + padding, 0), mask=frame2.convert("LA"))
+
+        b = io.BytesIO()
+        output.save(b, format="GIF")
+        output = Image.open(b)
+
         frames.append(output)
 
-    i = 0
-    size_of_previous = len(frames)
-    for frame in ImageSequence.Iterator(im2):
-        if i < size_of_previous:
-            frames[i].paste(frame, (im1.width + padding, 0), mask=frame.convert("LA"))
-
-        else:
-            output = background.copy()
-            output.paste(frame, (im1.width + padding, 0), mask=frame.convert("LA"))
-            frames.append(output)
-        
-        i += 1
 
     # create buffer
     buffer = io.BytesIO()
 
-    # save PNG in buffer
-    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])    
-
-    # move to beginning of buffer so `send()` it will read from beginning
-    buffer.seek(0)
+    # save GIF in buffer
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
 
     return Image.open(buffer)
 
@@ -629,8 +682,24 @@ def resize_image(im, width, max_height=1000, color=(44, 45, 47)):
         hpercent = (hsize / float(im.size[1]))
         width = int((float(im.size[0]) * float(hpercent)))
 
-    return im.resize((width, hsize), Image.Resampling.LANCZOS)
+    frames = []
+    for frame in ImageSequence.Iterator(im):
 
+        frame.resize((width, hsize), Image.Resampling.LANCZOS)
+
+        b = io.BytesIO()
+        frame.save(b, format="GIF")
+        frame = Image.open(b)
+
+        frames.append(frame)
+
+    # create buffer
+    buffer = io.BytesIO()
+
+    # save GIF in buffer
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+
+    return Image.open(buffer)
 
 
 # get number in human format
