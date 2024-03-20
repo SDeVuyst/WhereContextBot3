@@ -301,7 +301,7 @@ class CharacterBuilder:
             poses = poses[chunksize:]
 
             poses_dst.append(
-                self.get_pose_concat(poses_to_build, 150, 1)
+                self.get_pose_concat(poses_to_build, 150, i+1)
             )
 
             i += chunksize
@@ -314,9 +314,7 @@ class CharacterBuilder:
             )
 
         # add the images together vertically
-        total = poses_dst[0]
-        # total = vertical_concat_multi(poses_dst) TODO
-        # print(total)
+        total = vertical_concat_multi(poses_dst)
 
         # create buffer
         buffer = io.BytesIO()
@@ -358,7 +356,7 @@ class CharacterBuilder:
                 draw = ImageDraw.Draw(output)
                 draw.text(
                     (text_x_paste, text_y_paste),
-                    text=str(number+1),
+                    text=str(number+start_number),
                     align='center', font=font, anchor='mm', fill=(255, 104, 1)
                 )
                 del draw
@@ -509,23 +507,48 @@ def vertical_concat_multi(images):
 
 
 def vertical_concat(im1, im2):
-
+    
     width1, height1 = im1.size
     width2, height2 = im2.size
 
     # Create a new image with the combined width and the height of the tallest image
     new_width = max(width1, width2)
     new_height = height1 + height2
-    new_image = Image.new("RGB", (new_width, new_height), (44, 45, 47))
+    background = Image.new("RGB", (new_width, new_height), (44, 45, 47))
 
-    # Paste the two images onto the new image
-    new_image.paste(im1, (0, 0))
-    # center second image
-    remaining_width = new_width - width2
-    new_image.paste(im2, (remaining_width//2, height1))
+    total_frame_count = max(im1.n_frames, im2.n_frames)
+    frames = []
+    for i in range(total_frame_count):
+        
+        output = background.copy()
 
-    return new_image
+        im1.seek(i)
+        frame1 = im1.copy()
 
+        # Paste the two images onto the new image
+        output.paste(frame1, (0, 0), mask=frame1.convert("LA"))
+
+        # center second image
+        im2.seek(i)
+        frame2 = im2.copy()
+        remaining_width = new_width - width2
+        output.paste(frame2, (remaining_width//2, height1))
+
+
+        b = io.BytesIO()
+        output.save(b, format="GIF")
+        output = Image.open(b)
+
+        frames.append(output)
+
+
+    # create buffer
+    buffer = io.BytesIO()
+
+    # save PNG in buffer
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+
+    return Image.open(buffer)
 
 
 # concat multiple images with overlap (only if all 3 podiums present)
