@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageSequence, GifImagePlugin
 
 import discord
 import io
@@ -7,9 +7,9 @@ import requests
 import random
 import csv
 
-from helpers import db_manager
+# from helpers import db_manager
 
-#BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
+# BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
 BASE_LOCATION = 'media/images/'
 
 
@@ -265,7 +265,7 @@ class CharacterBuilder:
     async def get_all_poses_image(self, user_id):
 
         # prerenderd of default all poses
-        if not self.has_custom_poses(user_id, 1):
+        if not self.has_custom_poses(user_id):
             return discord.File(
                 f"{BASE_LOCATION}default/AllPoses.png",
                 'poses.png'
@@ -280,7 +280,7 @@ class CharacterBuilder:
         
         # not prerendered, create it
         poses = [
-            remove_transparency(Image.open(self.get_pose_location(user_id, i+1)))
+            Image.open(self.get_pose_location(user_id, i+1))
             for i in range(self.get_amount_of_poses(user_id))
         ]
 
@@ -300,74 +300,104 @@ class CharacterBuilder:
             poses_to_build = poses[:chunksize]
             poses = poses[chunksize:]
 
-            # build poses image with n poses
-            dst = get_concat_h_multi_blank(poses_to_build, 150)
-            bg = self.add_numbering_to_poses(dst, i, chunksize, 150)
-            
-            poses_dst.append(bg)
+            poses_dst.append(
+                self.get_pose_concat(poses_to_build, 150, 1)
+            )
 
             i += chunksize
 
 
         # leftover poses
         if len(poses) > 0:
-            dst = get_concat_h_multi_blank(poses, 150)
-            bg = self.add_numbering_to_poses(dst, i, len(poses), 150)
-            
-            poses_dst.append(bg)
+            poses_dst.append(
+                self.get_pose_concat(poses_to_build, 150, 1)
+            )
 
         # add the images together vertically
-        total = vertical_concat_multi(poses_dst)
+        total = poses_dst[0]
+        # total = vertical_concat_multi(poses_dst) TODO
+        # print(total)
+
+        # create buffer
+        buffer = io.BytesIO()
+
+        # save GIF in buffer
+        total.save(buffer, format='gif', save_all=True, loop=0)    
+
+        # move to beginning of buffer so `send()` it will read from beginning
+        buffer.seek(0)
+
+        # return total
+        return discord.File(buffer, 'poses.gif')   
+    
+    
+    def get_pose_concat(self, poses, padding, start_number, color=(44, 45, 47)):
+        new_width = sum([im.width for im in poses]) + padding*(len(poses) - 1)
+        background = Image.new('RGBA', (new_width, poses[0].height + 400), color)
+        font = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contb.ttf", size=200)
+        text_y_paste = background.height - 200
+
+        total_frame_count = max(*[gif.n_frames for gif in poses])
+        frames = []
+        for i in range(total_frame_count):
+            
+            output = background.copy()
+            current_x_point = 0
+
+            for number, pose in enumerate(poses):
+                pose.seek(i)
+                frame = pose.copy()
+
+                output.paste(
+                    frame, 
+                    (current_x_point, 0), 
+                    mask=frame.convert("LA")
+                )
+
+                text_x_paste = current_x_point - 50 + pose.width // 2
+                draw = ImageDraw.Draw(output)
+                draw.text(
+                    (text_x_paste, text_y_paste),
+                    text=str(number+1),
+                    align='center', font=font, anchor='mm', fill=(255, 104, 1)
+                )
+                del draw
+
+                current_x_point += pose.width + padding
+
+            b = io.BytesIO()
+            output.save(b, format="GIF")
+            output = Image.open(b)
+
+            frames.append(output)
+
 
         # create buffer
         buffer = io.BytesIO()
 
         # save PNG in buffer
-        total.save(buffer, format='PNG')    
+        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
 
-        # move to beginning of buffer so `send()` it will read from beginning
-        buffer.seek(0)
+        return Image.open(buffer)
 
-        return discord.File(buffer, 'poses.png')   
-    
-    
 
-    def has_custom_poses(self, user_id, place):
-        return os.path.exists(self.get_pose_location(user_id, place))
+        
+    def has_custom_poses(self, user_id, pose=1):
+        return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/Pose{pose}.gif") or os.path.exists(f"{BASE_LOCATION}{str(user_id)}/Pose{pose}.png")
 
 
 
-    def get_pose_location(self, user_id, place):
-        return f"{BASE_LOCATION}{str(user_id)}/Pose{place}.png"
+    def get_pose_location(self, user_id, pose):
+        if os.path.exists(f"{BASE_LOCATION}{str(user_id)}/Pose{pose}.gif"):
+            return f"{BASE_LOCATION}{str(user_id)}/Pose{pose}.gif"
+
+        return f"{BASE_LOCATION}{str(user_id)}/Pose{pose}.png"
 
 
 
     def has_prerender_of_poses(self, user_id):
         return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/AllPoses.png")
-    
-
-
-    def add_numbering_to_poses(self, dst, start_number, number_of_poses, padding):
-        # add poses to bg image
-        bg = Image.new('RGB', (dst.width, dst.height + 400), (44, 45, 47))
-        bg.paste(dst, (0,0))
-
-        draw = ImageDraw.Draw(bg)
-        font = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contb.ttf", size=200)
-
-        offset_per_pose = 450 + padding + 450
-        y_paste = int(dst.height + (bg.height - dst.height) // 2)
-
-        # add numbering of poses
-        for i, number in enumerate(range(start_number, start_number+number_of_poses)):
-            draw.text(
-                (450 + offset_per_pose*i, y_paste),
-                text=str(number+1),
-                align='center', font=font, anchor='mm', fill=(255, 104, 1)
-            )
-
-        return bg
-    
+     
 
 
 class PodiumBuilder:
@@ -479,6 +509,7 @@ def vertical_concat_multi(images):
 
 
 def vertical_concat(im1, im2):
+
     width1, height1 = im1.size
     width2, height2 = im2.size
 
@@ -530,19 +561,38 @@ def get_concat_h_multi_blank(im_list, padding, color=(44, 45, 47)):
 
 # concat 2 images
 def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
-    dst = Image.new('RGBA', (im1.width + im2.width + padding, im1.height), color)
-    dst.paste(im1, (0, 0))
-    dst.paste(im2, (im1.width + padding, 0))
-    return dst
 
+    background = Image.new('RGBA', (im1.width + im2.width + padding, im1.height), color)
+    
+    frames = []
+    for frame in ImageSequence.Iterator(im1):
+        output = background.copy()
+        output.paste(frame, (0, 0), mask=frame.convert("LA"))
+        frames.append(output)
 
+    i = 0
+    size_of_previous = len(frames)
+    for frame in ImageSequence.Iterator(im2):
+        if i < size_of_previous:
+            frames[i].paste(frame, (im1.width + padding, 0), mask=frame.convert("LA"))
 
-def remove_transparency(im, color=(44, 45, 47)):
-    im = im.convert("RGBA")
-    new_image = Image.new("RGBA", im.size, color)
-    new_image.paste(im, mask=im)
+        else:
+            output = background.copy()
+            output.paste(frame, (im1.width + padding, 0), mask=frame.convert("LA"))
+            frames.append(output)
+        
+        i += 1
 
-    return new_image.convert("RGB")
+    # create buffer
+    buffer = io.BytesIO()
+
+    # save PNG in buffer
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])    
+
+    # move to beginning of buffer so `send()` it will read from beginning
+    buffer.seek(0)
+
+    return Image.open(buffer)
 
 
 

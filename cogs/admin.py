@@ -842,7 +842,7 @@ class ConfigureView(discord.ui.View):
             "👥 Select your poses",
             "You can pick different poses for each position on your podium.\nIf you select multiple poses, one will be selected at random every time your podium is displayed."
         )
-        embed.set_image(url="attachment://poses.png")
+        embed.set_image(url="attachment://poses.gif")
         
         await waiting_message.edit(
             embed=embed,
