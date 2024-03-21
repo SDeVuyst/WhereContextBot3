@@ -851,7 +851,7 @@ async def has_poses(user_id, place) -> bool:
             return False
         
 
-async def get_poses(user_id, place):
+async def async_get_poses(user_id, place):
     try:
         with psycopg2.connect(
         host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
@@ -865,7 +865,23 @@ async def get_poses(user_id, place):
             
     except Exception as err:
         return -1
-    
+
+
+def get_poses(user_id, place):
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT active_poses FROM poses WHERE user_id=%s AND place=%s", (str(user_id), int(place),)
+                )
+                return cursor.fetchone()
+            
+    except Exception as err:
+        return -1
+
 
 async def remove_poses(user_id, place):
     try:

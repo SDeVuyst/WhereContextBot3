@@ -588,15 +588,15 @@ class Admin(commands.Cog, name="admin"):
             inline=False
         )
 
-        # show podiums if user has one
+        
+        message = await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user))
+
+        # create task to add image of podiums
         builder = ArtBuilder.PodiumBuilder(self.bot)
-        if builder.user_has_podium(user.id):
-            file = await builder.get_all_podiums_image([user.id, user.id, user.id], padding=100, add_characters=False)
-            embed.set_image(url="attachment://podium.gif")
-
-            return await interaction.followup.send(embed=embed, files=[file], view=ConfigureView(self.bot, embed, user))
-
-        await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user))
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            builder.async_set_all_podiums_image(loop, message, embed, user.id, [user.id, user.id, user.id], 100, False)
+        )
 
 
 
@@ -831,7 +831,7 @@ class ConfigureView(discord.ui.View):
 
         # 1, 2, 3
         for i in range(1, 4):
-            poses = await db_manager.get_poses(self.user.id, i)
+            poses = await db_manager.async_get_poses(self.user.id, i)
             if poses is not None:
                 poses = [int(pose) for pose in poses[0]]
             else:

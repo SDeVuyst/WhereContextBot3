@@ -201,7 +201,7 @@ class CharacterBuilder:
 
 
 
-    async def add_character_to_podium(self, podium_image, user_id, poseNumber, place, podium_user_id):
+    def add_character_to_podium(self, podium_image, user_id, poseNumber, place, podium_user_id):
         # get object that contains info about the arts done
         defined_art_user = self.get_extra_pose_data(user_id)
         defined_art_podium = self.get_extra_data(podium_user_id)
@@ -441,7 +441,7 @@ class PodiumBuilder:
         return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/ShinyPodium{place}.png")
 
 
-    async def get_podium_image(self, user_id, place, always_shiny = False):
+    def get_podium_image(self, user_id, place, always_shiny = False):
 
         # get location of the podium
         if self.user_has_podium(user_id, place):
@@ -460,7 +460,7 @@ class PodiumBuilder:
         return image
     
 
-    async def get_all_podiums_image(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True, characters=None):
+    def get_all_podiums_image(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True, characters=None):
         # create normalised images for every given podium
         if len(user_ids) == 1:
             order = [1]
@@ -476,7 +476,7 @@ class PodiumBuilder:
         # for every available user (top 3)
         for i, id in enumerate(user_ids):
             # get podium
-            podium_image = await self.get_podium_image(id, order[i], always_shiny)
+            podium_image = self.get_podium_image(id, order[i], always_shiny)
 
             if add_characters: 
                 
@@ -487,14 +487,14 @@ class PodiumBuilder:
                     id_char = id
 
                 # get active pose and pick 1 at random
-                poses = await db_manager.get_poses(str(id_char), order[i]) # order[i] was i+1
+                poses = db_manager.get_poses(str(id_char), order[i]) # order[i] was i+1
                 if poses is not None:
                     pose = random.choice([int(pose) for pose in poses[0]])
                 else:
                     pose = random.randint(1, self.character_builder.get_amount_of_poses(str(id_char)))
 
                 # add character
-                podium_image = await self.character_builder.add_character_to_podium(podium_image, str(id_char), pose, order[i], str(id))
+                podium_image = self.character_builder.add_character_to_podium(podium_image, str(id_char), pose, order[i], str(id))
 
             podiums.append(podium_image)
 
@@ -519,6 +519,16 @@ class PodiumBuilder:
         buffer.seek(0)
 
         return discord.File(buffer, 'podium.gif')   
+
+
+    async def async_set_all_podiums_image(self, loop, message, embed, user_id, user_ids, padding, add_characters):
+                 
+        # show podiums if user has one
+        if self.user_has_podium(user_id):
+            podiums_image = await loop.run_in_executor(POOL, self.get_all_podiums_image, user_ids, True, padding, (44, 45, 47), add_characters)
+            embed.set_image(url="attachment://podium.gif")
+
+            await message.edit(embed=embed, attachments=[podiums_image])   
 
 
 
