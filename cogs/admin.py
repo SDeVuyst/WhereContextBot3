@@ -823,7 +823,7 @@ class ConfigureView(discord.ui.View):
         waiting_message = await interaction.followup.send(embed=self.waiting_embed)
 
         builder = ArtBuilder.CharacterBuilder(self.bot)
-        file = await builder.get_all_poses_image(self.user.id)
+
         amount_of_poses = builder.get_amount_of_poses(self.user.id)
 
         # get previously selected poses
@@ -844,15 +844,20 @@ class ConfigureView(discord.ui.View):
         )
         embed.set_image(url="attachment://poses.gif")
         
-        await waiting_message.edit(
+        message = await waiting_message.edit(
             embed=embed,
             view=PosesSelectView(
                 self.bot,
                 amount_of_poses,
                 selected_poses,
                 self.user,
-            ),
-            attachments=[file]
+            )
+        )
+
+        # create task to add image of available poses
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            builder.async_set_all_poses_image(loop, self.user.id, message)
         )
 
 

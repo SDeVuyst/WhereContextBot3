@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 
 import discord
 from discord.ext import tasks
-from discord.ext.commands import Bot
+from discord.ext.commands import AutoShardedBot
 from discord import Webhook
 import aiohttp
 
@@ -31,7 +31,7 @@ from cogs.general import DynamicVotesButton
 
 intents = discord.Intents.all()
 
-bot = Bot(
+bot = AutoShardedBot(
     command_prefix='',
     intents=intents,
     help_command=None,
@@ -585,7 +585,7 @@ async def on_tree_error(interaction, error):
     await interaction.response.send_message(embed=embed)
 
 
-bot.tree.on_error = on_tree_error
+# bot.tree.on_error = on_tree_error TODO uncomment
 
 
 async def setup_hook() -> None:

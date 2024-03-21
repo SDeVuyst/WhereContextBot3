@@ -140,6 +140,10 @@ class General(commands.Cog, name="general"):
 
         await interaction.response.defer()
 
+        await interaction.followup.send(embed=embeds.DefaultEmbed(
+            "⏳ Loading...", "This can take a while."
+        ))
+
         builder = ArtBuilder.PodiumBuilder(self.bot)
         characters = [
             second_character.id  if second_character is not None else None,
@@ -148,7 +152,7 @@ class General(commands.Cog, name="general"):
         ]
         file = await builder.get_all_podiums_image([second_podium.id, first_podium.id, third_podium.id], characters=characters)
         
-        await interaction.followup.send(files=[file])
+        await interaction.edit_original_response(embed=None, attachments=[file])
 
 
 

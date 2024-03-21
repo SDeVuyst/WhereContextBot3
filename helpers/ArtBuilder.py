@@ -1,18 +1,17 @@
-from PIL import Image, ImageDraw, ImageFont, ImageSequence, GifImagePlugin
-
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
 import discord
 import io
 import os
 import requests
 import random
 import csv
-
 from helpers import db_manager
+from concurrent.futures import ThreadPoolExecutor
 
 # BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
 BASE_LOCATION = 'media/images/'
 
-
+POOL = ThreadPoolExecutor()
 
 class LeaderboardBuilder:
     def __init__(self, bot) -> None:
@@ -117,13 +116,13 @@ class LeaderboardBuilder:
         # create buffer
         buffer = io.BytesIO()
 
-        # save PNG in buffer
-        bg.save(buffer, format='PNG')    
+        # save GIF in buffer
+        bg.save(buffer, format='GIF')    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
-        return discord.File(buffer, 'leaderboardbottom.png')
+        return discord.File(buffer, 'leaderboardbottom.gif')
     
     
 
@@ -202,56 +201,58 @@ class CharacterBuilder:
 
 
 
-    async def add_character_to_podium(self, podium_image, user_id, pose_number, place, podium_user_id):
+    async def add_character_to_podium(self, podium_image, user_id, poseNumber, place, podium_user_id):
         # get object that contains info about the arts done
         defined_art_user = self.get_extra_pose_data(user_id)
         defined_art_podium = self.get_extra_data(podium_user_id)
 
         # get location of the character
-        if self.has_custom_poses(user_id, pose_number):
-            custom_character_location = self.get_pose_location(user_id, pose_number)
+        if self.has_custom_poses(user_id, poseNumber):
+            custom_character_location = self.get_pose_location(user_id, poseNumber)
         else:
-            custom_character_location = f"{BASE_LOCATION}default/Pose{pose_number}.png"
+            custom_character_location = f"{BASE_LOCATION}default/Pose{poseNumber}.png"
 
         # load the character image
         character_image = Image.open(custom_character_location)
         
         # resize it
-        # character_image = resize_image(character_image, 700) TESTING
+        character_image = resize_image(character_image, 700)
 
         # create empty bg to add podium and character to
         background = Image.new('RGBA', (podium_image.width, podium_image.height + character_image.height))
         
         offset = defined_art_podium.get("poseOffset", [(0, 110), (0, 200), (0, 370)])[place-1]
         # different offset for specific pose
-        if defined_art_user[0][pose_number-1] is not None:
-            offset = defined_art_user[0][pose_number-1][place-1]
+        if defined_art_user[0][poseNumber-1] is not None:
+            offset = defined_art_user[0][poseNumber-1][place-1]
 
         paste_coords = defined_art_podium.get(
             "badgePasteCoords", 
             [(255, 1050), (255, 1130), (255, 1320)]
         )
+
         badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
 
         frames = []
-        for frame in ImageSequence.Iterator(character_image):
+        for i in range(character_image.n_frames):
             
             output = background.copy()
 
+            character_image.seek(i)
+            frame = character_image.copy()
+            
             # paste podium
             output.paste(podium_image, (0, character_image.height), podium_image) 
             
             # paste character
-            background.paste(
+            output.paste(
                 frame,
                 ((background.width - frame.width)//2 + offset[0], offset[1]), 
                 mask=frame.convert("LA")
             )
 
             # paste badge to fix 3d realness of character standing on podium
-            if defined_art_user[1] is not None:
-                if defined_art_user[1][pose_number-1][place-1]:
-                    background.paste(badge_image, paste_coords[place-1], badge_image)        
+            output.paste(badge_image, paste_coords[place-1], badge_image)        
             
             b = io.BytesIO()
             output.save(b, format="GIF")
@@ -263,11 +264,11 @@ class CharacterBuilder:
         # create buffer
         buffer = io.BytesIO()
 
-        # save GIF in buffer
-        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+        # save GIF in buffeR
+        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0)
 
         return Image.open(buffer)
-        
+    
 
 
     def get_amount_of_poses(self, user_id):
@@ -283,7 +284,14 @@ class CharacterBuilder:
     
 
 
-    async def get_all_poses_image(self, user_id):
+    async def async_set_all_poses_image(self, loop, user_id, message):
+        poses_image = await loop.run_in_executor(POOL, self.get_all_poses_image, user_id)
+
+        await message.edit(attachments=[poses_image])            
+
+
+
+    def get_all_poses_image(self, user_id):
 
         # prerenderd of default all poses
         if not self.has_custom_poses(user_id):
@@ -349,7 +357,6 @@ class CharacterBuilder:
         # return total
         return discord.File(buffer, 'poses.gif')   
     
-    
 
     def get_pose_concat(self, poses, padding, start_number, color=(44, 45, 47)):
         new_width = sum([im.width for im in poses]) + padding*(len(poses) - 1)
@@ -395,7 +402,7 @@ class CharacterBuilder:
         # create buffer
         buffer = io.BytesIO()
 
-        # save PNG in buffer
+        # save gif in buffer
         frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
 
         return Image.open(buffer)
@@ -427,13 +434,11 @@ class PodiumBuilder:
         self.character_builder = CharacterBuilder(bot)
 
 
-
     def user_has_podium(self, user_id, place=1, shiny=False):
         if not shiny:
             return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/Podium{place}.png")
     
         return os.path.exists(f"{BASE_LOCATION}{str(user_id)}/ShinyPodium{place}.png")
-
 
 
     async def get_podium_image(self, user_id, place, always_shiny = False):
@@ -455,7 +460,6 @@ class PodiumBuilder:
         return image
     
 
-    
     async def get_all_podiums_image(self, user_ids, return_file=True, padding=200, color=(44, 45, 47), add_characters=True, characters=None):
         # create normalised images for every given podium
         if len(user_ids) == 1:
@@ -595,15 +599,15 @@ def get_concat(main_image, left_image, right_image):
         output = background.copy()
 
         # paste the podiums onto the bg
-        main_image.seek(min(i, main_image.n_frames))
+        main_image.seek(i if main_image.is_animated else 0)
         main_image_frame = main_image.copy()
         output.paste(main_image_frame, (paste_width, 0), mask=main_image_frame.convert("LA"))
 
-        left_image.seek(min(i, main_image.n_frames))
+        left_image.seek(i if left_image.is_animated else 0)
         left_image_frame = left_image.copy()
         output.paste(left_image_frame, (0, output.height - left_image_frame.height), mask=left_image_frame.convert("LA"))
 
-        right_image.seek(min(i, main_image.n_frames))
+        right_image.seek(i if left_image.is_animated else 0)
         right_image_frame = right_image.copy()
         output.paste(right_image, (output.width - right_image_frame.width, output.height - left_image_frame.height), mask=right_image_frame.convert("LA"))
 
@@ -685,13 +689,13 @@ def resize_image(im, width, max_height=1000, color=(44, 45, 47)):
     frames = []
     for frame in ImageSequence.Iterator(im):
 
-        frame.resize((width, hsize), Image.Resampling.LANCZOS)
+        frame_resized = frame.resize((width, hsize), Image.Resampling.LANCZOS)
 
         b = io.BytesIO()
-        frame.save(b, format="GIF")
-        frame = Image.open(b)
+        frame_resized.save(b, format="GIF")
+        frame_resized = Image.open(b)
 
-        frames.append(frame)
+        frames.append(frame_resized)
 
     # create buffer
     buffer = io.BytesIO()
