@@ -528,7 +528,14 @@ class PodiumBuilder:
             podiums_image = await loop.run_in_executor(POOL, self.get_all_podiums_image, user_ids, True, padding, (44, 45, 47), add_characters)
             embed.set_image(url="attachment://podium.gif")
 
-            await message.edit(embed=embed, attachments=[podiums_image])   
+            await message.edit(embed=embed, attachments=[podiums_image])
+
+
+    async def async_set_all_podiums_image_file(self, loop, message, user_ids, characters):
+                
+        # show podiums if user has one
+        podiums_image = await loop.run_in_executor(POOL, self.get_all_podiums_image, user_ids, True, 200, (44, 45, 47), True, characters)
+        await message.edit(embed=None, attachments=[podiums_image]) 
 
 
 
@@ -617,7 +624,7 @@ def get_concat(main_image, left_image, right_image):
         left_image_frame = left_image.copy()
         output.paste(left_image_frame, (0, output.height - left_image_frame.height), mask=left_image_frame.convert("LA"))
 
-        right_image.seek(i if left_image.is_animated else 0)
+        right_image.seek(i if right_image.is_animated else 0)
         right_image_frame = right_image.copy()
         output.paste(right_image, (output.width - right_image_frame.width, output.height - left_image_frame.height), mask=right_image_frame.convert("LA"))
 

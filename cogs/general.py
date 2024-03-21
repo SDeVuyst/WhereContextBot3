@@ -6,6 +6,7 @@ Description:
 Version: 5.5.0
 """
 
+import asyncio
 import os
 import dateparser
 import re
@@ -140,7 +141,7 @@ class General(commands.Cog, name="general"):
 
         await interaction.response.defer()
 
-        await interaction.followup.send(embed=embeds.DefaultEmbed(
+        message = await interaction.followup.send(embed=embeds.DefaultEmbed(
             "⏳ Loading...", "This can take a while."
         ))
 
@@ -150,11 +151,14 @@ class General(commands.Cog, name="general"):
             first_character.id if first_character is not None else None, 
             third_character.id if third_character is not None else None
         ]
-        file = await builder.get_all_podiums_image([second_podium.id, first_podium.id, third_podium.id], characters=characters)
+
+        # create task to add image of available poses
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            builder.async_set_all_podiums_image_file(loop, message, [first_podium.id, second_podium.id, third_podium.id], characters)
+        )
+                
         
-        await interaction.edit_original_response(embed=None, attachments=[file])
-
-
 
     @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
