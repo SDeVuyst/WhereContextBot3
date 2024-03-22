@@ -24,10 +24,10 @@ class LeaderboardBuilder:
     async def async_set_leaderboard_images(self, loop, top_message, bottom_message, leaderboard, command):
                  
         top_file = await loop.run_in_executor(POOL, self.get_top_leaderboard, leaderboard, command)
-        # bottom_file = await loop.run_in_executot(POOL, self.get_bottom_leaderboard, leaderboard)
+        bottom_file = await loop.run_in_executor(POOL, self.get_bottom_leaderboard, leaderboard)
 
         await top_message.edit(embed=None, attachments=[top_file])
-        # await bottom_message.edit(embed=None, attachments=[bottom_file])
+        await bottom_message.edit(embed=None, attachments=[bottom_file])
 
 
 
@@ -136,12 +136,12 @@ class LeaderboardBuilder:
         buffer = io.BytesIO()
 
         # save GIF in buffer
-        bg.save(buffer, format='GIF')    
+        bg.save(buffer, format='png')    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
-        return discord.File(buffer, 'leaderboardbottom.gif')
+        return discord.File(buffer, 'leaderboardbottom.png')
     
     
 
