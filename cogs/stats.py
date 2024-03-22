@@ -6,6 +6,7 @@ Description:
 Version: 5.5.0
 """
 
+import asyncio
 import discord
 
 import requests
@@ -40,10 +41,12 @@ class Stats(commands.Cog, name="stats"):
         Args:
             interaction (Interaction): Users interaction
         """
-        view = CommandView(self.bot)
-        await interaction.response.send_message(view=view)
+        await interaction.response.defer()
 
-        secondMessage = await interaction.channel.send('** **')
+        view = CommandView(self.bot)
+        first_message = await interaction.followup.send(view=view)
+
+        second_message = await interaction.channel.send('** **')
         
         await view.wait()        
 
@@ -53,22 +56,22 @@ class Stats(commands.Cog, name="stats"):
         elif view.chosen_command == "bancount":
             leaderb = await db_manager.get_ban_leaderboard()
 
-        elif command == "current_win_streak":
+        elif view.chosen_command == "current_win_streak":
             leaderb = await db_manager.get_current_win_streak_leaderboard()
 
-        elif command == "current_loss_streak":
+        elif view.chosen_command == "current_loss_streak":
             leaderb = await db_manager.get_current_loss_streak_leaderboard()
 
-        elif command == "highest_win_streak":
+        elif view.chosen_command == "highest_win_streak":
             leaderb = await db_manager.get_highest_win_streak_leaderboard()
 
-        elif command == "highest_loss_streak":
+        elif view.chosen_command == "highest_loss_streak":
             leaderb = await db_manager.get_highest_loss_streak_leaderboard()
 
-        elif command == "ban_total_wins":
+        elif view.chosen_command == "ban_total_wins":
             leaderb = await db_manager.get_ban_total_wins_leaderboard()
 
-        elif command == "ban_total_losses":
+        elif view.chosen_command == "ban_total_losses":
             leaderb = await db_manager.get_ban_total_losses_leaderboard()
 
         else:
@@ -86,9 +89,6 @@ class Stats(commands.Cog, name="stats"):
             return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
                 "Something went wrong...", leaderb[1]
             ), view=None)
-         
-        if view.chosen_command == "danae":
-            command = "danae trigger"
 
         elif view.chosen_command == "current_win_streak":
             command = "Ban Gamble - Current Win Streak"
@@ -112,12 +112,10 @@ class Stats(commands.Cog, name="stats"):
             command = f'/{view.chosen_command}'
         
         builder = ArtBuilder.LeaderboardBuilder(self.bot)
-
-        top = await builder.get_top_leaderboard(leaderb, command)
-        await interaction.edit_original_response(attachments=[top], view=None, embed=None)
-
-        bottom = await builder.get_bottom_leaderboard(leaderb)
-        await secondMessage.add_files(bottom)
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            builder.async_set_leaderboard_images(loop, first_message, second_message, leaderb, command)
+        )
 
 
 
@@ -240,9 +238,6 @@ class Stats(commands.Cog, name="stats"):
             if command == "bancount":
                 title = f"🔨 **<@{userid}> has not been banned yet.**"
 
-            elif command == "danae":
-                title = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
-
             elif command == "current_win_streak":
                 title = f"**<@{userid}> doesn't have a win streak yet.**"
 
@@ -277,9 +272,6 @@ class Stats(commands.Cog, name="stats"):
 
         elif command == "messages_deleted":
             desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
-
-        elif command == "danae":
-            desc = f"**<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
 
         elif command == "bancount":
             desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
@@ -391,7 +383,6 @@ class CommandSelect(Select):
         
         elif selected_cog == "stats":
             commands.insert(0, ("Bans", "bancount"))
-            commands.insert(0, ("Danae trigger", "danae"))
         
         elif selected_cog == "admin":
             commands.append("Ban Gamble - Current Win Streak", "current_win_streak")

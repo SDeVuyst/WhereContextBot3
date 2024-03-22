@@ -7,6 +7,7 @@ import random
 import csv
 from helpers import db_manager
 from concurrent.futures import ThreadPoolExecutor
+from itertools import zip_longest
 
 # BASE_LOCATION = 'C:/Users/Silas/OneDrive/Documenten/GitHub/WhereContextBot3/media/images/'
 BASE_LOCATION = 'media/images/'
@@ -20,17 +21,23 @@ class LeaderboardBuilder:
         self.podium_builder = PodiumBuilder(bot)
 
 
+    async def async_set_leaderboard_images(self, loop, top_message, bottom_message, leaderboard, command):
+                 
+        top_file = await loop.run_in_executor(POOL, self.get_top_leaderboard, leaderboard, command)
+        # bottom_file = await loop.run_in_executot(POOL, self.get_bottom_leaderboard, leaderboard)
 
-    async def get_top_leaderboard(self, leaderboard, command):
+        await top_message.edit(embed=None, attachments=[top_file])
+        # await bottom_message.edit(embed=None, attachments=[bottom_file])
+
+
+
+    def get_top_leaderboard(self, leaderboard, command):
         #  load background
         bg = Image.open(f"{BASE_LOCATION}leaderboard/LeaderboardTop.png")
         bg = bg.convert('RGBA')
 
         # load fonts
         fontb = ImageFont.truetype(f"{BASE_LOCATION}../fonts/contb.ttf", size=150)
-
-        # create object for drawing
-        draw = ImageDraw.Draw(bg)
 
         podiums = []
 
@@ -48,24 +55,36 @@ class LeaderboardBuilder:
                 podiums.append((user_id, count))
 
         # add podium
-        podium_image = await self.podium_builder.get_all_podiums_image([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
+        podium_image = self.podium_builder.get_all_podiums_image([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
         podium_image = resize_image(podium_image, 2000, 1800)
         remaining_width = bg.width - podium_image.width
 
-        bg.paste(podium_image, (remaining_width//2, bg.height - podium_image.height - 150), podium_image)
-    
-        # draw title    
-        draw.text(
-            (1330, 245),
-            text=command,
-            align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
-        )
+        frames = []
+        for frame in ImageSequence.Iterator(podium_image):
+            
+            output = bg.copy()
+
+            output.paste(frame, (remaining_width//2, output.height - frame.height - 150), frame.convert("LA"))
+
+            # create object for drawing
+            draw = ImageDraw.Draw(output)
+
+            # draw title
+            draw.text(
+                (1330, 245),
+                text=command,
+                align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
+            )
+            del draw
+
+            frames.append(output)
+
 
         # create buffer
         buffer = io.BytesIO()
 
         # save GIF in buffer
-        bg.save(buffer, format='GIF')    
+        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2) 
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
@@ -74,7 +93,7 @@ class LeaderboardBuilder:
     
 
 
-    async def get_bottom_leaderboard(self, leaderboard):
+    def get_bottom_leaderboard(self, leaderboard):
         #  load background
         bg = Image.open(f"{BASE_LOCATION}leaderboard/LeaderboardBottom.png")
 
@@ -89,7 +108,7 @@ class LeaderboardBuilder:
             
             # get user info
             user_id, count = tuple(stat)
-            user = await self.bot.fetch_user(int(user_id))
+            user = self.bot.get_user(int(user_id))
             # normalize count
             count = human_format(count)
             
@@ -491,8 +510,6 @@ class PodiumBuilder:
         # paste podiums on correct location
         if len(podiums) == 3:
             final_image = get_concat(podiums[1], podiums[0], podiums[2])
-        
-        # TODO als len podiums < 3 -> vul aan met default podiums
         else:
             final_image = get_concat_h_multi_blank(podiums, padding, color)
             
@@ -510,6 +527,7 @@ class PodiumBuilder:
         buffer.seek(0)
 
         return discord.File(buffer, 'podium.gif')  
+
 
 
     async def async_set_all_podiums_image(self, loop, message, embed, user_id, user_ids, padding, add_characters):
@@ -600,11 +618,23 @@ def get_concat(main_image, left_image, right_image):
     right_frames = [frame.copy() for frame in ImageSequence.Iterator(right_image)]
 
     frames = []
-    for main_frame, left_frame, right_frame in zip(main_frames, left_frames, right_frames):
+    for main_frame, left_frame, right_frame in zip_longest(main_frames, left_frames, right_frames):
         
         output = background.copy()
 
-        # paste the podiums onto the bg
+        # check if each frame has frames left
+        if main_frame is None:
+            main_image.seek(0)
+            main_frame = main_image.copy()
+
+        if left_frame is None:
+            left_image.seek(0)
+            left_frame = left_image.copy()
+
+        if right_frame is None:
+            right_image.seek(0)
+            right_frame = right_image.copy()
+
         output.paste(main_frame, (paste_width, 0), mask=main_frame.convert("LA"))
         output.paste(left_frame, (0, output.height - left_frame.height), mask=left_frame.convert("LA"))
         output.paste(right_frame, (output.width - right_frame.width, output.height - left_frame.height), mask=right_frame.convert("LA"))
@@ -659,7 +689,7 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
     buffer = io.BytesIO()
 
     # save GIF in buffer
-    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2)
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2, optimize=False)
 
     return Image.open(buffer)
 

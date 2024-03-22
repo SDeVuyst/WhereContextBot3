@@ -569,9 +569,7 @@ class Admin(commands.Cog, name="admin"):
         command_count = await db_manager.get_most_used_command(user.id)
         if command_count is None or command_count[0] == -1:
             value = f"```No Commands Used```"
-        else:
-            com = "Danae Trigger" if command_count[0] == 'danae' else f"/{command_count[0]}"
-            value=f"```{com}: {command_count[1]}```"
+
 
         embed.add_field(
             name="🤖 Most Used Command",
