@@ -234,15 +234,12 @@ class CharacterBuilder:
         badge_image = Image.open(f"{BASE_LOCATION}badges/Badge{place}.png")
 
         frames = []
-        for i in range(character_image.n_frames):
+        for frame in ImageSequence.Iterator(character_image):
             
             output = background.copy()
-
-            character_image.seek(i)
-            frame = character_image.copy()
             
             # paste podium
-            output.paste(podium_image, (0, character_image.height), podium_image) 
+            output.paste(podium_image, (0, character_image.height), mask=podium_image) 
             
             # paste character
             output.paste(
@@ -252,20 +249,15 @@ class CharacterBuilder:
             )
 
             # paste badge to fix 3d realness of character standing on podium
-            output.paste(badge_image, paste_coords[place-1], badge_image)        
-            
-            b = io.BytesIO()
-            output.save(b, format="GIF")
-            output = Image.open(b)
+            output.paste(badge_image, paste_coords[place-1], mask=badge_image)        
 
             frames.append(output)
-
 
         # create buffer
         buffer = io.BytesIO()
 
-        # save GIF in buffeR
-        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0)
+        # save GIF in buffer
+        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2)
 
         return Image.open(buffer)
     
@@ -349,7 +341,7 @@ class CharacterBuilder:
         buffer = io.BytesIO()
 
         # save GIF in buffer
-        total.save(buffer, format='gif', save_all=True, loop=0)    
+        total.save(buffer, format='gif', save_all=True, loop=0, disposal=2)    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
@@ -357,6 +349,7 @@ class CharacterBuilder:
         # return total
         return discord.File(buffer, 'poses.gif')   
     
+
 
     def get_pose_concat(self, poses, padding, start_number, color=(44, 45, 47)):
         new_width = sum([im.width for im in poses]) + padding*(len(poses) - 1)
@@ -392,10 +385,6 @@ class CharacterBuilder:
 
                 current_x_point += pose.width + padding
 
-            b = io.BytesIO()
-            output.save(b, format="GIF")
-            output = Image.open(b)
-
             frames.append(output)
 
 
@@ -403,7 +392,7 @@ class CharacterBuilder:
         buffer = io.BytesIO()
 
         # save gif in buffer
-        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+        frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2)
 
         return Image.open(buffer)
 
@@ -501,24 +490,26 @@ class PodiumBuilder:
 
         # paste podiums on correct location
         if len(podiums) == 3:
-            dst = get_concat(podiums[1], podiums[0], podiums[2])
+            final_image = get_concat(podiums[1], podiums[0], podiums[2])
+        
+        # TODO als len podiums < 3 -> vul aan met default podiums
         else:
-            dst = get_concat_h_multi_blank(podiums, padding, color)
-
+            final_image = get_concat_h_multi_blank(podiums, padding, color)
+            
         # return as image if necessary
         if not return_file:
-            return dst
+            return final_image
         
         # create buffer
         buffer = io.BytesIO()
 
         # save GIF in buffer
-        dst.save(buffer, format='GIF')    
+        final_image.save(buffer, format='gif', save_all=True, loop=0, disposal=2, optimize=False)    
 
         # move to beginning of buffer so `send()` it will read from beginning
         buffer.seek(0)
 
-        return discord.File(buffer, 'podium.gif')   
+        return discord.File(buffer, 'podium.gif')  
 
 
     async def async_set_all_podiums_image(self, loop, message, embed, user_id, user_ids, padding, add_characters):
@@ -575,12 +566,7 @@ def vertical_concat(im1, im2):
         im2.seek(i)
         frame2 = im2.copy()
         remaining_width = new_width - width2
-        output.paste(frame2, (remaining_width//2, height1))
-
-
-        b = io.BytesIO()
-        output.save(b, format="GIF")
-        output = Image.open(b)
+        output.paste(frame2, (remaining_width//2, height1), mask=frame2.convert("LA"))
 
         frames.append(output)
 
@@ -589,7 +575,7 @@ def vertical_concat(im1, im2):
     buffer = io.BytesIO()
 
     # save GIF in buffer
-    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2)
 
     return Image.open(buffer)
 
@@ -608,30 +594,20 @@ def get_concat(main_image, left_image, right_image):
 
     paste_width = (background.width - main_image.width)//2
 
-    total_frame_count = max(main_image.n_frames, left_image.n_frames, right_image.n_frames)
+
+    main_frames = [frame.copy() for frame in ImageSequence.Iterator(main_image)]
+    left_frames = [frame.copy() for frame in ImageSequence.Iterator(left_image)]
+    right_frames = [frame.copy() for frame in ImageSequence.Iterator(right_image)]
 
     frames = []
-    for i in range(total_frame_count):
+    for main_frame, left_frame, right_frame in zip(main_frames, left_frames, right_frames):
         
         output = background.copy()
 
         # paste the podiums onto the bg
-        main_image.seek(i if main_image.is_animated else 0)
-        main_image_frame = main_image.copy()
-        output.paste(main_image_frame, (paste_width, 0), mask=main_image_frame.convert("LA"))
-
-        left_image.seek(i if left_image.is_animated else 0)
-        left_image_frame = left_image.copy()
-        output.paste(left_image_frame, (0, output.height - left_image_frame.height), mask=left_image_frame.convert("LA"))
-
-        right_image.seek(i if right_image.is_animated else 0)
-        right_image_frame = right_image.copy()
-        output.paste(right_image, (output.width - right_image_frame.width, output.height - left_image_frame.height), mask=right_image_frame.convert("LA"))
-
-
-        b = io.BytesIO()
-        output.save(b, format="GIF")
-        output = Image.open(b)
+        output.paste(main_frame, (paste_width, 0), mask=main_frame.convert("LA"))
+        output.paste(left_frame, (0, output.height - left_frame.height), mask=left_frame.convert("LA"))
+        output.paste(right_frame, (output.width - right_frame.width, output.height - left_frame.height), mask=right_frame.convert("LA"))
 
         frames.append(output)
 
@@ -640,9 +616,9 @@ def get_concat(main_image, left_image, right_image):
     buffer = io.BytesIO()
 
     # save GIF in buffer
-    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2, optimize=False)
 
-    return Image.open(buffer)
+    return Image.open(buffer) 
 
 
 
@@ -676,10 +652,6 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
         frame2 = im2.copy()
         output.paste(frame2, (im1.width + padding, 0), mask=frame2.convert("LA"))
 
-        b = io.BytesIO()
-        output.save(b, format="GIF")
-        output = Image.open(b)
-
         frames.append(output)
 
 
@@ -687,7 +659,7 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
     buffer = io.BytesIO()
 
     # save GIF in buffer
-    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2)
 
     return Image.open(buffer)
 
@@ -707,18 +679,13 @@ def resize_image(im, width, max_height=1000, color=(44, 45, 47)):
     for frame in ImageSequence.Iterator(im):
 
         frame_resized = frame.resize((width, hsize), Image.Resampling.LANCZOS)
-
-        b = io.BytesIO()
-        frame_resized.save(b, format="GIF")
-        frame_resized = Image.open(b)
-
         frames.append(frame_resized)
 
     # create buffer
     buffer = io.BytesIO()
 
     # save GIF in buffer
-    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:])
+    frames[0].save(buffer, format='gif', save_all=True, append_images=frames[1:], loop=0, disposal=2)
 
     return Image.open(buffer)
 
