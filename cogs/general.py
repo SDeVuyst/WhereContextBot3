@@ -162,7 +162,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=20, key=lambda i: (i.user.id))
+    @app_commands.checks.cooldown(rate=1, per=8, key=lambda i: (i.user.id))
     @checks.not_in_dm()
     @app_commands.describe(user="What user to DM")
     @app_commands.describe(content="What to DM to the user")
@@ -290,7 +290,7 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="summary", description="Generate a summary of the latest conversation", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    # @app_commands.checks.cooldown(rate=1, per=300, key=lambda i: (i.user.id)) TODO uncomment
+    @app_commands.checks.cooldown(rate=1, per=20, key=lambda i: (i.user.id))
     @checks.not_in_dm()
     async def summary(self, interaction) -> None:
         """Let the bot DM a user

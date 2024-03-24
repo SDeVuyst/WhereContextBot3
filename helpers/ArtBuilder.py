@@ -64,14 +64,14 @@ class LeaderboardBuilder:
             
             output = bg.copy()
 
-            output.paste(frame, (remaining_width//2, output.height - frame.height - 150), frame.convert("LA"))
+            output.paste(frame, (remaining_width//2, output.height - frame.height - 25), frame.convert("LA"))
 
             # create object for drawing
             draw = ImageDraw.Draw(output)
 
             # draw title
             draw.text(
-                (1330, 245),
+                (1330, 250),
                 text=command,
                 align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
             )
@@ -115,12 +115,12 @@ class LeaderboardBuilder:
             # profile picture
             pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
             pfp = pfp.resize((240, 240))
-            bg.paste(pfp, (530, 330 + i*340))
+            bg.paste(pfp, (535, 330 + i*340))
 
             # username
             name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
             draw.text(
-                (1275, 420 + i*340), 
+                (1275, 430 + i*340), 
                 text=name, 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
@@ -308,7 +308,7 @@ class CharacterBuilder:
         if not self.has_custom_poses(user_id):
             return discord.File(
                 f"{BASE_LOCATION}default/AllPoses.gif", # TODO make this file
-                'poses.png'
+                'poses.gif'
             ) 
         
         # prerendered of custom all poses
@@ -350,11 +350,13 @@ class CharacterBuilder:
         # leftover poses
         if len(poses) > 0:
             poses_dst.append(
-                self.get_pose_concat(poses_to_build, 150, 1)
+                self.get_pose_concat(poses, 150, i+1)
             )
 
         # add the images together vertically
         total = vertical_concat_multi(poses_dst)
+
+        # total.save("C:/Users/Silas/Desktop/poses.gif", format='gif', save_all=True, loop=0, disposal=2) 
 
         # create buffer
         buffer = io.BytesIO()
@@ -384,7 +386,7 @@ class CharacterBuilder:
             current_x_point = 0
 
             for number, pose in enumerate(poses):
-                pose.seek(i)
+                pose.seek(min(i, pose.n_frames-1))
                 frame = pose.copy()
 
                 output.paste(
@@ -574,14 +576,14 @@ def vertical_concat(im1, im2):
         
         output = background.copy()
 
-        im1.seek(i)
+        im1.seek(min(i, im1.n_frames-1))
         frame1 = im1.copy()
 
         # Paste the two images onto the new image
         output.paste(frame1, (0, 0), mask=frame1.convert("LA"))
 
         # center second image
-        im2.seek(i)
+        im2.seek(min(i, im2.n_frames-1))
         frame2 = im2.copy()
         remaining_width = new_width - width2
         output.paste(frame2, (remaining_width//2, height1), mask=frame2.convert("LA"))
@@ -672,13 +674,13 @@ def get_concat_h_blank(im1, im2, padding, color=(44, 45, 47)):
         
         output = background.copy()
 
-        im1.seek(i)
+        im1.seek(min(i, im1.n_frames-1))
         frame1 = im1.copy()
 
         # Paste the two images onto the new image
         output.paste(frame1, (0, 0), mask=frame1.convert("LA"))
 
-        im2.seek(i)
+        im2.seek(min(i, im2.n_frames-1))
         frame2 = im2.copy()
         output.paste(frame2, (im1.width + padding, 0), mask=frame2.convert("LA"))
 
@@ -728,3 +730,10 @@ def human_format(num):
         magnitude += 1
         num /= 1000.0
     return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
+
+
+
+if __name__ == "__main__":
+    print("running")
+    print(CharacterBuilder("").get_all_poses_image(462932133170774036))
+    print("done")

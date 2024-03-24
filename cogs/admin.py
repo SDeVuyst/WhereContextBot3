@@ -54,12 +54,12 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour", extras={'cog': 'admin'})
+    @app_commands.command(name="gifban", description="Prevent a user from using gifs for 1 hour", extras={'cog': 'admin'})
     @app_commands.checks.cooldown(rate=1, per=30, key=lambda i: (i.guild_id, i.user.id)) # 1 per 30 sec
     @checks.not_blacklisted()   
     @checks.not_in_dm()
     @app_commands.describe(user="Who to block")
-    async def anti_gif(self, interaction, user: discord.User) -> None:
+    async def gifban(self, interaction, user: discord.User) -> None:
         """Prevent a user from using gifs for 1 hour
 
         Args:
@@ -405,7 +405,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.command(name="ban", description="Ban someone", extras={'cog': 'admin'})
     @app_commands.describe(user="Which user")
     @app_commands.describe(reason="Reason for the ban")
-    @app_commands.checks.cooldown(rate=1, per=100, key=lambda i: (i.guild_id, i.user.id))
+    @app_commands.checks.cooldown(rate=1, per=25, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
@@ -522,7 +522,6 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.user.id))
     @app_commands.describe(user="Which user")
     @checks.not_in_dm()
-    @checks.is_owner() # TODO remove
     async def profile(self, interaction, user: discord.User=None) -> None:
         """View someones bot profile
 
@@ -569,7 +568,8 @@ class Admin(commands.Cog, name="admin"):
         command_count = await db_manager.get_most_used_command(user.id)
         if command_count is None or command_count[0] == -1:
             value = f"```No Commands Used```"
-
+        else:
+            value=f"```/{command_count[0]}: {command_count[1]}```"
 
         embed.add_field(
             name="🤖 Most Used Command",

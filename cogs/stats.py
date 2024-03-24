@@ -33,7 +33,6 @@ class Stats(commands.Cog, name="stats"):
     )
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @checks.is_owner() # TODO remove
     @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.guild_id, i.user.id))
     async def leaderboard(self,interaction):
         """Shows the leaderboard for a command
