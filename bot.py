@@ -585,7 +585,7 @@ async def on_tree_error(interaction, error):
     await interaction.response.send_message(embed=embed)
 
 
-# bot.tree.on_error = on_tree_error TODO uncomment
+bot.tree.on_error = on_tree_error
 
 
 async def setup_hook() -> None:

@@ -307,7 +307,7 @@ class CharacterBuilder:
         # prerenderd of default all poses
         if not self.has_custom_poses(user_id):
             return discord.File(
-                f"{BASE_LOCATION}default/AllPoses.gif", # TODO make this file
+                f"{BASE_LOCATION}default/AllPoses.gif",
                 'poses.gif'
             ) 
         
