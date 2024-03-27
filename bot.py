@@ -22,7 +22,7 @@ from discord import Webhook
 import aiohttp
 
 import embeds
-from helpers import WordFinder, db_manager
+from helpers import WordFinder, db_manager, ArtBuilder
 import exceptions
 
 from datetime import datetime, timedelta
@@ -223,9 +223,11 @@ async def check_remindme():
 
                 # stuur reminder
                 user = await bot.fetch_user(int(user_id))
-                await user.send(embed=embeds.DefaultEmbed(
-                    "⏰ Reminder!", f"```{subject}```"
-                ))
+                embed = embeds.DefaultEmbed(
+                    "⏰ Reminder!", f"```{subject}```", user=user
+                )
+
+                await user.send(embed=embed)
 
                 # verwijder reminder uit db
                 succes = await db_manager.delete_reminder(id)

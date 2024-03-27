@@ -497,9 +497,8 @@ class Audio(commands.Cog, name="audio"):
 
             # confirmatie
             embed = embeds.DefaultEmbed(
-                title="Playing music!",
+                title="🎵 Playing music!",
                 description=f"[{tr.title}]({tr.url}) by {tr.author}\n{bardata} - {self.format_seconds_to_mmss(0)} / {'?' if tr.length is None else self.format_seconds_to_mmss(tr.length)}",
-                emoji="🎵"
             )
 
             try:

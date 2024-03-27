@@ -76,7 +76,7 @@ class Admin(commands.Cog, name="admin"):
 
         # stuur het antwoord
         await interaction.followup.send(embed=embeds.OperationSucceededEmbed(
-            "Done!", f"<@{user.id}> is now banned from using gifs."
+            "Done!", f"<@{user.id}> is now banned from using gifs.", user=user
         ))
 
 
@@ -102,7 +102,8 @@ class Admin(commands.Cog, name="admin"):
             # operation didnt actually fail, this is just for a red border
             embed = embeds.RedBorderEmbed(
                 ":warning: ***LIEN LOCKDOWN*** :warning:",
-                "<@464400950702899211> has been kicked."
+                "<@464400950702899211> has been kicked.",
+                user=grom
             )
 
         # grom kick error
@@ -346,7 +347,7 @@ class Admin(commands.Cog, name="admin"):
         # user is already blacklisted
         if await db_manager.is_blacklisted(user.id):
             return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
-                f"{user.name} is already in the blacklist."
+                f"{user.name} is already in the blacklist.", user=user
             ))
 
         total = await db_manager.add_user_to_blacklist(user.id)
@@ -357,7 +358,7 @@ class Admin(commands.Cog, name="admin"):
 
         # alles oke
         embed = embeds.OperationSucceededEmbed(
-            f"{user.name} has been successfully added to the blacklist"
+            f"{user.name} has been successfully added to the blacklist", user=user
         ).set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
         )
@@ -382,7 +383,7 @@ class Admin(commands.Cog, name="admin"):
         """
         if not await db_manager.is_blacklisted(user.id):
             return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
-                f"{user.name} is not in the blacklist."
+                f"{user.name} is not in the blacklist.", user=user
             ))
 
         total = await db_manager.remove_user_from_blacklist(user.id)
@@ -393,7 +394,7 @@ class Admin(commands.Cog, name="admin"):
 
         # alles ok
         embed = embeds.OperationSucceededEmbed(
-            f"{user.name} has been successfully removed from the blacklist"
+            f"{user.name} has been successfully removed from the blacklist", user=user
         ).set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'user' if total == 1 else 'users'} in the blacklist"
         )
@@ -426,7 +427,7 @@ class Admin(commands.Cog, name="admin"):
         # cant ban the server owner
         if user.id == interaction.guild.owner_id:
             return await interaction.followup.send(embed=embeds.OperationFailedEmbed(
-                "You can't ban the server owner!"
+                "You can't ban the server owner!", user=user
             ))
 
         ban_explain_embed = embeds.DefaultEmbed("🔨 Pick your ban type")
@@ -493,7 +494,8 @@ class Admin(commands.Cog, name="admin"):
         # respond to interaction
         await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
             "Done!",
-            f"{user} is now called {nickname}"
+            f"{user} is now called {nickname}",
+            user=user
         ))
 
 
@@ -537,12 +539,7 @@ class Admin(commands.Cog, name="admin"):
 
         # creeer embed
         embed = embeds.DefaultEmbed(
-            f"**{user.display_name}'s Profile**"
-        )
-
-        # set thumbnail als users character
-        embed.set_thumbnail(
-            url=str(user.avatar.url)
+            f"**{user.display_name}'s Profile**", user=user
         )
 
         embed.set_author(
@@ -586,7 +583,6 @@ class Admin(commands.Cog, name="admin"):
             inline=False
         )
 
-        
         message = await interaction.followup.send(embed=embed, view=ConfigureView(self.bot, embed, user))
 
         # create task to add image of podiums
@@ -627,7 +623,7 @@ class BanView(discord.ui.View):
             self.members_who_voted_yes.append(interaction.user.id)
 
             embed = embeds.OperationSucceededEmbed(
-                f"You have voted to kick {self.user.display_name}"
+                f"You have voted to kick {self.user.display_name}", user=self.user
             )
 
             # edit original embed
@@ -644,7 +640,7 @@ class BanView(discord.ui.View):
 
             # send ban message to user
             banned_embed = embeds.DefaultEmbed(
-                f"🔨 You have been banned from {interaction.guild.name}!",
+                f"🔨 You have been banned from {interaction.guild.name}!", user=self.user
             )
 
             banned_embed.add_field(
@@ -669,7 +665,7 @@ class BanView(discord.ui.View):
             # send confirmation
             await interaction.followup.send(embed=embeds.DefaultEmbed(
                 f"🔨 {self.user.display_name} has been banned!",
-                "Cooked his ass"
+                "Cooked his ass", user=self.user
             ))
 
             # ban user
@@ -691,7 +687,7 @@ class BanView(discord.ui.View):
             self.members_who_voted_yes.remove(interaction.user.id)
 
             embed = embeds.OperationSucceededEmbed(
-                f"You have removed your vote to kick {self.user.display_name}",
+                f"You have removed your vote to kick {self.user.display_name}", user=self.user
             )
 
             # edit original embed
@@ -740,7 +736,7 @@ class UnbanDropdown(discord.ui.Select):
         await guild.unban(user)
 
         await interaction.message.edit(embed=embeds.OperationSucceededEmbed(
-            "Done", f"{user} is now unbanned!"
+            "Done", f"{user} is now unbanned!", user=user
         ), view=None)
 
         await interaction.response.defer()
@@ -796,7 +792,8 @@ class ConfigureView(discord.ui.View):
 
         embed = embeds.DefaultEmbed(
             "📝 Select your default roles",
-            "Please select which roles you want to have automatically added when you join this server.\nNote that you can do this for every server WCB3 is in, and can only select roles lower than your current role."            
+            "Please select which roles you want to have automatically added when you join this server.\nNote that you can do this for every server WCB3 is in, and can only select roles lower than your current role.",
+            user=self.user            
         )
 
         all_roles = await interaction.guild.fetch_roles()
@@ -838,7 +835,8 @@ class ConfigureView(discord.ui.View):
 
         embed = embeds.DefaultEmbed(
             "👥 Select your poses",
-            "You can pick different poses for each position on your podium.\nIf you select multiple poses, one will be selected at random every time your podium is displayed."
+            "You can pick different poses for each position on your podium.\nIf you select multiple poses, one will be selected at random every time your podium is displayed.",
+            user=self.user
         )
         embed.set_image(url="attachment://poses.gif")
         
@@ -1012,7 +1010,7 @@ class BanTypeView(discord.ui.View):
 
         # create embed to show who won
         result_embed = embeds.DefaultEmbed(
-            f"🏅 {winner} won!", f"{loser.mention} has been banned"
+            f"🏅 {winner} won!", f"{loser.mention} has been banned", user=winner
         )
 
         # get winner current streak
@@ -1086,7 +1084,7 @@ class BanTypeView(discord.ui.View):
 
         # send ban message to loser
         banned_embed = embeds.DefaultEmbed(
-            f"🔨 You have been banned from {interaction.guild.name}!",
+            f"🔨 You have been banned from {interaction.guild.name}!", user=loser
         )
 
         banned_embed.add_field(
@@ -1116,6 +1114,7 @@ class BanTypeView(discord.ui.View):
         vote_embed = embeds.DefaultEmbed(
             f"🔨 Vote to ban {self.user.display_name}",
             f"This vote succeeds at {ban_number_treshold} votes in favour of banning.",
+            user=self.user
         )
         vote_embed.add_field(name="💡 Reason", value=f"```{self.reason}```", inline=False)
         vote_embed.add_field(name="📋 Current votes", value=f"```1/{ban_number_treshold}```")

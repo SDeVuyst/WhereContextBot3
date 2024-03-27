@@ -148,7 +148,7 @@ class Stats(commands.Cog, name="stats"):
             raise TimeoutCommand("Timeout in /statistic")
 
         #  generate response
-        embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
+        embed = await self.get_stat_individual_embed(user, view.chosen_command)
         
         await interaction.edit_original_response(embed=embed, view=None)
 
@@ -196,7 +196,7 @@ class Stats(commands.Cog, name="stats"):
 
 
 
-    async def get_stat_individual_embed(self, userid, command):
+    async def get_stat_individual_embed(self, user, command):
         """Get an embed for individual stats
 
         Args:
@@ -207,56 +207,56 @@ class Stats(commands.Cog, name="stats"):
             Embed
         """
         if command == "bancount":
-            count = await db_manager.get_ban_count(userid)
+            count = await db_manager.get_ban_count(user.id)
         
         elif command == "current_win_streak":
-            count = await db_manager.get_current_win_streak(userid)
+            count = await db_manager.get_current_win_streak(user.id)
 
         elif command == "current_loss_streak":
-            count = await db_manager.get_current_loss_streak(userid)
+            count = await db_manager.get_current_loss_streak(user.id)
 
         elif command == "highest_win_streak":
-            count = await db_manager.get_highest_win_streak(userid)
+            count = await db_manager.get_highest_win_streak(user.id)
 
         elif command == "highest_loss_streak":
-            count = await db_manager.get_highest_loss_streak(userid)
+            count = await db_manager.get_highest_loss_streak(user.id)
 
         elif command == "ban_total_wins":
-            count = await db_manager.get_ban_total_wins(userid)
+            count = await db_manager.get_ban_total_wins(user.id)
 
         elif command == "ban_total_losses":
-            count = await db_manager.get_ban_total_losses(userid)
+            count = await db_manager.get_ban_total_losses(user.id)
 
         else:
             # krijg count bericht uit db
-            count = await db_manager.get_command_count(userid, command)
+            count = await db_manager.get_command_count(user.id, command)
 
         
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
             if command == "bancount":
-                title = f"🔨 **<@{userid}> has not been banned yet.**"
+                title = f"🔨 **<@{user.id}> has not been banned yet.**"
 
             elif command == "current_win_streak":
-                title = f"**<@{userid}> doesn't have a win streak yet.**"
+                title = f"**<@{user.id}> doesn't have a win streak yet.**"
 
             elif command == "current_loss_streak":
-                title = f"**<@{userid}> doesn't have a loss streak yet.**"
+                title = f"**<@{user.id}> doesn't have a loss streak yet.**"
 
             elif command == "highest_win_streak":
-                title = f"**<@{userid}> doesn't have a highest win streak yet.**"
+                title = f"**<@{user.id}> doesn't have a highest win streak yet.**"
 
             elif command == "highest_loss_streak":
-                title = f"**<@{userid}> doesn't have a highest loss streak yet.**"
+                title = f"**<@{user.id}> doesn't have a highest loss streak yet.**"
 
             elif command == "ban_total_wins":
-                title = f"**<@{userid}> doesn't have a win yet.**"
+                title = f"**<@{user.id}> doesn't have a win yet.**"
 
             elif command == "ban_total_losses":
-                title = f"**<@{userid}> doesn't have a loss yet.**"
+                title = f"**<@{user.id}> doesn't have a loss yet.**"
 
             else:
-                title = f"❌ **<@{userid}> didn't use /{command} yet.**"
+                title = f"❌ **<@{user.id}> didn't use /{command} yet.**"
 
             return embeds.OperationFailedEmbed(title)
         
@@ -267,37 +267,37 @@ class Stats(commands.Cog, name="stats"):
             )
         
         if command == "messages_played":
-            desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
+            desc = f"**<@{user.id}> played```{count[0][0]}``` messages.**"
 
         elif command == "messages_deleted":
-            desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
+            desc = f"**<@{user.id}> deleted```{count[0][0]}``` messages.**"
 
         elif command == "bancount":
-            desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
+            desc = f"🔨 **<@{user.id}> has been banned ```{count[0][0]}``` times.**"
         
         elif command == "current_win_streak":
-            desc = f"**<@{userid}> has a current win streak of ```{count[0][0]}```**"
+            desc = f"**<@{user.id}> has a current win streak of ```{count[0][0]}```**"
 
         elif command == "current_loss_streak":
-            desc = f"**<@{userid}> has a current loss streak of ```{count[0][0]}```**"
+            desc = f"**<@{user.id}> has a current loss streak of ```{count[0][0]}```**"
 
         elif command == "highest_win_streak":
-            desc = f"**<@{userid}> has a highest win streak of ```{count[0][0]}```**"
+            desc = f"**<@{user.id}> has a highest win streak of ```{count[0][0]}```**"
 
         elif command == "highest_loss_streak":
-            desc = f"**<@{userid}> has a highest loss streak of ```{count[0][0]}```**"
+            desc = f"**<@{user.id}> has a highest loss streak of ```{count[0][0]}```**"
 
         elif command == "ban_total_wins":
-            desc = f"**<@{userid}> total wins```{count[0][0]}```**"
+            desc = f"**<@{user.id}> total wins```{count[0][0]}```**"
 
         elif command == "ban_total_losses":
-            desc = f"**<@{userid}> total losses ```{count[0][0]}```**" 
+            desc = f"**<@{user.id}> total losses ```{count[0][0]}```**" 
         
         else:
-            desc = f"**<@{userid}> used {command} ```{count[0][0]}``` times.**"
+            desc = f"**<@{user.id}> used {command} ```{count[0][0]}``` times.**"
 
         return embeds.DefaultEmbed(
-            "📊 Individual Statistic", desc
+            "📊 Individual Statistic", desc, user=user
         )
 
 

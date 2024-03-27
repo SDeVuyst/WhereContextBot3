@@ -349,8 +349,7 @@ class General(commands.Cog, name="general"):
 
         # send summary
         await interaction.followup.send(embed=embeds.DefaultEmbed(
-            f"🗒️ Summary of last {amount_of_messages} messages",
-            summary_response
+            f"🗒️ Summary of last {amount_of_messages} messages", summary_response, user=interaction.user
         ), ephemeral=True)
         
 
