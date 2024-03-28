@@ -135,7 +135,6 @@ class General(commands.Cog, name="general"):
 
     @app_commands.command(name="podium", description="generate a podium", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @checks.is_owner()
     @checks.not_in_dm()
     async def podium(self, interaction, first_podium: discord.User, second_podium: discord.User, third_podium: discord.User, first_character: discord.User = None, second_character: discord.User = None, third_character: discord.User = None) -> None:
 
