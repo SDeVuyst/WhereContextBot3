@@ -39,18 +39,6 @@ class WrongChannel(app_commands.CheckFailure):
         super().__init__(self.message)
 
 
-class MissingNwords(app_commands.CheckFailure):
-    """
-    Thrown when a user is attempting something, but has too little nwords.
-    """
-
-    def __init__(self, usercount: int, required:int):
-        self.usercount = usercount
-        self.required = required
-        self.message = f"You need {required} N-words to use this command, but you only have {usercount}."
-        super().__init__(self.message)
-
-
 class UserNotInVC(app_commands.CheckFailure):
     """
     Thrown when a user is attempting something, but is not in a voice channel
@@ -88,4 +76,20 @@ class TimeoutCommand(app_commands.CheckFailure):
 
     def __init__(self, message=""):
         self.message = message
+        super().__init__(self.message)
+
+class CogLoadError(app_commands.CheckFailure):
+    """
+    Thrown when a cog doesnt load correctly.
+    """
+
+    def __init__(self, cog, status):
+        if status == 0:
+            errortype = 'load'
+        elif status == 1:
+            errortype = 'unload'
+        else:
+            errortype = 'reload'
+
+        self.message = f"Could not {errortype} cog." if not cog else f"Could not {errortype} the ```{cog}``` cog."
         super().__init__(self.message)

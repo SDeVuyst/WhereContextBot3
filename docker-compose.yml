@@ -2,12 +2,11 @@ version: '3.9'
 services:
   wcb3:
     container_name: wcb3_container
-    pull_policy: build
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    env_file: stack.env
+    env_file: .env
     entrypoint: ['python', 'bot.py']
     depends_on:
       wcb3_postgres:
@@ -17,10 +16,10 @@ services:
     container_name: wcb3_postgres_container
     image: postgres:latest
     restart: always
-    env_file: stack.env
+    env_file: .env
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d pg_wcb3 -U wcb3"]
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,8 +28,8 @@ services:
       - "5432"
 
     volumes:
-      - /var/lib/docker/volumes/pg_wcb3/_data
-
+      - ./database/postgres_data:/var/lib/postgresql/data
+ 
     ports:
       - 5432:5432
 
@@ -50,3 +49,4 @@ volumes:
 
 networks:
   esnet:
+

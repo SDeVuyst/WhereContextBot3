@@ -1,14 +1,15 @@
 discord.py @ git+https://github.com/Rapptz/discord.py@master
 psycopg2
 yt_dlp
-PyNaCl==1.4.0
 ffmpeg
 aiohttp>=3.7.4
 requests
 pytube
-openai
 dateparser
 reactionmenu
 strprogressbar
 spotipy
 google-api-python-client
+pillow
+openai
+beautifulsoup4

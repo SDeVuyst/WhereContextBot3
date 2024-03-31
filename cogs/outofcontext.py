@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 import os
+import embeds
 from discord import app_commands
 from helpers import checks, db_manager
 
@@ -23,32 +24,6 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         self.currently_playing = False
 
-    # COMMANDS
-    
-    # @app_commands.command(name="context_debug",description="debug stats for /play-game (admin only)", extras={'cog': 'outofcontext'})
-    # @checks.is_owner()
-    # @checks.in_correct_server()
-    # @checks.not_in_dm()
-    # async def context_debug(self, interaction):
-    #     """Debug stats about the out of context game
-
-    #     Args:
-    #         interaction (Interaction): Users interaction
-    #     """
-    
-    #     embed = discord.Embed(
-    #         title="Debug",
-    #         color=self.bot.defaultColor,
-    #         description=f"""Amount of messages: {len(self.menu.messages)}\n\n
-    #             Current index: {self.menu.currentIndex}\n\n
-    #             Messages played: {self.menu.messagesPlayed}\n\n
-    #             Messages deleted: {self.menu.messagesDeleted}\n\n
-    #             Author: {self.menu.author.display_name if self.currently_playing else "None"}\n\n
-    #             Currently playing: {self.currently_playing}"""
-    #     )
-
-    #     await interaction.response.send_message(embed=embed)
-
 
     @app_commands.command(
         name="play_game",
@@ -59,7 +34,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
     @checks.not_blacklisted()
     @checks.in_correct_server()
     @checks.not_in_dm()
-    async def play_game(self, interaction, groep: bool=True) -> None:
+    async def play_game(self, interaction, groep: bool=True):
         """Play the out of context game
 
         Args:
@@ -67,16 +42,13 @@ class OutOfContext(commands.Cog, name="outofcontext"):
             groep (bool): If the game has to be ephemeral or not
         """
         if self.currently_playing:
-            embed = discord.Embed(
-                description=f"Er is al iemand het spel aan het spelen.",
-                color=self.bot.errorColor,
-            )
-            await interaction.response.send_message(embed=embed, delete_after=10)
-            return
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
+                "Er is al iemand het spel aan het spelen.",
+            ), delete_after=10)
         
         self.menu = Menu(self)
         
-        embed, sendView = await self.getRandomMessage(interaction.guild)
+        embed, sendView = await self.get_random_message(interaction.guild)
         await self.menu.reset()
         self.menu.author = interaction.user
 
@@ -87,7 +59,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
 # HELPER FUNCTIONS
 
-    async def getRandomMessage(self, guild):
+    async def get_random_message(self, guild):
         """Gets a random message from the out of context game db
 
         Args:
@@ -104,27 +76,21 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         # Geen berichten
         if len(messages) == 0:
-            embed = discord.Embed(
-                description="There are no messages.", color=self.bot.defaultColor
+            embed = embeds.OperationFailedEmbed(
+                "There are no messages."
             )
-            
             return (embed, False)
         
         # error
         elif messages[0] == -1 or not worked:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=messages[1],
-                color=self.bot.errorColor
-            )
-            return (embed, False)
+            raise Exception(messages[1])
 
         # alles is ok
-        embed = await self.getEmbed(int(messages[0][0]), guild, int(messages[0][2]), int(messages[0][3]))
+        embed = await self.get_embed(int(messages[0][0]), guild, int(messages[0][2]), int(messages[0][3]))
         return (embed, True)
     
 
-    async def getMessage(self, guild, id):
+    async def get_message(self, guild, id):
         """Get specific message from the ooc db
 
         Args:
@@ -140,27 +106,22 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         # Geen berichten
         if len(messages) == 0:
-            embed = discord.Embed(
-                description="There are no messages.", color=self.bot.defaultColor
+            embed = embeds.OperationFailedEmbed(
+                "There are no messages."
             )
             
             return (embed, False)
         
         # error
         elif messages[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=messages[1],
-                color=self.bot.errorColor
-            )
-            return (embed, False)
+            raise Exception(messages[1])
 
         # alles is ok
-        embed = await self.getEmbed(int(messages[0][0]), guild, int(messages[0][2]), int(messages[0][3]))
+        embed = await self.get_embed(int(messages[0][0]), guild, int(messages[0][2]), int(messages[0][3]))
         return (embed, True)
         
 
-    async def getEmbed(self, id, guild, added_by, times_played):
+    async def get_embed(self, id, guild, added_by, times_played):
         """ Generates an embed
 
         Args:
@@ -174,14 +135,11 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         """
 
         # haal bericht op van discord
-        try:
-            m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
-            desc = f"[Go to message]({m.jump_url})" if len(m.content) == 0 else f"**{m.content}**\n[Go to message]({m.jump_url})"
-            embed = discord.Embed(
-                title="**Out of Context**", 
-                color=self.bot.defaultColor,
-                description=desc
-            )
+        m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
+        desc = f"[Go to message]({m.jump_url})" if len(m.content) == 0 else f"**{m.content}**\n[Go to message]({m.jump_url})"
+        embed = embeds.DefaultEmbed(
+            "**Out of Context**", desc
+        )
 
             if m.attachments:
                 # als er meerdere attachments zijn, tonen we enkel de eerste
@@ -198,11 +156,11 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
             try:
 
-                embed.add_field(
-                    name="Times played",
-                    value=f"```{times_played}```",
-                    inline=True
-                )
+            embed.add_field(
+                name="Times played",
+                value=f"```{times_played}```",
+                inline=True
+            )
 
                 embed.add_field(
                     name="Added at",
@@ -243,7 +201,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
             )
         
         # voeg id toe aan messages indien nodig
-        if self.menu.currentIndex == len(self.menu.messages):
+        if self.menu.current_index == len(self.menu.messages):
             self.menu.messages.append(m.id)
             
         return embed
@@ -264,34 +222,25 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         # check als bericht bestaat
         if not await db_manager.is_in_ooc(id):
-            embed = discord.Embed(
-                description=f"Message is not in the game.",
-                color=self.bot.errorColor,
-            )
-            return embed
+            return embeds.OperationFailedEmbed("Message is not in the game.")
         
         # verwijder bericht
         total = await db_manager.remove_message_from_ooc(id)
     
         # error
         if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.",
-                color=self.bot.errorColor,
+            return embeds.OperationFailedEmbed(
+                "Something went wrong..."
             )
-            return embed
         
         m = await guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
         
         # alles oke
-        embed = discord.Embed(
-            description=f"[Message]({m.jump_url}) has been removed from the game",
-            color=self.bot.succesColor,
-        )
-        embed.set_footer(
+        return embeds.OperationSucceededEmbed(
+            f"[Message]({m.jump_url}) has been removed from the game"
+        ).set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
         )
-        return embed
 
 
 
@@ -306,9 +255,8 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         # check als message uit OOC komt
         if message.channel.id != int(os.environ.get('CHANNEL')):
-            embed = discord.Embed(
-                description="Bericht moet in #out-of-context staan!",
-                color=self.bot.errorColor,
+            embed = embeds.OperationFailedEmbed(
+                "Bericht moet in #out-of-context staan!"
             )
             embed.set_footer(text=f"{message.id}")
             await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
@@ -316,31 +264,27 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         # check als bericht al in db staat
         if await db_manager.is_in_ooc(message.id):
-            embed = discord.Embed(
-                description=f"Message is already in the game.",
-                color=self.bot.errorColor,
+            embed = embeds.OperationFailedEmbed(
+                "Message is already in the game."
             )
             embed.set_footer(text=f"{message.id}")
-            await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
-            return
+            return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
         
         # voeg toe
         total = await db_manager.add_message_to_ooc(message.id, submitted_id)
 
         # error
         if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.",
-                color=self.bot.errorColor,
+            embed = embeds.OperationFailedEmbed(
+                "Something went wrong..."
+            ).set_footer(
+                text=f"{message.id}"
             )
-            embed.set_footer(text=f"{message.id}")
-            await interaction.response.send_message(embed=embed)
-            return
+            return await interaction.response.send_message(embed=embed)
         
         # alles oke
-        embed = discord.Embed(
-            description=f"[Message]({message.jump_url}) has been added to the game",
-            color=self.bot.succesColor,
+        embed = embeds.OperationSucceededEmbed(
+            "[Message]({message.jump_url}) has been added to the game"
         )
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
@@ -359,29 +303,25 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         # check als bericht bestaat
         id = message.id
         if not await db_manager.is_in_ooc(id):
-            embed = discord.Embed(
-                description=f"**{id}** is not in the game.",
-                color=self.bot.errorColor,
-            )
-            return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+            
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
+                "**{id}** is not in the game."
+            ), delete_after=10, ephemeral=True)
         
         # verwijder bericht
         total = await db_manager.remove_message_from_ooc(id)
 
         # error
         if total == -1:
-            embed = discord.Embed(
-                description=f"Er is iets misgegaan.",
-                color=self.bot.errorColor,
-            )
-            return await interaction.response.send_message(embed=embed, delete_after=10, ephemeral=True)
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
+                "Something went wrong..."
+            ), delete_after=10, ephemeral=True)
         
         m = await interaction.guild.get_channel(int(os.environ.get("CHANNEL"))).fetch_message(id)
         
         # alles oke
-        embed = discord.Embed(
-            description=f"[Message]({m.jump_url}) has been removed from the game",
-            color=self.bot.succesColor,
+        embed = embeds.OperationSucceededEmbed(
+            f"[Message]({m.jump_url}) has been removed from the game"
         )
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
@@ -394,9 +334,9 @@ class Menu(discord.ui.View):
         super().__init__(timeout=300)
         self.OOC = OOC
         self.messages = []
-        self.currentIndex = 0
-        self.messagesPlayed = 0
-        self.messagesDeleted = 0
+        self.current_index = 0
+        self.messages_played = 0
+        self.messages_deleted = 0
         self.author = None
 
 
@@ -415,17 +355,17 @@ class Menu(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): the button
         """
-        self.currentIndex -= 1
-        self.currentIndex = self.currentIndex if self.currentIndex > 0 else 0
+        self.current_index -= 1
+        self.current_index = self.current_index if self.current_index > 0 else 0
 
         # disable previous knop als we op eerste bericht zitten
-        if self.currentIndex == 0:
+        if self.current_index == 0:
             for b in self.children:
                 b.disabled = b.label == "Previous"
                 
 
         # Toon het vorige bericht
-        embed, showView = await self.OOC.getMessage(interaction.guild, self.messages[self.currentIndex])
+        embed, showView = await self.OOC.get_message(interaction.guild, self.messages[self.current_index])
         await interaction.response.edit_message(embed=embed, view = self if showView else None)
 
 
@@ -437,14 +377,14 @@ class Menu(discord.ui.View):
             interaction (discord.Interaction): Users Interaction
             button (discord.ui.Button): button
         """
-        self.currentIndex += 1
+        self.current_index += 1
         # check als we bericht al hebben ingeladen of nieuw random bericht moeten opvragen
-        if (self.currentIndex == len(self.messages)):
-            embed, sendView = await self.OOC.getRandomMessage(interaction.guild)
-            self.messagesPlayed += 1
+        if (self.current_index == len(self.messages)):
+            embed, sendView = await self.OOC.get_random_message(interaction.guild)
+            self.messages_played += 1
 
         else:
-            embed, sendView = await self.OOC.getMessage(interaction.guild, self.messages[self.currentIndex])
+            embed, sendView = await self.OOC.get_message(interaction.guild, self.messages[self.current_index])
 
         # enable alle knoppen
         for c in self.children:
@@ -463,19 +403,19 @@ class Menu(discord.ui.View):
         """
 
         # verwijder bericht
-        embed = await self.OOC.remove(self.messages[self.currentIndex], interaction.guild)
+        embed = await self.OOC.remove(self.messages[self.current_index], interaction.guild)
 
         # zet index juist en verwijder bericht ook uit ingeladen berichten
-        messageToDelete = self.messages[self.currentIndex]
-        self.messages = [i for i in self.messages if i != messageToDelete]
-        self.currentIndex = len(self.messages)-1 # if len(self.messages) > 0 else -1
-        self.messagesDeleted += 1
+        message_to_delete = self.messages[self.current_index]
+        self.messages = [i for i in self.messages if i != message_to_delete]
+        self.current_index = len(self.messages)-1 # if len(self.messages) > 0 else -1
+        self.messages_deleted += 1
 
         # disable de verwijder knop
         for b in self.children:
             b.disabled = b.label == "Remove"
             # disable de previous knop als we op begin van lijst zitten
-            if self.currentIndex == -1:
+            if self.current_index == -1:
                 b.disabled = b.label == "Previous" or b.label == "Remove"
 
         await interaction.response.edit_message(embed=embed, view=self)
@@ -491,12 +431,10 @@ class Menu(discord.ui.View):
         """
 
         # stuur confirmatie bericht
-        embed = discord.Embed(
-            title="Bye. :wave:",
-            description=f"You played {self.messagesPlayed +1} {'message' if self.messagesPlayed == 0 else 'messages'}.",
-            color=self.OOC.bot.defaultColor
-        )
-        await interaction.response.edit_message(embed=embed, view=None)
+        await interaction.response.edit_message(embed=embeds.DefaultEmbed(
+            "Bye. :wave:", 
+            f"You played {self.messages_played +1} {'message' if self.messages_played == 0 else 'messages'}."
+        ), view=None)
         await self.reset_game()
 
 
@@ -510,15 +448,12 @@ class Menu(discord.ui.View):
             bool
         """
 
-        try:
-            is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
-            # stuur dm naar user als niet author is
-            if not is_possible:
-                await interaction.user.send('nt')
-            return is_possible
+        is_possible = interaction.user.id == self.author.id or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        # stuur dm naar user als niet author is
+        if not is_possible:
+            await interaction.user.send('nt')
+        return is_possible
         
-        except:
-            return False
         
 
     async def on_timeout(self) -> None:
@@ -526,13 +461,11 @@ class Menu(discord.ui.View):
         """
 
         if self.message is None: return
+        
         # stuur confirmatie bericht
-        embed = discord.Embed(
-            title="Bye. :wave:",
-            description=f"You played {self.messagesPlayed +1} {'message' if self.messagesPlayed == 0 else 'messages'}.",
-            color=self.OOC.bot.defaultColor
-        )
-        await self.message.edit(embed=embed, view=None)
+        await self.message.edit(embed=embeds.DefaultEmbed(
+            "Bye. :wave:", f"You played {self.messages_played +1} {'message' if self.messages_played == 0 else 'messages'}."
+        ), view=None)
         await self.reset_game()
     
 
@@ -540,19 +473,20 @@ class Menu(discord.ui.View):
         """Resets the game
         """
         # stats
-        await db_manager.increment_or_add_command_count(self.author.id, "messages_played", self.messagesPlayed+1)
-        await db_manager.increment_or_add_command_count(self.author.id, "messages_deleted", self.messagesDeleted)       
+        await db_manager.increment_or_add_command_count(self.author.id, "messages_played", self.messages_played+1)
+        await db_manager.increment_or_add_command_count(self.author.id, "messages_deleted", self.messages_deleted)       
 
         # reset alle gegevens
         self.messages.clear()
-        self.currentIndex = 0
-        self.messagesPlayed = 0
-        self.messagesDeleted = 0
+        self.current_index = 0
+        self.messages_played = 0
+        self.messages_deleted = 0
         self.author = None
         self.message = None
         await self.reset()
 
         self.OOC.currently_playing = False
+
 
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.

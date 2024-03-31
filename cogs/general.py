@@ -6,10 +6,12 @@ Description:
 Version: 5.5.0
 """
 
+import asyncio
 import os
-import openai
 import dateparser
 import re
+import random
+from openai import OpenAI
 import io
 
 from datetime import datetime
@@ -17,14 +19,13 @@ from datetime import datetime
 import discord
 from discord import app_commands
 from discord.ext import commands
-from discord.ext.commands import has_permissions
+
+import embeds
 
 from reactionmenu import ViewMenu, ViewSelect, ViewButton
 
-from helpers import checks, db_manager
+from helpers import checks, db_manager, ArtBuilder
 
-
-openai.api_key = os.environ.get("OPENAI_SECRET")
 
 
 class General(commands.Cog, name="general"):
@@ -44,15 +45,12 @@ class General(commands.Cog, name="general"):
             None: Nothing
         """
 
-        admin = list(os.environ.get("OWNERS").split(","))
-
         menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
             "audio": "🎙️ Audio",
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
-            "reacties": "💭 Reacties",
             "admin": "👨‍🔧 Admin"
         }
 
@@ -60,10 +58,9 @@ class General(commands.Cog, name="general"):
         
         for i, c in enumerate(self.bot.cogs):
 
-            embed = discord.Embed(
-                title=f"**Help - {cog_to_title.get(c.lower())}**", 
-                description=f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
-                color=self.bot.defaultColor
+            embed = embeds.DefaultEmbed(
+                f"**Help - {cog_to_title.get(c.lower())}**", 
+                f"🔗 [Invite bot](https://discord.com/api/oauth2/authorize?client_id={os.environ.get('APPLICATION_ID')}&permissions=8&redirect_uri=https%3A%2F%2Fgithub.com%2FSDeVuyst%2FWhereContextBot3&response_type=code&scope=identify%20applications.commands%20applications.commands.permissions.update%20bot%20guilds.join%20guilds.members.read)  •  [Support Server](https://discord.gg/PBsUeB9fP3)  •  [More Info](https://github.com/SDeVuyst/WhereContextbot3) 🔗", 
             )
 
             cog = self.bot.get_cog(c.lower())
@@ -83,12 +80,6 @@ class General(commands.Cog, name="general"):
                 data.append("Rechtermuisklik -> Apps -> Add Context - Add message")
                 data.append("Rechtermuisklik -> Apps -> Remove Context - Remove message")
             
-            elif c == "general":
-                embed.add_field(
-                    name = "🪙 N-Word Cost",
-                    value="Sommige commands kosten N-Words, bv. voor een command dat 2 N-Words kost, staat er (2🪙) bij de beschrijving",
-                    inline=False
-                )
 
             help_text = "\n".join(data)
             if len(help_text) > 0:
@@ -107,112 +98,6 @@ class General(commands.Cog, name="general"):
         return await menu.start()
 
 
-    @app_commands.command(name="lien",description="LIEN LOCKDOWN (admin only)", extras={'cog': 'general'})
-    @has_permissions(ban_members=True)
-    @app_commands.checks.cooldown(rate=1, per=180)
-    @checks.in_correct_server()
-    @checks.not_in_dm()
-    @checks.not_blacklisted()
-    async def lien(self, interaction) -> None:
-        """Kicks Jerome in case of emergency
-
-        Args:
-            interaction (Interaction): Users Interaction
-        """
-
-        # kick grom
-        try:
-            gromID = int(os.environ.get("GROM"))
-            grom = await interaction.guild.fetch_member(gromID)
-            await grom.kick(reason=":warning: ***LIEN LOCKDOWN*** :warning:")
-        # grom kick error
-        except:
-            pass
-        # stuur lockdown bericht
-        embed = discord.Embed(
-            title=":warning: ***LIEN LOCKDOWN*** :warning:",
-            description="<@464400950702899211> has been kicked.",
-            color=self.bot.errorColor
-        )
-        await interaction.response.send_message(embed=embed)
-
-
-    @app_commands.command(name="minecraft",description="Minecraft server info", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    async def minecraft(self, interaction) -> None:
-
-        embed = discord.Embed(
-            title="⛏ Minecraft",
-            description=f"```mc.silasdevuyst.com```*__\n[Download mods.zip]({os.environ.get('modszip_url')})__*",
-            color=self.bot.defaultColor
-        )
-
-        general_mods = [
-            "[**🌐 Forge**](https://files.minecraftforge.net/net/minecraftforge/forge/)",
-            "[**🛰️ Citadel**](https://www.curseforge.com/minecraft/mc-mods/citadel)",
-            "[**🌙 Moonlight Lib**](https://www.curseforge.com/minecraft/mc-mods/selene)",
-            "[**🌱 Terrablender**](https://www.curseforge.com/minecraft/mc-mods/terrablender)",
-            "[**🦿 YUNG's API**](https://www.curseforge.com/minecraft/mc-mods/yungs-api)",
-            "[**🏗️ Framework**](https://www.curseforge.com/minecraft/mc-mods/framework/)",
-        ]
-        general_mods_formatted = '\n'.join(general_mods)
-        embed.add_field(
-            name="General Mods", value=general_mods_formatted, inline=True
-        )
-
-        world_mods = [
-            "[**🌍 Biomes O' Plenty**](https://www.curseforge.com/minecraft/mc-mods/biomes-o-plenty)",
-            "[**🌊 YUNG's Better Ocean Monuments**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-ocean-monuments)",
-            "[**🔮 YUNG's Better End Island**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-end-island)",
-            "[**⚔️ YUNG's Better Strongholds**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-strongholds)",
-            "[**🚧 YUNG's Better Mineshafts**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-mineshafts-forge)",
-            "[**🏰 YUNG's Better Nether Fortresses**](https://www.curseforge.com/minecraft/mc-mods/yungs-better-nether-fortresses)",
-            "[**🐘 Alex's Mobs**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
-            "[**🐧 Waddles**](https://www.curseforge.com/minecraft/mc-mods/waddles)",
-        ]
-        world_mods_formatted = '\n'.join(world_mods)
-        embed.add_field(
-            name="World Mods", value=world_mods_formatted, inline=True
-        )
-
-        create_mods = [
-            "[**⚙️ Create**](https://www.curseforge.com/minecraft/mc-mods/create)",
-            "[**🪄 Create Enchantment Industry**](https://www.curseforge.com/minecraft/mc-mods/create-enchantment-industry)",
-            "[**🚄 Create: Steam 'n' Rails**](https://www.curseforge.com/minecraft/mc-mods/create-steam-n-rails)",
-            "[**🔌 Create: Power Loader**](https://www.curseforge.com/minecraft/mc-mods/create-power-loader)",
-        ]
-        create_mods_formatted = '\n'.join(create_mods)
-        embed.add_field(
-            name="Create Mods", value=create_mods_formatted, inline=True
-        )
-
-        deco_mods = [
-            "[**🖼️ Supplementaries**](https://www.curseforge.com/minecraft/mc-mods/supplementaries)",
-            "[**🌉 Macaw's Bridges**](https://www.curseforge.com/minecraft/mc-mods/macaws-bridges)",
-        ]
-        deco_mods_formatted = '\n'.join(deco_mods)
-        embed.add_field(
-            name="Deco Mods", value=deco_mods_formatted, inline=True
-        )
-
-        QOL_mods = [
-            "[**📖 JEI**](https://www.curseforge.com/minecraft/mc-mods/jei)",
-            "[**🗺️ JourneyMap**](https://www.curseforge.com/minecraft/mc-mods/journeymap)",
-            "[**🍎 AppleSkin**](https://www.curseforge.com/minecraft/mc-mods/appleskin)",
-            "[**⚰️ Corpse**](https://www.curseforge.com/minecraft/mc-mods/alexs-mobs)",
-            "[**📦 Storage Drawers**](https://www.curseforge.com/minecraft/mc-mods/storage-drawers)",
-            "[**🎒 Backpacked**](https://www.curseforge.com/minecraft/mc-mods/backpacked)",
-            "[**🏷️ Curios**](https://www.curseforge.com/minecraft/mc-mods/curios)",
-            "[**⛔ Anti-Endermen Griefing**](https://www.curseforge.com/minecraft/mc-mods/disable-enderman-picking-up-blocks)",
-        ]
-        QOL_mods_formatted = '\n'.join(QOL_mods)
-        embed.add_field(
-            name="QOL Mods", value=QOL_mods_formatted, inline=True
-        )
-
-        await interaction.response.send_message(embed=embed)
-
-
 
     @app_commands.command(name="countdown", description=f"Countdown till {os.environ.get('COUNTDOWN_TITLE')}", extras={'cog': 'general'})
     @checks.not_blacklisted()
@@ -227,21 +112,19 @@ class General(commands.Cog, name="general"):
         diff = deadline - datetime.now()
 
         if int(diff.total_seconds()) < 0:
-            desc = f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!"
-            kleur = self.bot.succesColor
+            embed = embeds.OperationSucceededEmbed(
+                f" Time till {os.environ.get('COUNTDOWN_TITLE')}", 
+                f"{os.environ.get('COUNTDOWN_TITLE')} IS NU UIT!",
+                emoji="⌛"
+            )
         else:
             hours, remainder = divmod(diff.seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
-            desc = f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"    
-            kleur = self.bot.defaultColor
+            embed = embeds.DefaultEmbed(
+                f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}",
+                f"Nog {diff.days} dagen, {hours} uur, {minutes} minuten en {seconds} seconden te gaan!"
+            )
             
-
-        embed = discord.Embed(
-            title=f"⏳ Time till {os.environ.get('COUNTDOWN_TITLE')}",
-            description=desc,
-            color=kleur
-        )
-
         embed.set_thumbnail(
             url=os.environ.get('COUNTDOWN_URL')
         )
@@ -250,11 +133,36 @@ class General(commands.Cog, name="general"):
 
 
 
-    @app_commands.command(name="dm", description="let the bot DM a user (3🪙)", extras={'cog': 'general'})
+    @app_commands.command(name="podium", description="generate a podium", extras={'cog': 'general'})
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=20)
     @checks.not_in_dm()
-    @checks.cost_nword(3)
+    async def podium(self, interaction, first_podium: discord.User, second_podium: discord.User, third_podium: discord.User, first_character: discord.User = None, second_character: discord.User = None, third_character: discord.User = None) -> None:
+
+        await interaction.response.defer()
+
+        message = await interaction.followup.send(embed=embeds.DefaultEmbed(
+            "⏳ Loading...", "This can take a while."
+        ))
+
+        builder = ArtBuilder.PodiumBuilder(self.bot)
+        characters = [
+            second_character.id  if second_character is not None else None,
+            first_character.id if first_character is not None else None, 
+            third_character.id if third_character is not None else None
+        ]
+
+        # create task to add image of available poses
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            builder.async_set_all_podiums_image_file(loop, message, [first_podium.id, second_podium.id, third_podium.id], characters)
+        )
+                
+        
+
+    @app_commands.command(name="dm", description="let the bot DM a user", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    @app_commands.checks.cooldown(rate=1, per=8, key=lambda i: (i.user.id))
+    @checks.not_in_dm()
     @app_commands.describe(user="What user to DM")
     @app_commands.describe(content="What to DM to the user")
     async def dm(self, interaction, user: discord.User, content: str) -> None:
@@ -265,6 +173,7 @@ class General(commands.Cog, name="general"):
             user (discord.User): Which user to dm
             content (str): What to dm the user
         """
+        await interaction.response.defer()
 
         # stuur dm naar gebruiker
         await user.send(content=content)
@@ -273,111 +182,12 @@ class General(commands.Cog, name="general"):
         owner = int(list(os.environ.get("OWNERS").split(","))[0])
         admin = await self.bot.fetch_user(owner)
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -3)
         
         # stuur confirmatie
-        embed = discord.Embed(
-            title="✅ done.",
-            description=f"I dm'd {user.display_name}",
-            color=self.bot.succesColor
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
-
-
-    @app_commands.command(name="chat", description="Chat with the bot (3🪙)", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=2, per=30)
-    @checks.cost_nword(3)
-    @app_commands.describe(prompt="Your question/conversation piece")
-    async def chat(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
-        """Chat with the bot using AI
-
-        Args:
-            interaction (Interaction): Users Interaction
-            prompt (app_commands.Range[str, 1, 200]): The users question
-        """
-        await interaction.response.defer()
-
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a discord bot named Where-Context-Bot-3. You are a helpful, but very sarcastic bot who is not afraid to trash-talk. You were made by solos."},
-                    {"role": "user", "content": f'Mijn naam is  {interaction.user.display_name}. Anwser the question delimited by triple quotes in about 75 words. """{prompt}"""'},
-
-                ],
-                temperature=0.5,
-                max_tokens=150
-            )
-            embed = discord.Embed(
-                title=None,
-                description=response['choices'][0]['message']['content'],
-                color=self.bot.defaultColor
-            )
-
-        except Exception as e:
-            self.bot.logger.warning(e)
-            embed = discord.Embed(
-                title="Er ging iets mis",
-                description=e,
-                color=self.bot.errorColor
-            )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -3)
-
-        # stuur het antwoord
-        await interaction.followup.send(embed=embed)
-
-
-
-    @app_commands.command(name="image", description="Create an image (5🪙)", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    @checks.cost_nword(5)
-    @app_commands.checks.cooldown(rate=5, per=120) # 3 per 10 minutes
-    @app_commands.describe(prompt="A detailed description of what to create")
-    async def image(self, interaction, prompt: app_commands.Range[str, 1, 200]) -> None:
-        """Create an image using Ai
-
-        Args:
-            interaction (Interaction): Users Interaction
-            prompt (app_commands.Range[str, 1, 200]): Information about what to create
-        """
-
-        await interaction.response.defer()
-
-        try:
-            response = openai.Image.create(
-                prompt=prompt,
-                n=1,
-                size="512x512"
-            )
-            
-            image_url = response['data'][0]['url']
-            
-            embed = discord.Embed(
-                title=None,
-                color=self.bot.defaultColor
-            )
-            embed.set_image(url=image_url)
-
-        except Exception as e:
-            self.bot.logger.warning(e)
-            embed = discord.Embed(
-                title="Er ging iets mis",
-                description=e,
-                color=self.bot.errorColor
-            )
-        
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -5)
-
-        # stuur het antwoord
-        await interaction.followup.send(embed=embed)
-
+        await interaction.followup.send(embed=embeds.OperationSucceededEmbed(
+            "Done!"
+        ), ephemeral=True)
+   
 
 
     @app_commands.command(name="remindme", description="Remind me of an event", extras={'cog': 'general'})
@@ -395,111 +205,34 @@ class General(commands.Cog, name="general"):
         
         t = dateparser.parse(wanneer, settings={
             'DATE_ORDER': 'DMY',
-            'TIMEZONE': 'CEST',
+            'TIMEZONE': 'CET',
             'PREFER_DAY_OF_MONTH': 'first',
             'PREFER_DATES_FROM': 'future',
             'DEFAULT_LANGUAGES': ["en", "nl"]
         })
 
-        if t is None:
-            embed = discord.Embed(
-                title="⏰ Geen geldig tijdstip",
-                description=f"{wanneer} is geen geldig tijdstip",
-                color=self.bot.errorColor
-            )
-        elif t < datetime.now():
-            embed = discord.Embed(
-                title="⏰ Geen geldig tijdstip",
-                description=f"{wanneer} is in het verleden",
-                color=self.bot.errorColor
-            )
-        else:
-
-            # zet reminder in db
-            succes = await db_manager.set_reminder(interaction.user.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
-
-            
-            desc = f"I will remind you at ```{t.strftime('%d/%m/%y %H:%M:%S')} CEST``` for ```{waarover}```" if succes else "Something went wrong!"
-            embed = discord.Embed(
-                title="⏳ Reminder set!" if succes else "Oops!",
-                description=desc,
-                color=self.bot.succesColor if succes else self.bot.errorColor
-            )
-
-        await interaction.response.send_message(embed=embed)
-
-
-    @app_commands.command(name="status", description="Set the status of the bot for 1 hour (10🪙)", extras={'cog': 'general'})
-    @app_commands.checks.cooldown(rate=1, per=300) # 1 per 5 minutes
-    @checks.not_blacklisted()
-    @checks.not_in_dm()
-    @checks.cost_nword(10)
-    @app_commands.describe(status="What do you want the status of the bot to be")
-    async def status(self, interaction, status: app_commands.Range[str, 1, 50]) -> None:
-        """Set the status of the bot
-
-        Args:
-            interaction (Interaction): Users Interaction
-            status (app_commands.Range[str, 1, 50]): status
-        """
-
-        await interaction.response.defer()
-
-        # set the status
-        self.bot.statusManual = datetime.now()
-        await self.bot.change_presence(activity=discord.Game(status))
-
-        embed = discord.Embed(
-            title="✅ Status changed!",
-            description=f"Changed status to ```{status}```",
-            color=self.bot.succesColor
-        )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -10)
+        if t is None or t < datetime.now():
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
+                "Geen geldig tijdstip"
+            ))
         
-        # stuur het antwoord
-        await interaction.followup.send(embed=embed)
+        # zet reminder in db
+        succes = await db_manager.set_reminder(interaction.user.id, subject=waarover, time=t.strftime('%d/%m/%y %H:%M:%S'))
+
+        
+        desc = f"I will remind you at ```{t.strftime('%d/%m/%y %H:%M:%S')} CEST``` for ```{waarover}```" if succes else "Something went wrong!"
+
+        await interaction.response.send_message(
+            embed=embeds.OperationSucceededEmbed(
+                "Reminder set!", desc, emoji="⏳"
+            ) if succes else embeds.OperationFailedEmbed(
+                "Oops!", desc
+            ))
 
 
-    @app_commands.command(name="anti_gif", description="Prevent a user from using gifs for 1 hour (125🪙)", extras={'cog': 'general'})
-    @app_commands.checks.cooldown(rate=1, per=30) # 1 per 30 sec
+    @app_commands.command(name="impersonate", description="Send a message diguised as a user", extras={'cog': 'general'})
     @checks.not_blacklisted()
     @checks.not_in_dm()
-    @checks.cost_nword(125)
-    @app_commands.describe(user="Who to block")
-    async def anti_gif(self, interaction, user: discord.User) -> None:
-        """Prevent a user from using gifs for 1 hour
-
-        Args:
-            interaction (Interaction): Users Interaction
-            user (User): who to block
-        """
-
-        await interaction.response.defer()
-
-        # add user to block list
-        self.bot.gif_prohibited.append(
-            (user.name, datetime.now())
-        )
-
-        embed = discord.Embed(
-            title="✅ Done!",
-            description=f"<@{user.id}> is now banned from using gifs.",
-            color=self.bot.succesColor
-        )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -125)
-
-        # stuur het antwoord
-        await interaction.followup.send(embed=embed)
-
-
-    @app_commands.command(name="impersonate", description="Send a message diguised as a user (10🪙)", extras={'cog': 'general'})
-    @checks.not_blacklisted()
-    @checks.not_in_dm()
-    @checks.cost_nword(10)
     @app_commands.describe(user="Who to impersonate")
     @app_commands.describe(message="What to say")
     async def impersonate(self, interaction, user: discord.User, message: str) -> None:
@@ -519,16 +252,10 @@ class General(commands.Cog, name="general"):
 
         await webhook.delete()
 
-        embed = discord.Embed(
-            title="✅ Done!",
-            description=f"😈",
-            color=self.bot.succesColor
-        )
-
-        #update ncount
-        await db_manager.increment_or_add_nword(interaction.user.id, -10)
         # stuur het antwoord
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Done!", "😈"
+        ), ephemeral=True)
 
 
     @app_commands.command(name="poll", description="Create a poll", extras={'cog': 'general'})
@@ -548,10 +275,8 @@ class General(commands.Cog, name="general"):
             options (str): possible answers
         """
 
-        embed = discord.Embed(
-            title=f'Build your poll!', 
-            color = self.bot.defaultColor,
-            timestamp=datetime.utcnow()
+        embed = embeds.DefaultEmbed(
+            "Build your poll!"
         )
         embed.add_field(name='❓ Question', value=question, inline=False)
         embed.set_footer(text=f"Poll started by {interaction.user.display_name}")
@@ -559,6 +284,72 @@ class General(commands.Cog, name="general"):
 
         view = PollMenuBuilder(question, embed, interaction.user.id, anoniem.value, self.bot)
         await interaction.edit_original_response(embed=embed, view=view)
+
+
+
+    @app_commands.command(name="summary", description="Generate a summary of the latest conversation", extras={'cog': 'general'})
+    @checks.not_blacklisted()
+    @app_commands.checks.cooldown(rate=1, per=20, key=lambda i: (i.user.id))
+    @checks.not_in_dm()
+    async def summary(self, interaction) -> None:
+        """Let the bot DM a user
+
+        Args:
+            interaction (Interaction): Users Interaction
+            user (discord.User): Which user to dm
+            content (str): What to dm the user
+        """
+        await interaction.response.defer()
+
+        messages_str = ""
+        amount_of_messages = 0
+        # get last messages from channel
+        messages = [message async for message in interaction.channel.history(limit=20)]
+        messages = messages[::-1]
+        message_sent_time = messages[0].created_at
+
+        # iterate over messsages and format in a string
+        i = 0
+        while i < len(messages) and i < 250:
+
+            message = messages[i]
+
+            # mark end of conversation if too big of time difference with previous message
+            time_difference = divmod((message_sent_time - message.created_at).total_seconds(), 60)
+            if time_difference[0] >= 2 and i > 20:
+                break
+            else: 
+                message_sent_time = message.created_at 
+
+            # message cannot be from bot
+            if not message.author.bot:
+                messages_str += f"{message.author}: {message.clean_content}\n"
+                amount_of_messages += 1
+
+            # check if needed to fetch more messages
+            if i == len(messages) -1:
+                extra_messages = [m async for m in interaction.channel.history(limit=20, before=message)]
+                messages.extend(extra_messages)
+
+            i += 1
+
+        # ask gpt to summarize
+        client = OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Generate a concise, professional summary of the following conversation."},
+                {"role": "user", "content": messages_str},
+            ],
+
+        )
+
+        summary_response = response.choices[0].message.content
+
+        # send summary
+        await interaction.followup.send(embed=embeds.DefaultEmbed(
+            f"🗒️ Summary of last {amount_of_messages} messages", summary_response, user=interaction.user
+        ), ephemeral=True)
         
 
 
@@ -668,12 +459,20 @@ class PollMenuBuilder(discord.ui.View):
         )
 
         self.embed.title = f'***{self.title}***'      
-
+                       
         # edit original message
-        msg = interaction.message
+        msg = await interaction.message.edit(embed=self.embed)
+
+        # create view to add to message
         view = discord.ui.View(timeout=None)
-        view.add_item(DynamicVotesButton(interaction.user.id))
-        await msg.edit(embed=self.embed, view=view if not self.anonymous else None)
+        # add end poll button
+        view.add_item(EndPollButton(interaction.user.id, msg, self.anonymous))
+        # add see votes button if not anoymous
+        if not self.anonymous:
+            view.add_item(DynamicVotesButton(interaction.user.id))
+        
+        # we have to edit twice because the end poll button needs the new embed
+        await msg.edit(view=view)
         
         # save poll to db
         rcts = ('{' + (len(self.options) * '{"placeholder"}') + '}').replace("}{", "},{")
@@ -684,11 +483,9 @@ class PollMenuBuilder(discord.ui.View):
             await msg.add_reaction(self.reactions[i])
 
         # send confirmation
-        embed = discord.Embed(
-            title="🗳️ Poll is live!",
-            color=self.bot.succesColor
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Poll is live!", emoji="🗳️"
+        ), ephemeral=True)
 
 
     @discord.ui.button(label="Stop", emoji='✖️', style=discord.ButtonStyle.danger, disabled=False)
@@ -704,11 +501,9 @@ class PollMenuBuilder(discord.ui.View):
         await interaction.message.delete()
 
         # send confirmation
-        embed = discord.Embed(
-            title="🛑 Stopped!",
-            color=self.bot.defaultColor
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.DefaultEmbed(
+            "🛑 Stopped!"
+        ), ephemeral=True)
 
 
     async def interaction_check(self, interaction: discord.Interaction):
@@ -742,42 +537,70 @@ class DynamicVotesButton(discord.ui.DynamicItem[discord.ui.Button], template=r'b
         return True
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        # get votes from db
-        try:
-            reactions = await db_manager.get_poll_reactions(interaction.message.id)
-            reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
-        except:
-            return await interaction.response.send_message("poll is not active...")
-
-        # create embed
-        embed = discord.Embed(
-            title="🗳️ Votes",
-            color=0xF4900D
-        )
-
-        numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-        
-        # check if poll has votes
-        total_reactions = sum([len(x) for x in reactions])
-        if total_reactions == 0:
-            embed.description = '**This poll has no votes yet...**'
-        
-        else:
-            for i, react in enumerate(reactions):
-                # generate description per reaction
-                desc = ''
-                for r in react:
-                    r = r.replace("'", "")
-                    desc += f'\n<@{int(r)}>'
-
-                embed.add_field(
-                    name=f'**{numbers[i]}**',
-                    value=desc if len(desc) > 0 else 'No votes yet',
-                    inline=True
-                )
-
-        # respond
+        embed = await get_poll_votes_embed(interaction.message.id)
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+
+class EndPollButton(discord.ui.Button):
+    def __init__(self, user_id: int, message, anonymous) -> None:
+        super().__init__(
+            label='End Poll',
+            style=discord.ButtonStyle.red,
+            custom_id=f'button:userb:{user_id}',
+            emoji='⌛',
+        )
+        self.user_id: int = user_id
+        self.message = message
+        self.anonymous = anonymous
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        responses = [
+            f"<@{interaction.user.id}> shatap lil bro",
+            f"<@{interaction.user.id}> you are NOT him",
+            f"<@{interaction.user.id}> blud thinks he's funny",
+            f"<@{interaction.user.id}> imma touch you lil nigga",
+            f"<@{interaction.user.id}> it's on sight now",
+        ]
+
+        
+        # can only be triggered by the profile owner or an owner
+        is_possible = (interaction.user.id == self.user_id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        
+        # send message if usr cannot interact with button
+        if not is_possible:
+            await interaction.response.send_message(random.choice(responses))
+        
+        return is_possible
+    
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        # respond to original message with the final results
+        response = None
+        if not self.anonymous:
+            result_embed = await get_poll_votes_embed(self.message.id, True)
+            response = await self.message.reply(embed=result_embed)
+
+        # edit message to show that poll is closed
+        embed = self.message.embeds[0]
+        has_desc = embed.description is not None
+        if response is not None:
+            embed.description = f"***Closed*** - [See Final Votes]({response.jump_url})\n" + (embed.description if has_desc else "")
+        else:
+            embed.description = f"***Closed***\n" + (embed.description if has_desc else "")
+       
+        await self.message.edit(embed=embed, view=None)
+
+        # remove all reactions from poll
+        await self.message.clear_reactions()
+
+        # remove poll from db
+        await db_manager.delete_poll(self.message.id)
+
+        # respond with confirmation
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Closed Poll!"
+        ), ephemeral=True)
 
 
 
@@ -795,12 +618,9 @@ class AddResponseModal(discord.ui.Modal, title='Add Option'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.options.append(self.answer.value)
-        embed = discord.Embed(
-            title="💾 Option added!",
-            description=f'```{self.answer.value}```',
-            color=self.poll_builder.bot.succesColor
-        )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Option added!", f'```{self.answer.value}```', emoji="💾"
+        ), ephemeral=True)
 
 
 
@@ -818,12 +638,46 @@ class AddDescriptionModal(discord.ui.Modal, title='Add/Change Description'):
 
     async def on_submit(self, interaction: discord.Interaction):
         self.poll_builder.description = self.answer.value
-        embed = discord.Embed(
-            title="💾 Description set!",
-            description=f'```{self.answer.value}```',
-            color=self.poll_builder.bot.succesColor
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
+            "Description set!", f'```{self.answer.value}```', emoji="💾"
+            
+        ), ephemeral=True)
+
+
+
+async def get_poll_votes_embed(message_id, is_poll_end=False):
+    # get votes from db
+    reactions = await db_manager.get_poll_reactions(message_id)
+    reactions = [[ subelt for subelt in elt if subelt not in ['placeholder', "'placeholder'"] ] for elt in reactions[0][0]]
+
+    # create embed
+    embed = embeds.DefaultEmbed(
+        "🗳️ Final Votes" if is_poll_end else "🗳️ Votes"
+    )
+
+    numbers = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+    
+    # check if poll has votes
+    total_reactions = sum([len(x) for x in reactions])
+    if total_reactions == 0:
+        embed.description = '**The poll ended without votes' if is_poll_end else '**This poll has no votes...**'
+        return embed
+
+    no_votes_str = 'No votes' if is_poll_end else 'No votes yet'
+    for i, react in enumerate(reactions):
+        # generate description per reaction
+        desc = ''
+        for r in react:
+            r = r.replace("'", "")
+            desc += f'\n<@{int(r)}>'
+
+        embed.add_field(
+            name=f'**{numbers[i]}**',
+            value=desc if len(desc) > 0 else no_votes_str,
+            inline=True
         )
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    return embed
 
 
 

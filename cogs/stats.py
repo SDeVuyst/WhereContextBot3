@@ -6,14 +6,18 @@ Description:
 Version: 5.5.0
 """
 
+import asyncio
 import discord
+
+import requests
+from bs4 import BeautifulSoup
 from discord import app_commands
 from discord.components import SelectOption
 from discord.ext import commands
 from discord.interactions import Interaction
 from discord.ui import Select, View
-
-from helpers import checks, db_manager
+import embeds
+from helpers import ArtBuilder, checks, db_manager
 from exceptions import TimeoutCommand
 
 
@@ -22,106 +26,177 @@ class Stats(commands.Cog, name="stats"):
         self.bot = bot
         
     
-    @app_commands.command(name="leaderboard", description="Leaderboard of a command", extras={'cog': 'stats'})
+    @app_commands.command(
+            name="leaderboard",
+            description="Leaderboard of a command", 
+            extras={'cog': 'stats'}
+    )
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=10)
+    @checks.not_in_dm()
+    @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.guild_id, i.user.id))
     async def leaderboard(self,interaction):
         """Shows the leaderboard for a command
 
         Args:
             interaction (Interaction): Users interaction
         """
+        await interaction.response.defer()
+
         view = CommandView(self.bot)
-        await interaction.response.send_message(view=view)
-        await view.wait()
+        first_message = await interaction.followup.send(view=view)
+
+        second_message = await interaction.channel.send('** **')
+        
+        await view.wait()        
+
         if view.chosen_command is None:
             raise TimeoutCommand('Timeout in /leaderboard')
+
+        elif view.chosen_command == "bancount":
+            leaderb = await db_manager.get_ban_leaderboard()
+
+        elif view.chosen_command == "current_win_streak":
+            leaderb = await db_manager.get_current_win_streak_leaderboard()
+
+        elif view.chosen_command == "current_loss_streak":
+            leaderb = await db_manager.get_current_loss_streak_leaderboard()
+
+        elif view.chosen_command == "highest_win_streak":
+            leaderb = await db_manager.get_highest_win_streak_leaderboard()
+
+        elif view.chosen_command == "highest_loss_streak":
+            leaderb = await db_manager.get_highest_loss_streak_leaderboard()
+
+        elif view.chosen_command == "ban_total_wins":
+            leaderb = await db_manager.get_ban_total_wins_leaderboard()
+
+        elif view.chosen_command == "ban_total_losses":
+            leaderb = await db_manager.get_ban_total_losses_leaderboard()
+
+        else:
+            # krijg count bericht uit db
+            leaderb = await db_manager.get_leaderboard(view.chosen_command)
         
-        embed = await self.get_leaderboard_embed(view.chosen_command)
-        await interaction.edit_original_response(embed=embed, view=None)
+        # Geen berichten
+        if len(leaderb) == 0:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "**This command has not been used yet.**"
+            ), view=None)
+        
+        # error
+        elif leaderb[0] == -1:
+            return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
+                "Something went wrong...", leaderb[1]
+            ), view=None)
+
+        elif view.chosen_command == "current_win_streak":
+            command = "Ban Gamble - Current Win Streak"
+
+        elif view.chosen_command == "current_loss_streak":
+            command = "Ban Gamble - Current Loss Streak"
+
+        elif view.chosen_command == "highest_win_streak":
+            command = "Ban Gamble - Highest Win Streak"
+
+        elif view.chosen_command == "highest_loss_streak":
+            command = "Ban Gamble - Highest Loss Streak"
+
+        elif view.chosen_command == "ban_total_wins":
+            command = "Ban Gamble - Total Wins"
+
+        elif view.chosen_command == "ban_total_losses":
+            command = "Ban Gamble - Total Losses"
+
+        else:
+            command = f'/{view.chosen_command}'
+        
+        builder = ArtBuilder.LeaderboardBuilder(self.bot)
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            builder.async_set_leaderboard_images(loop, first_message, second_message, leaderb, command)
+        )
 
 
 
     @app_commands.command(
         name="statistic",
-        description="How many times did a user use a command",
+        description="How many times did a user use a feature",
         extras={'cog': 'stats'}
     )
     @app_commands.describe(user="Welke persoon")
     @checks.not_blacklisted()
-    @app_commands.checks.cooldown(rate=1, per=10)
-    async def statistic(self,interaction, user: discord.User) -> None:
+    @app_commands.checks.cooldown(rate=1, per=10, key=lambda i: (i.guild_id, i.user.id))
+    async def statistic(self,interaction, user: discord.User = None) -> None:
         """Shows the individual stats for a user for a given command
 
         Args:
             interaction (Interaction): Users interaction
             user (discord.User): Which user
         """
+
+        # geen gebruiker meegegeven, gaat over zichzelf
+        if user is None:
+            user = interaction.user
+
+        # send view to get chosen command
         view = CommandView(self.bot)
         await interaction.response.send_message(view=view)
         await view.wait()
+
+        # timeout
         if view.chosen_command is None:
             raise TimeoutCommand("Timeout in /statistic")
 
-        
-        embed = await self.get_stat_individual_embed(user.id, view.chosen_command)
+        #  generate response
+        embed = await self.get_stat_individual_embed(user, view.chosen_command)
         
         await interaction.edit_original_response(embed=embed, view=None)
 
 
 
-    async def get_leaderboard_embed(self, command):
-        """Get embed for a leaderboard 
+    @app_commands.command(
+        name="fortnite",
+        description="See statistic about a fortnite creative map",
+        extras={'cog': 'stats'}
+    )
+    @app_commands.choices(map=[
+        discord.app_commands.Choice(name="Naruto Box PVP", value="3216-2522-9844"),
+        discord.app_commands.Choice(name="📦STARWARS BOX PVP🔥", value="1630-9217-6519"),
+    ])   
+    @checks.not_blacklisted()
+    async def fortnite(self, interaction, map: discord.app_commands.Choice[str]) -> None:
+        await interaction.response.defer()
 
-        Args:
-            command (str): Which command
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        response = requests.get(f"https://fortnite.gg/island?code={map.value}", headers=headers)
 
-        Returns:
-            Embed
-        """
-        if command == "ncountCHECK":
-            leaderb = await db_manager.get_nword_leaderboard()
-        elif command == "bancount":
-            leaderb = await db_manager.get_ban_leaderboard()
+        if response.status_code == 200:
+            # Parse the HTML content of the page
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            embed = embeds.DefaultEmbed(
+                f'🎮 {map.name}', map.value
+            )
+
+            player_stats_titles = soup.find_all('div', class_='chart-stats-title')
+
+            embed.add_field(name="Players Right Now", value=f"```{player_stats_titles[0].text}```")
+            embed.add_field(name="All Time Peak", value=f"```{player_stats_titles[2].text}```")
+
+            embed.set_image(url=str(soup.find(id='island-img')["src"]))
+
+            await interaction.followup.send(embed=embed)
+
         else:
-            # krijg count bericht uit db
-            leaderb = await db_manager.get_leaderboard(command)
-        
-        # Geen berichten
-        if len(leaderb) == 0:
-            embed = discord.Embed(
-                description=f"❌ **This command has not been used yet.**",
-                color=self.bot.defaultColor
-            )
-            return embed
-        
-        # error
-        elif leaderb[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=leaderb[1],
-                color=self.bot.errorColor
-            )
-            return embed
-        
-        desc = ""
-        for i, stat in enumerate(leaderb):
-            user_id, count = tuple(stat)
-            desc += f"{i+1}: **<@{int(user_id)}>  ⇨ {count}**\n\n"
-
-        command = "N-words said" if command == "ncountCHECK" else command
-        command = "danae trigger" if command == "danae" else command
-
-        embed = discord.Embed(
-            title=f"🏆 Leaderboard for {command}",
-            description=desc,
-            color=self.bot.defaultColor
-        )
-
-        return embed
+            return interaction.followup.send(embed=embeds.OperationFailedEmbed(
+                "Something went wrong", response.status_code
+            ))
 
 
-    async def get_stat_individual_embed(self, userid, command):
+
+    async def get_stat_individual_embed(self, user, command):
         """Get an embed for individual stats
 
         Args:
@@ -131,61 +206,99 @@ class Stats(commands.Cog, name="stats"):
         Returns:
             Embed
         """
-        if command == "ncountCHECK":
-            count = await db_manager.get_nword_count(userid)
-        elif command == "bancount":
-            count = await db_manager.get_ban_count(userid)
+        if command == "bancount":
+            count = await db_manager.get_ban_count(user.id)
+        
+        elif command == "current_win_streak":
+            count = await db_manager.get_current_win_streak(user.id)
+
+        elif command == "current_loss_streak":
+            count = await db_manager.get_current_loss_streak(user.id)
+
+        elif command == "highest_win_streak":
+            count = await db_manager.get_highest_win_streak(user.id)
+
+        elif command == "highest_loss_streak":
+            count = await db_manager.get_highest_loss_streak(user.id)
+
+        elif command == "ban_total_wins":
+            count = await db_manager.get_ban_total_wins(user.id)
+
+        elif command == "ban_total_losses":
+            count = await db_manager.get_ban_total_losses(user.id)
+
         else:
             # krijg count bericht uit db
-            count = await db_manager.get_command_count(userid, command)
+            count = await db_manager.get_command_count(user.id, command)
 
         
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
-            if command == "ncountCHECK":
-                desc = f"😌 **<@{userid}> has not said the nword yet."
-            elif command == "bancount":
-                desc = f"🔨 **<@{userid}> has not been banned yet.**"
-            elif command == "danae":
-                desc = f"✌️ **<@{userid}> has not triggered the danae feature yet.**"
-            else:
-                desc = f"❌ **<@{userid}> didn't use /{command} yet.**"
+            if command == "bancount":
+                title = f"🔨 <@{user.display_name}> has not been banned yet."
 
-            embed = discord.Embed(
-                description=desc,
-                color=self.bot.defaultColor
-            )
-            return embed
+            elif command == "current_win_streak":
+                title = f"🏆 <@{user.display_name}> doesn't have a win streak yet."
+
+            elif command == "current_loss_streak":
+                title = f"🤓 <@{user.display_name}> doesn't have a loss streak yet."
+
+            elif command == "highest_win_streak":
+                title = f"🏆 <@{user.display_name}> doesn't have a highest win streak yet."
+
+            elif command == "highest_loss_streak":
+                title = f"🤓 <@{user.display_name}> doesn't have a highest loss streak yet."
+
+            elif command == "ban_total_wins":
+                title = f"🏆 <@{user.display_name}> doesn't have a win yet."
+
+            elif command == "ban_total_losses":
+                title = f"🤓 <@{user.display_name}> doesn't have a loss yet."
+
+            else:
+                title = f"❌ <@{user.display_name}> didn't use /{command} yet."
+
+            return embeds.OperationFailedEmbed(title, emoji=None)
         
         # error
-        elif count[0] == -1:
-            embed = discord.Embed(
-                title=f"Something went wrong",
-                description=count[1],
-                color=self.bot.errorColor
+        if count[0] == -1:
+            return embeds.OperationFailedEmbed(
+                "Something went wrong...", count[1]
             )
-            return embed
         
         if command == "messages_played":
-            desc = f"**<@{userid}> played```{count[0][0]}``` messages.**"
+            desc = f"**<@{user.id}> played```{count[0][0]}``` messages.**"
+
         elif command == "messages_deleted":
-            desc = f"**<@{userid}> deleted```{count[0][0]}``` messages.**"
-        elif command == "ncountCHECK":
-            desc = f"**<@{userid}> said the n-word ```{count[0][0]}``` times.**"
-        elif command == "danae":
-            desc = f"**<@{userid}> triggered 'danae' ```{count[0][0]}``` times.**"
+            desc = f"**<@{user.id}> deleted```{count[0][0]}``` messages.**"
+
         elif command == "bancount":
-            desc = f"🔨 **<@{userid}> has been banned ```{count[0][0]}``` times.**"
+            desc = f"🔨 **<@{user.id}> has been banned ```{count[0][0]}``` times.**"
+        
+        elif command == "current_win_streak":
+            desc = f"🏆 **<@{user.id}> has a current win streak of ```{count[0][0]}```**"
+
+        elif command == "current_loss_streak":
+            desc = f"**<@{user.id}> has a current loss streak of ```{count[0][0]}```**"
+
+        elif command == "highest_win_streak":
+            desc = f"🏆 **<@{user.id}> has a highest win streak of ```{count[0][0]}```**"
+
+        elif command == "highest_loss_streak":
+            desc = f"**<@{user.id}> has a highest loss streak of ```{count[0][0]}```**"
+
+        elif command == "ban_total_wins":
+            desc = f"🏆 **<@{user.id}> total wins```{count[0][0]}```**"
+
+        elif command == "ban_total_losses":
+            desc = f"**<@{user.id}> total losses ```{count[0][0]}```**" 
+        
         else:
-            desc = f"**<@{userid}> used /{command} ```{count[0][0]}``` times.**"
+            desc = f"**<@{user.id}> used {command} ```{count[0][0]}``` times.**"
 
-        embed = discord.Embed(
-            title="📊 Individual Statistic",
-            description=desc,
-            color=self.bot.defaultColor
+        return embeds.DefaultEmbed(
+            "📊 Individual Statistic", desc, user=user
         )
-
-        return embed
 
 
 
@@ -204,7 +317,6 @@ class CommandView(View):
             SelectOption(label="General", emoji="🤖", value="general"),
             SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
-            SelectOption(label="Reacties", emoji="💭", value="reacties"),
             SelectOption(label="Admin", emoji="👨‍🔧", value="admin")
         ]     
     )
@@ -220,7 +332,6 @@ class CommandView(View):
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
-            "reacties": "💭 Reacties",
             "admin": "👨‍🔧 Admin"
         }
         # self.children[0].disabled = True
@@ -246,8 +357,10 @@ class CommandView(View):
             choices (list): What has the user chosen
         """
         self.chosen_command = choices[0]
-        self.children[1].disabled= True
-        await interaction.message.edit(view=self)
+        await interaction.message.edit(view=None, embed=embeds.DefaultEmbed(
+            "⏳ Loading...", "This can take a while."
+        ))
+
         await interaction.response.defer()
         self.stop()
 
@@ -268,18 +381,23 @@ class CommandSelect(Select):
             commands.append(("Messages Deleted", "Remove"))
         
         elif selected_cog == "stats":
-            commands.insert(0, ("N-Words said", "ncountCHECK"))
             commands.insert(0, ("Bans", "bancount"))
-            commands.insert(0, ("Danae trigger", "danae"))
-        
+            commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
+            commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
+            commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
+            commands.append(("Ban Gamble - Highest Loss Streak", "highest_loss_streak"))
+            commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))
+            commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
 
         super().__init__(
             placeholder="Pick a feature", 
             options=[SelectOption(label=label, value=value) for label, value in commands]
         )
 
+
     async def callback(self, interaction:Interaction):
         await self.view.respond_to_answer2(interaction, self.values)
+
 
 
 async def setup(bot):

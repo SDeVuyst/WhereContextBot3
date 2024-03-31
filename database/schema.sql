@@ -12,12 +12,6 @@ CREATE TABLE IF NOT EXISTS context_message (
   times_played INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS nword_counter (
-  id SERIAL PRIMARY KEY,
-  user_id varchar(20) NOT NULL UNIQUE,
-  count INTEGER DEFAULT 0
-);
-
 CREATE TABLE IF NOT EXISTS command_stats (
   id SERIAL PRIMARY KEY,
   command varchar(20) NOT NULL,
@@ -42,4 +36,36 @@ CREATE TABLE IF NOT EXISTS polls (
   id SERIAL PRIMARY KEY,
   message_id varchar(20) NOT NULL,
   reactions varchar(20)[][]
+);
+
+CREATE TABLE IF NOT EXISTS nicknames (
+  id SERIAL PRIMARY KEY,
+  server_id varchar(20) NOT NULL DEFAULT '710963677943169107',
+  user_id varchar(20) NOT NULL,
+  nickname varchar(32) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS autoroles (
+  id SERIAL PRIMARY KEY,
+  server_id varchar(20) NOT NULL DEFAULT '710963677943169107',
+  user_id varchar(20) NOT NULL,
+  roles varchar(20)[]
+);
+
+CREATE TABLE IF NOT EXISTS poses (
+  id SERIAL PRIMARY KEY,
+  user_id varchar(20) NOT NULL,
+  active_poses INTEGER[],
+  place INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bangamble (
+  id SERIAL PRIMARY KEY,
+  user_id varchar(20) NOT NULL,
+  current_win_streak INTEGER DEFAULT 0,
+  highest_win_streak INTEGER DEFAULT 0,
+  current_loss_streak INTEGER DEFAULT 0,
+  highest_loss_streak INTEGER DEFAULT 0,
+  total_wins INTEGER DEFAULT 0,
+  total_losses INTEGER DEFAULT 0
 );
