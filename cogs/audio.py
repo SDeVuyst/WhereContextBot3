@@ -74,19 +74,34 @@ class Audio(commands.Cog, name="audio"):
         if vc.is_playing():
             vc.pause()
 
-        # speel soundboard af
-        vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../media/audio_snippets/{effect.value}"), 
-            after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
-        )
-        
-        # resume de vorige spelende audio
-        if vc.is_paused():
-            vc.resume()
-        
-        # confirmatie 
-        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
-            f"Played {effect.name}!", emoji="📻"
-        ), ephemeral=True)
+            # speel soundboard af
+            vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
+                after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
+            )
+            
+            # resume de vorige spelende audio
+            if vc.is_paused():
+                vc.resume()
+            
+            # confirmatie 
+            embed = discord.Embed(
+                title=f"📻 played {effect.name}!",
+                color=self.bot.succesColor
+            )
+
+            #update ncount
+            await db_manager.increment_or_add_nword(interaction.user.id, -5)
+
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        # error
+        except Exception as e:
+            embed = discord.Embed(
+                title=f"Something went wrong",
+                description=e,
+                color=self.bot.errorColor
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 

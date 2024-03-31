@@ -141,20 +141,20 @@ class OutOfContext(commands.Cog, name="outofcontext"):
             "**Out of Context**", desc
         )
 
-        if m.attachments:
-            # als er meerdere attachments zijn, tonen we enkel de eerste
-            embed.set_image(url=m.attachments[0].url)
+            if m.attachments:
+                # als er meerdere attachments zijn, tonen we enkel de eerste
+                embed.set_image(url=m.attachments[0].url)
 
-            # check als er video in message zit
-            for attch in m.attachments:
-                try:
-                    embed.description += f"\n**Contains {attch.content_type if attch.content_type else 'unknown attachment'}!**"
+                # check als er video in message zit
+                for attch in m.attachments:
+                    try:
+                        embed.description += f"\n**Contains {attch.content_type if attch.content_type else 'unknown attachment'}!**"
 
-                # attachement type is onbekend
-                except TypeError:
-                    embed.description += "\n**Contains unknown attachment!**"
+                    # attachement type is onbekend
+                    except TypeError:
+                        embed.description += "\n**Contains unknown attachment!**"
 
-        try:
+            try:
 
             embed.add_field(
                 name="Times played",
@@ -162,39 +162,51 @@ class OutOfContext(commands.Cog, name="outofcontext"):
                 inline=True
             )
 
-            embed.add_field(
-                name="Added at",
-                value=f"```{m.created_at.strftime('%d/%m/%Y - %H:%M:%S')}```",
-                inline=True
-            )
+                embed.add_field(
+                    name="Added at",
+                    value=f"```{m.created_at.strftime('%d/%m/%Y - %H:%M:%S')}```",
+                    inline=True
+                )
 
-            embed.set_footer(
-                text=f"message id: {id}"
-            )
+                embed.set_footer(
+                    text=f"message id: {id}"
+                )
 
-            user = await self.bot.fetch_user(int(added_by))
-            embed.set_thumbnail(
-                url=str(user.avatar.url)
-            )
+                user = await self.bot.fetch_user(int(added_by))
+                embed.set_thumbnail(
+                    url=str(user.avatar.url)
+                )
 
-            embed.set_author(
-                name=user.name, 
-                icon_url=str(user.avatar.url)
-            )
+                embed.set_author(
+                    name=user.name, 
+                    icon_url=str(user.avatar.url)
+                )
+
+            except Exception as e:
+                embed.add_field(
+                    name="User error",
+                    value=e,
+                    inline=False
+                )
+            
+            
+
+        
 
         except Exception as e:
-            embed.add_field(
-                name="User error",
-                value=e,
-                inline=False
+            embed = discord.Embed(
+                title="**Out of Context**", 
+                color=self.bot.errorColor,
+                description="Message was deleted, you can remove this one from the game"
             )
-        
         
         # voeg id toe aan messages indien nodig
         if self.menu.current_index == len(self.menu.messages):
             self.menu.messages.append(m.id)
-
+            
         return embed
+        
+        
 
 
     async def remove(self, id, guild):
@@ -289,6 +301,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
 
         """
         # check als bericht bestaat
+        id = message.id
         if not await db_manager.is_in_ooc(id):
             
             return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(

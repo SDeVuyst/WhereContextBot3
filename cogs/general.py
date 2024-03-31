@@ -12,6 +12,7 @@ import dateparser
 import re
 import random
 from openai import OpenAI
+import io
 
 from datetime import datetime
 
@@ -128,7 +129,6 @@ class General(commands.Cog, name="general"):
             url=os.environ.get('COUNTDOWN_URL')
         )
 
- 
         await interaction.response.send_message(embed=embed)
 
 
