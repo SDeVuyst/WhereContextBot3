@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    env_file: .env
+    env_file: stack.env
     entrypoint: ['python', 'bot.py']
     depends_on:
       wcb3_postgres:
@@ -16,7 +16,7 @@ services:
     container_name: wcb3_postgres_container
     image: postgres:latest
     restart: always
-    env_file: .env
+    env_file: stack.env
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
