@@ -416,7 +416,7 @@ async def on_member_join(member):
 
     # send welcome to user
     await member.send(embed=embeds.DefaultEmbed(
-        "Welcome to {member.guild.name}!", description
+        f"Welcome to {member.guild.name}!", description
     ))
     
         

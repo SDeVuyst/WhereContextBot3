@@ -154,7 +154,7 @@ class General(commands.Cog, name="general"):
         # create task to add image of available poses
         loop = asyncio.get_event_loop()
         loop.create_task(
-            builder.async_set_all_podiums_image_file(loop, message, [first_podium.id, second_podium.id, third_podium.id], characters)
+            builder.async_set_all_podiums_image_file(loop, message, [second_podium.id, first_podium.id, third_podium.id], characters)
         )
                 
         
