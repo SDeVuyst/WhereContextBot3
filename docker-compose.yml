@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    pull_policy: build
     restart: unless-stopped
     env_file: stack.env
     entrypoint: ['python', 'bot.py']
