@@ -76,7 +76,7 @@ class Admin(commands.Cog, name="admin"):
 
         # stuur het antwoord
         await interaction.followup.send(embed=embeds.OperationSucceededEmbed(
-            "Done!", f"<@{user.id}> is now banned from using gifs.", user=user
+            "Done!", f"<@{user.id}> is now banned from using gifs for 1 hour.", user=user
         ))
 
 

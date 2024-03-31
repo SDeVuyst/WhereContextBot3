@@ -14,6 +14,22 @@ BASE_LOCATION = 'media/images/'
 
 POOL = ThreadPoolExecutor()
 
+URLS = {
+    "339820557086228490": "https://i.imgur.com/sVd3QyY.png",
+    "756527409876041859": "https://i.imgur.com/d1ECdVb.png",
+    "512256261459542019": "https://i.imgur.com/PgGVLiB.png",
+    "453136562885099531": "https://i.imgur.com/WTtyiqZ.png",
+    "464400950702899211": "https://i.imgur.com/Gt3tRbw.png",
+    "334371900170043402": "https://i.imgur.com/w2hdAV5.png",
+    "273503117348306944": "https://i.imgur.com/qDGnl70.png",
+    "222415043550117888": "https://i.imgur.com/AWWtZzP.png",
+    "559715606014984195": "https://i.imgur.com/BMEEQdU.png",
+    "494508091283603462": "https://i.imgur.com/lJ3dr24.png",
+    "527916521754722315": "https://i.imgur.com/Fp8hrLk.png",
+    "462932133170774036": "https://i.imgur.com/IKq28sW.png",
+    "733845345225670686": "https://i.imgur.com/mZh0Fa1.png",
+}
+
 class LeaderboardBuilder:
     def __init__(self, bot) -> None:
         self.bot = bot
@@ -64,7 +80,7 @@ class LeaderboardBuilder:
             
             output = bg.copy()
 
-            output.paste(frame, (remaining_width//2, output.height - frame.height - 25), frame.convert("LA"))
+            output.paste(frame, (remaining_width//2, output.height - frame.height - 50), frame.convert("LA"))
 
             # create object for drawing
             draw = ImageDraw.Draw(output)
@@ -113,14 +129,15 @@ class LeaderboardBuilder:
             count = human_format(count)
             
             # profile picture
-            pfp = Image.open(requests.get(user.display_avatar.url, stream=True).raw)
+            pfp_url = URLS.get(str(user.id), str(user.display_avatar.url))
+            pfp = Image.open(requests.get(pfp_url, stream=True).raw)
             pfp = pfp.resize((240, 240))
-            bg.paste(pfp, (535, 330 + i*340))
+            bg.paste(pfp, (530, 330 + i*342))
 
             # username
             name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
             draw.text(
-                (1275, 430 + i*340), 
+                (1275, 430 + i*342), 
                 text=name, 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )

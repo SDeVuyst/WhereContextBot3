@@ -154,9 +154,14 @@ async def on_ready() -> None:
 
     await init_fortnite_player_peak()
 
-    check_fortnite_player_peak.start()
-    status_task.start()
-    check_remindme.start()
+    # start tasks
+    try:
+        check_fortnite_player_peak.start()
+        status_task.start()
+        check_remindme.start()
+
+    except Exception as e:
+        bot.logger.warning(e)
 
 
     cmds = await bot.tree.sync()

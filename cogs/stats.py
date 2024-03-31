@@ -235,30 +235,30 @@ class Stats(commands.Cog, name="stats"):
         # Geen berichten
         if len(count) == 0 or int(count[0][0]) == 0:
             if command == "bancount":
-                title = f"🔨 **<@{user.id}> has not been banned yet.**"
+                title = f"🔨 <@{user.display_name}> has not been banned yet."
 
             elif command == "current_win_streak":
-                title = f"**<@{user.id}> doesn't have a win streak yet.**"
+                title = f"🏆 <@{user.display_name}> doesn't have a win streak yet."
 
             elif command == "current_loss_streak":
-                title = f"**<@{user.id}> doesn't have a loss streak yet.**"
+                title = f"🤓 <@{user.display_name}> doesn't have a loss streak yet."
 
             elif command == "highest_win_streak":
-                title = f"**<@{user.id}> doesn't have a highest win streak yet.**"
+                title = f"🏆 <@{user.display_name}> doesn't have a highest win streak yet."
 
             elif command == "highest_loss_streak":
-                title = f"**<@{user.id}> doesn't have a highest loss streak yet.**"
+                title = f"🤓 <@{user.display_name}> doesn't have a highest loss streak yet."
 
             elif command == "ban_total_wins":
-                title = f"**<@{user.id}> doesn't have a win yet.**"
+                title = f"🏆 <@{user.display_name}> doesn't have a win yet."
 
             elif command == "ban_total_losses":
-                title = f"**<@{user.id}> doesn't have a loss yet.**"
+                title = f"🤓 <@{user.display_name}> doesn't have a loss yet."
 
             else:
-                title = f"❌ **<@{user.id}> didn't use /{command} yet.**"
+                title = f"❌ <@{user.display_name}> didn't use /{command} yet."
 
-            return embeds.OperationFailedEmbed(title)
+            return embeds.OperationFailedEmbed(title, emoji=None)
         
         # error
         if count[0] == -1:
@@ -276,19 +276,19 @@ class Stats(commands.Cog, name="stats"):
             desc = f"🔨 **<@{user.id}> has been banned ```{count[0][0]}``` times.**"
         
         elif command == "current_win_streak":
-            desc = f"**<@{user.id}> has a current win streak of ```{count[0][0]}```**"
+            desc = f"🏆 **<@{user.id}> has a current win streak of ```{count[0][0]}```**"
 
         elif command == "current_loss_streak":
             desc = f"**<@{user.id}> has a current loss streak of ```{count[0][0]}```**"
 
         elif command == "highest_win_streak":
-            desc = f"**<@{user.id}> has a highest win streak of ```{count[0][0]}```**"
+            desc = f"🏆 **<@{user.id}> has a highest win streak of ```{count[0][0]}```**"
 
         elif command == "highest_loss_streak":
             desc = f"**<@{user.id}> has a highest loss streak of ```{count[0][0]}```**"
 
         elif command == "ban_total_wins":
-            desc = f"**<@{user.id}> total wins```{count[0][0]}```**"
+            desc = f"🏆 **<@{user.id}> total wins```{count[0][0]}```**"
 
         elif command == "ban_total_losses":
             desc = f"**<@{user.id}> total losses ```{count[0][0]}```**" 
@@ -384,12 +384,12 @@ class CommandSelect(Select):
             commands.insert(0, ("Bans", "bancount"))
         
         elif selected_cog == "admin":
-            commands.append("Ban Gamble - Current Win Streak", "current_win_streak")
-            commands.append("Ban Gamble - Current Loss Streak", "current_loss_streak")
-            commands.append("Ban Gamble - Highest Win Streak", "highest_win_streak")
-            commands.append("Ban Gamble - Highest Loss Streak", "highest_loss_streak")
-            commands.append("Ban Gamble - Total Wins", "ban_total_wins")
-            commands.append("Ban Gamble - Total Losses", "ban_total_losses")
+            commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
+            commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
+            commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
+            commands.append(("Ban Gamble - Highest Loss Streak", "highest_loss_streak"))
+            commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))
+            commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
 
         super().__init__(
             placeholder="Pick a feature", 
