@@ -382,8 +382,6 @@ class CommandSelect(Select):
         
         elif selected_cog == "stats":
             commands.insert(0, ("Bans", "bancount"))
-        
-        elif selected_cog == "admin":
             commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
             commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
             commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
