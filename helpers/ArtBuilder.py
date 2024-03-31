@@ -70,8 +70,15 @@ class LeaderboardBuilder:
             if i < 3:       
                 podiums.append((user_id, count))
 
+        if len(podiums) == 1:
+            podiums_order = [podiums[0][0]]
+        elif len(podiums) == 2:
+            podiums_order = [podiums[1][0], podiums[0][0]]
+        else:
+            podiums_order = [podiums[1][0], podiums[0][0], podiums[2][0]]
+
         # add podium
-        podium_image = self.podium_builder.get_all_podiums_image([pod[0] for pod in podiums], False, color=(62,62,62), add_characters=True)
+        podium_image = self.podium_builder.get_all_podiums_image(podiums_order, False, color=(62,62,62), add_characters=True)
         podium_image = resize_image(podium_image, 2000, 1800)
         remaining_width = bg.width - podium_image.width
 
