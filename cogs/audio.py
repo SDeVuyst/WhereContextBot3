@@ -70,36 +70,37 @@ class Audio(commands.Cog, name="audio"):
             effect (discord.app_commands.Choice[str]): Which effect to play
         """
         vc = interaction.guild.voice_client
-        # pauzeer reeds spelende audio
-        if vc.is_playing():
-            vc.pause()
+        try:
+            # pauzeer reeds spelende audio
+            if vc.is_playing():
+                vc.pause()
 
-            # speel soundboard af
-            vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
-                after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
-            )
-            
-            # resume de vorige spelende audio
-            if vc.is_paused():
-                vc.resume()
-            
-            # confirmatie 
-            embed = discord.Embed(
-                title=f"📻 played {effect.name}!",
-                color=self.bot.succesColor
-            )
+                # speel soundboard af
+                vc.play(discord.FFmpegPCMAudio(f"{os.path.realpath(os.path.dirname(__file__))}/../audio_snippets/{effect.value}"), 
+                    after=lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop)
+                )
+                
+                # resume de vorige spelende audio
+                if vc.is_paused():
+                    vc.resume()
+                
+                # confirmatie 
+                embed = embeds.OperationSucceededEmbed(
+                    title=f"played {effect.name}!",
+                    emoji="📻"
+                )
 
-            #update ncount
-            await db_manager.increment_or_add_nword(interaction.user.id, -5)
+                #update ncount
+                await db_manager.increment_or_add_nword(interaction.user.id, -5)
 
-            await interaction.response.send_message(embed=embed, ephemeral=True)
+                await interaction.response.send_message(embed=embed, ephemeral=True)
 
         # error
         except Exception as e:
-            embed = discord.Embed(
+        
+            embed = embeds.OperationFailedEmbed(
                 title=f"Something went wrong",
-                description=e,
-                color=self.bot.errorColor
+                description=e
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
 

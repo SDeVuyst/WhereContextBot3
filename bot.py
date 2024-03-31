@@ -15,6 +15,8 @@ import psycopg2
 import time
 import discord
 import requests
+from bs4 import BeautifulSoup
+
 from discord.ext import tasks
 from discord.ext.commands import AutoShardedBot
 from discord import Webhook
