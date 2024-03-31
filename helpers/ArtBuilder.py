@@ -80,19 +80,16 @@ class LeaderboardBuilder:
             
             output = bg.copy()
 
-            output.paste(frame, (remaining_width//2, output.height - frame.height - 50), frame.convert("LA"))
-
-            # create object for drawing
+            # add title
             draw = ImageDraw.Draw(output)
-
             # draw title
             draw.text(
-                (1330, 250),
+                (1330, 255),
                 text=command,
                 align='center', font=fontb, anchor='mm', fill=(255, 104, 1)
             )
-            del draw
 
+            output.paste(frame, (remaining_width//2, output.height - frame.height - 50), frame.convert("LA"))
             frames.append(output)
 
 
@@ -129,21 +126,21 @@ class LeaderboardBuilder:
             count = human_format(count)
             
             # profile picture
-            pfp_url = URLS.get(str(user.id), str(user.display_avatar.url))
-            pfp = Image.open(requests.get(pfp_url, stream=True).raw)
-            pfp = pfp.resize((240, 240))
-            bg.paste(pfp, (530, 330 + i*342))
+            pfp_url = self.get_pfp_url(user)            
+            pfp = Image.open(pfp_url)
+            pfp = pfp.resize((245, 245))
+            bg.paste(pfp, (515, 182 + i*345))
 
             # username
             name = user.display_name if len(user.display_name) <= 16 else user.display_name[:13] + '...'
             draw.text(
-                (1275, 430 + i*342), 
+                (1275, 300 + i*345), 
                 text=name, 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
             # count
             draw.text(
-                (2050, 440 + i*340), 
+                (2050, 300 + i*345), 
                 text=str(count), 
                 align='center', font=fontm, anchor='mm', fill=(255, 104, 1)
             )
@@ -161,6 +158,15 @@ class LeaderboardBuilder:
         return discord.File(buffer, 'leaderboardbottom.png')
     
     
+    def get_pfp_url(self, user):
+        # user has custom pfp
+        if os.path.exists(f"{BASE_LOCATION}{str(user.id)}/pfp.png"):
+            return f"{BASE_LOCATION}{str(user.id)}/pfp.png"
+
+        # use profile picture
+        my_res = requests.get(str(user.display_avatar.url))
+        return io.BytesIO(my_res.content)
+
 
 class CharacterBuilder:
     def __init__(self, bot):
