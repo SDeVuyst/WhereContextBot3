@@ -1148,7 +1148,7 @@ k
 
         
         # can only be triggered by the profile owner or an owner
-        is_possible = (interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        is_possible = (interaction.user.id == self.ban_starter.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
         
         # send message if usr cannot interact with button
         if not is_possible:
