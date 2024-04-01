@@ -648,9 +648,6 @@ class BanView(discord.ui.View):
                 f"🔨 You have been banned from {interaction.guild.name}!", user=self.user
             )
 
-            # increase ban count of loser
-            await db_manager.increment_or_add_ban_count(self.user.id, 1)
-
             banned_embed.add_field(
                 name="💡 Reason",
                 value=f"```{self.reason}```",
@@ -1089,9 +1086,6 @@ class BanTypeView(discord.ui.View):
 
         # ban the user
         await loser.ban(reason=self.reason, delete_message_days=0) 
-
-        # increment ban count of loser
-        await db_manager.increment_or_add_ban_count(loser.id, 1)
 
         # send ban message to loser
         banned_embed = embeds.DefaultEmbed(
