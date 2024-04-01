@@ -173,8 +173,7 @@ class General(commands.Cog, name="general"):
             user (discord.User): Which user to dm
             content (str): What to dm the user
         """
-        await interaction.response.defer()
-
+        
         # stuur dm naar gebruiker
         await user.send(content=content)
 
@@ -184,7 +183,7 @@ class General(commands.Cog, name="general"):
         await admin.send(content=f"{interaction.user.display_name} dm'd {user.display_name}: {content}")
         
         # stuur confirmatie
-        await interaction.followup.send(embed=embeds.OperationSucceededEmbed(
+        await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
             "Done!"
         ), ephemeral=True)
    
