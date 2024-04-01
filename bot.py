@@ -487,6 +487,11 @@ async def on_tree_error(interaction, error):
             emoji="⏲️"
         )
 
+        # send out response
+        if interaction.response.is_done():
+            return await interaction.followup.send(embed=embed, ephemeral=True)
+        return await interaction.response.send_message(embed=embed, ephemeral=True)
+
     elif isinstance(error, exceptions.UserBlacklisted):
         """
         The code here will only execute if the error is an instance of 'UserBlacklisted', which can occur when using
