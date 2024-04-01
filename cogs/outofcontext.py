@@ -270,7 +270,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         
         # alles oke
         embed = embeds.OperationSucceededEmbed(
-            title='Success!'
+            title='Success!',
             description="[Message]({message.jump_url}) has been added to the game"
         )
         embed.set_footer(
