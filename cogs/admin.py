@@ -411,7 +411,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.command(name="ban", description="Ban someone", extras={'cog': 'admin'})
     @app_commands.describe(user="Which user")
     @app_commands.describe(reason="Reason for the ban")
-    @app_commands.checks.cooldown(rate=1, per=4500, key=lambda i: (i.guild_id, i.user.id))
+    @app_commands.checks.cooldown(rate=1, per=2700, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
@@ -1099,7 +1099,7 @@ class BanTypeView(discord.ui.View):
 
         # add field to show you lost a 50/50
         banned_embed.add_field(
-            name="🪦 You have lost a 50/50",
+            name="🪦 You have lost a 65/35",
             value=f"```You lost to {winner}```",
             inline=False
         )
