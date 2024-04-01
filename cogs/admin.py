@@ -438,7 +438,7 @@ class Admin(commands.Cog, name="admin"):
         ban_explain_embed = embeds.DefaultEmbed("🔨 Pick your ban type")
         ban_explain_embed.add_field(
             name="🎰 Gamble",
-            value=f"This is a 65/35. Either you ({interaction.user.mention}) or {user.mention} are banned.",
+            value=f"This is a 50/50. Either you ({interaction.user.mention}) or {user.mention} are banned.",
             inline=True
         )
         ban_explain_embed.add_field(
@@ -996,7 +996,7 @@ class BanTypeView(discord.ui.View):
 
         # determine who to ban
         choices = [self.user, self.ban_starter]
-        loser = self.ban_starter if random.randint(0, 100) < 65 else self.user # 65/35 for starter to lose
+        loser = self.ban_starter if random.randint(0, 100) < 50 else self.user # 50/50 for starter to lose
         choices.remove(loser)
         winner = choices[0]
 
@@ -1099,7 +1099,7 @@ class BanTypeView(discord.ui.View):
 
         # add field to show you lost a 50/50
         banned_embed.add_field(
-            name="🪦 You have lost a 65/35",
+            name="🪦 You have lost a 50/50",
             value=f"```You lost to {winner}```",
             inline=False
         )
