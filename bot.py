@@ -48,7 +48,8 @@ FORTNITE_MAPS = {
 }
 
 WEBHOOK_URLS_FORTNITE = [
-    "https://discord.com/api/webhooks/1218834508703596554/p8SOyOe7jRZ8Ed0o5OzUQ5XuCqLznr4V1y4dqfowXvLT1RYqnlRtUZRBi-0623Fq6QcC"
+    "https://discord.com/api/webhooks/1218834508703596554/p8SOyOe7jRZ8Ed0o5OzUQ5XuCqLznr4V1y4dqfowXvLT1RYqnlRtUZRBi-0623Fq6QcC",
+    "https://discord.com/api/webhooks/1224272410854035496/YmJPolsS5LCo1EiH-cl9YM5wQ3Y5kk78ZpeIzoA2i-vM45ZSxSe6V2s7vYnIawdXx9fT"
 ]
 
 bot.loaded = set()
