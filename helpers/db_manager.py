@@ -1214,7 +1214,7 @@ async def get_current_win_streak_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, current_win_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                    "SELECT user_id, current_win_streak FROM bangamble ORDER BY current_win_streak DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -1230,7 +1230,7 @@ async def get_current_loss_streak_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, current_loss_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                    "SELECT user_id, current_loss_streak FROM bangamble ORDER BY current_loss_streak DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -1246,7 +1246,7 @@ async def get_highest_win_streak_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, highest_win_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                    "SELECT user_id, highest_win_streak FROM bangamble ORDER BY highest_win_streak DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -1262,7 +1262,7 @@ async def get_highest_loss_streak_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, highest_loss_streak FROM bangamble ORDER BY count DESC LIMIT 5"
+                    "SELECT user_id, highest_loss_streak FROM bangamble ORDER BY highest_loss_streak DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -1278,7 +1278,7 @@ async def get_ban_total_wins_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, total_wins FROM bangamble ORDER BY count DESC LIMIT 5"
+                    "SELECT user_id, total_wins FROM bangamble ORDER BY total_wins DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -1294,7 +1294,7 @@ async def get_ban_total_losses_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, total_losses FROM bangamble ORDER BY count DESC LIMIT 5"
+                    "SELECT user_id, total_losses FROM bangamble ORDER BY total_losses DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
