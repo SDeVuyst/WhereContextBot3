@@ -128,6 +128,9 @@ class LeaderboardBuilder:
             
             # get user info
             user_id, count = tuple(stat)
+            if user_id is None:
+                continue
+            
             user = self.bot.get_user(int(user_id))
             # normalize count
             count = human_format(count)

@@ -411,7 +411,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.command(name="ban", description="Ban someone", extras={'cog': 'admin'})
     @app_commands.describe(user="Which user")
     @app_commands.describe(reason="Reason for the ban")
-    @app_commands.checks.cooldown(rate=1, per=90, key=lambda i: (i.guild_id, i.user.id))
+    @app_commands.checks.cooldown(rate=1, per=4500, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
@@ -438,7 +438,7 @@ class Admin(commands.Cog, name="admin"):
         ban_explain_embed = embeds.DefaultEmbed("🔨 Pick your ban type")
         ban_explain_embed.add_field(
             name="🎰 Gamble",
-            value=f"This is a 50/50. Either you ({interaction.user.mention}) or {user.mention} are banned.",
+            value=f"This is a 65/35. Either you ({interaction.user.mention}) or {user.mention} are banned.",
             inline=True
         )
         ban_explain_embed.add_field(
@@ -996,7 +996,7 @@ class BanTypeView(discord.ui.View):
 
         # determine who to ban
         choices = [self.user, self.ban_starter]
-        loser = random.choice(choices)
+        loser = self.ban_starter if random.randint(0, 100) < 65 else self.user # 65/35 for starter to lose
         choices.remove(loser)
         winner = choices[0]
 
