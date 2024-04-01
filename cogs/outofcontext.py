@@ -271,7 +271,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         # alles oke
         embed = embeds.OperationSucceededEmbed(
             title='Success!',
-            description="[Message]({message.jump_url}) has been added to the game"
+            description=f"[Message]({message.jump_url}) has been added to the game"
         )
         embed.set_footer(
             text=f"There {'is' if total == 1 else 'are'} now {total} {'message' if total == 1 else 'messages'} in the game"
@@ -292,7 +292,7 @@ class OutOfContext(commands.Cog, name="outofcontext"):
         if not await db_manager.is_in_ooc(id):
             
             return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
-                "**{id}** is not in the game."
+                f"**{id}** is not in the game."
             ), delete_after=10, ephemeral=True)
         
         # verwijder bericht
