@@ -107,6 +107,9 @@ class Stats(commands.Cog, name="stats"):
         elif view.chosen_command == "ban_total_losses":
             command = "Ban Gamble - Total Losses"
 
+        elif view.chosen_command == "bancount":
+            command = "Bans"
+
         else:
             command = f'/{view.chosen_command}'
         
