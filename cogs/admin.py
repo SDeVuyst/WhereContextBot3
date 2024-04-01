@@ -1129,7 +1129,34 @@ class BanTypeView(discord.ui.View):
         view.message = message
 
 
+    async def interaction_check(self, interaction: discord.Interaction):
+        """Check that the user is the one who is clicking buttons
+k
+        Args:
+            interaction (discord.Interaction): Users Interaction
 
+        Returns:
+            bool
+        """
+        responses = [
+            f"<@{interaction.user.id}> shatap lil bro",
+            f"<@{interaction.user.id}> you are NOT him",
+            f"<@{interaction.user.id}> blud thinks he's funny",
+            f"<@{interaction.user.id}> imma touch you lil nigga",
+            f"<@{interaction.user.id}> it's on sight now",
+        ]
+
+        
+        # can only be triggered by the profile owner or an owner
+        is_possible = (interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        
+        # send message if usr cannot interact with button
+        if not is_possible:
+            await interaction.response.send_message(random.choice(responses))
+        
+        return is_possible
+    
+    
 
 class RolesSelect(discord.ui.Select):
     def __init__(self, user, all_roles, bot, view, autoroles):
@@ -1204,6 +1231,35 @@ class PosesSelectView(discord.ui.View):
         await interaction.edit_original_response(embed=embeds.OperationSucceededEmbed(
             "Saved active poses!"
         ), view=None, attachments=[])
+
+
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        """Check that the user is the one who is clicking buttons
+k
+        Args:
+            interaction (discord.Interaction): Users Interaction
+
+        Returns:
+            bool
+        """
+        responses = [
+            f"<@{interaction.user.id}> shatap lil bro",
+            f"<@{interaction.user.id}> you are NOT him",
+            f"<@{interaction.user.id}> blud thinks he's funny",
+            f"<@{interaction.user.id}> imma touch you lil nigga",
+            f"<@{interaction.user.id}> it's on sight now",
+        ]
+
+        
+        # can only be triggered by the profile owner or an owner
+        is_possible = (interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
+        
+        # send message if usr cannot interact with button
+        if not is_possible:
+            await interaction.response.send_message(random.choice(responses))
+        
+        return is_possible
 
            
 
