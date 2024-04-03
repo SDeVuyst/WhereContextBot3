@@ -415,10 +415,17 @@ async def on_member_join(member):
         bot.logger.info(f"Added autoroles")
         description += f"You got your roles back!"
 
-    # send welcome to user
-    await member.send(embed=embeds.DefaultEmbed(
+    embed = embeds.DefaultEmbed(
         f"Welcome to {member.guild.name}!", description
-    ))
+    )
+
+    try:
+        embed.set_thumbnail(member.guild_avatar.url)
+    except:
+        pass
+
+    # send welcome to user
+    await member.send(embed=embed)
     
         
 
