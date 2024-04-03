@@ -740,7 +740,12 @@ class UnbanDropdown(discord.ui.Select):
 
         await guild.unban(user)
 
-        await interaction.message.edit(embed=embeds.OperationSucceededEmbed(
+        guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
+        channel = await guild.fetch_channel(int(os.environ.get("CHANNEL")))
+
+        link = await channel.create_invite(max_age = 0, max_uses = 1)
+
+        await interaction.message.edit(link, embed=embeds.OperationSucceededEmbed(
             "Done", f"{user} is now unbanned!", user=user
         ), view=None)
 
