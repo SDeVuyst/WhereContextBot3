@@ -400,6 +400,16 @@ async def on_member_join(member):
 
     # autoroles
     roles_to_add = await db_manager.get_autoroles(member.guild.id, member.id)
+    
+    # add default member role
+    if str(member.guild.id) == str(os.environ.get("GUILD_ID")):
+        if roles_to_add in [None, -1]:
+            roles_to_add = []
+            roles_to_add.append([os.environ.get("MEMBER_ROLE_ID")])
+            
+        else:
+            roles_to_add[0].append(os.environ.get("MEMBER_ROLE_ID"))
+
     if roles_to_add not in [None, -1]:
         
         roles_to_add = [int(role_id) for role_id in roles_to_add[0]]
@@ -420,7 +430,7 @@ async def on_member_join(member):
     )
 
     try:
-        embed.set_thumbnail(member.guild_avatar.url)
+        embed.set_thumbnail(member.guild.icon.url)
     except:
         pass
 
