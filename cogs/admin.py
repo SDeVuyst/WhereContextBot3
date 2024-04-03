@@ -745,7 +745,7 @@ class UnbanDropdown(discord.ui.Select):
 
         link = await channel.create_invite(max_age = 0, max_uses = 1)
 
-        await interaction.message.edit(link, embed=embeds.OperationSucceededEmbed(
+        await interaction.message.edit(content=link, embed=embeds.OperationSucceededEmbed(
             "Done", f"{user} is now unbanned!", user=user
         ), view=None)
 
