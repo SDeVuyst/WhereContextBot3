@@ -1048,7 +1048,7 @@ async def get_ban_kd_ratio(user_id) -> list:
     try:
         wins = await get_ban_total_wins(user_id)
         losses = await get_ban_total_losses(user_id)
-        ratio = wins/losses
+        ratio = wins[0][0]/losses[0][0]
         return [[f'{ratio:.2f}']]
             
     except Exception as err:
