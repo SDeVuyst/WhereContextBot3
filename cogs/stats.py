@@ -328,7 +328,7 @@ class Stats(commands.Cog, name="stats"):
         
         for title, count in counts:
 
-            if len(count) != 0 and int(count[0][0]) != 0:
+            if len(count) != 0 and int(float(count[0][0])) != 0:
                 embed.add_field(
                     name=title,
                     value=f"```{count[0][0]}```",
@@ -435,7 +435,7 @@ class CommandSelect(Select):
                 commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
             else:
                 commands.append(("Ban Gamble - Statistics", "ban_gamble_all"))
-    
+
         super().__init__(
             placeholder="Pick a feature", 
             options=[SelectOption(label=label, value=value) for label, value in commands]
