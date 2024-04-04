@@ -213,7 +213,7 @@ class Stats(commands.Cog, name="stats"):
             count = await db_manager.get_ban_count(user.id)
         
         elif command == "ban_gamble_all":
-            return await self.get_embed_ban_gamble_all(user.id)
+            return await self.get_embed_ban_gamble_all(user)
         
         elif command == "current_win_streak":
             count = await db_manager.get_current_win_streak(user.id)
