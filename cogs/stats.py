@@ -427,7 +427,7 @@ class CommandSelect(Select):
                 commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))
                 commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
             else:
-                commands.append("Ban Gamble - Statistics", "ban_gamble_all")
+                commands.append(("Ban Gamble - Statistics", "ban_gamble_all"))
 
         super().__init__(
             placeholder="Pick a feature", 
