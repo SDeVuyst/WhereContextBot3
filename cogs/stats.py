@@ -329,10 +329,12 @@ class Stats(commands.Cog, name="stats"):
         for title, count in counts:
 
             if len(count) != 0 and int(float(count[0][0])) != 0:
-                embed.add_field(
+                embed = embed.add_field(
                     name=title,
                     value=f"```{count[0][0]}```",
                 )
+            else:
+                self.bot.logger.info(f"could not add field {title}: {count}")
 
 
         return embed
