@@ -55,6 +55,9 @@ class Stats(commands.Cog, name="stats"):
         elif view.chosen_command == "bancount":
             leaderb = await db_manager.get_ban_leaderboard()
 
+        elif view.chosen_command == "ban_gamble_ratio":
+            leaderb = await db_manager.get_ratio_leaderboard()
+
         elif view.chosen_command == "current_win_streak":
             leaderb = await db_manager.get_current_win_streak_leaderboard()
 
@@ -88,6 +91,9 @@ class Stats(commands.Cog, name="stats"):
             return await interaction.edit_original_response(embed=embeds.OperationFailedEmbed(
                 "Something went wrong...", leaderb[1]
             ), view=None)
+
+        elif view.chosen_command == "ban_gamble_ratio":
+            command = "Ban Gamble - Ratio"
 
         elif view.chosen_command == "current_win_streak":
             command = "Ban Gamble - Current Win Streak"
@@ -314,18 +320,18 @@ class Stats(commands.Cog, name="stats"):
         counts = []
         counts.append(("🏆 Total wins", await db_manager.get_ban_total_wins(user.id))) 
         counts.append(("😔 Total losses", await db_manager.get_ban_total_losses(user.id))) 
+        counts.append(("☯️ K/D ratio", await db_manager.get_ban_kd_ratio(user.id)))
         counts.append(("📈 Highest win streak", await db_manager.get_highest_win_streak(user.id)))
         counts.append(("📉 Highest loss streak", await db_manager.get_highest_loss_streak(user.id))) 
         counts.append(("🏅 Current win streak", await db_manager.get_current_win_streak(user.id)))
         counts.append(("😓 Current loss streak", await db_manager.get_current_loss_streak(user.id)))
-
+        
         for title, count in counts:
 
             if len(count) != 0 and int(count[0][0]) != 0:
                 embed.add_field(
                     name=title,
                     value=f"```{count[0][0]}```",
-                    inline=True
                 )
 
 
@@ -422,6 +428,7 @@ class CommandSelect(Select):
             if self.is_leaderboard:
                 commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
                 commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
+                commands.append(("Ban Gamble - Ratio", "ban_gamble_ratio"))
                 commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
                 commands.append(("Ban Gamble - Highest Loss Streak", "highest_loss_streak"))
                 commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))

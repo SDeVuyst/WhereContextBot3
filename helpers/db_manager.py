@@ -1043,6 +1043,18 @@ async def get_highest_loss_streak(user_id) -> list:
         return [-1, err]
     
 
+async def get_ban_kd_ratio(user_id) -> list:
+    
+    try:
+        wins = await get_ban_total_wins(user_id)
+        losses = await get_ban_total_losses(user_id)
+        ratio = wins/losses
+        return [[f'{ratio:.2f}']]
+            
+    except Exception as err:
+        return [-1, err]
+    
+
 async def get_ban_total_wins(user_id) -> list:
     try:
         with psycopg2.connect(
@@ -1215,6 +1227,22 @@ async def get_current_win_streak_leaderboard() -> list:
             with con.cursor() as cursor:
                 cursor.execute(
                     "SELECT user_id, current_win_streak FROM bangamble ORDER BY current_win_streak DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_ratio_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, round(total_wins*1./ NULLIF(total_losses,0), 2) as ratio FROM bangamble WHERE total_losses != 0 ORDER BY total_wins*1./NULLIF(total_losses,0) DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
