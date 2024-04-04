@@ -307,7 +307,7 @@ class Stats(commands.Cog, name="stats"):
         )
 
 
-    async def get_embed_ban_gamble_all(user):
+    async def get_embed_ban_gamble_all(self, user):
         embed = embeds.DefaultEmbed(
             "📊 Ban Gamble Statistic", user=user
         )
