@@ -42,7 +42,7 @@ class Stats(commands.Cog, name="stats"):
         """
         await interaction.response.defer()
 
-        view = CommandView(self.bot)
+        view = CommandView(self.bot, is_leaderboard=True)
         first_message = await interaction.followup.send(view=view)
 
         second_message = await interaction.channel.send('** **')
@@ -142,7 +142,7 @@ class Stats(commands.Cog, name="stats"):
             user = interaction.user
 
         # send view to get chosen command
-        view = CommandView(self.bot)
+        view = CommandView(self.bot, is_leaderboard=False)
         await interaction.response.send_message(view=view)
         await view.wait()
 
@@ -211,6 +211,9 @@ class Stats(commands.Cog, name="stats"):
         """
         if command == "bancount":
             count = await db_manager.get_ban_count(user.id)
+        
+        elif command == "ban_gamble_all":
+            return await self.get_embed_ban_gamble_all(user.id)
         
         elif command == "current_win_streak":
             count = await db_manager.get_current_win_streak(user.id)
@@ -304,11 +307,38 @@ class Stats(commands.Cog, name="stats"):
         )
 
 
+    async def get_embed_ban_gamble_all(user):
+        embed = embeds.DefaultEmbed(
+            "📊 Ban Gamble Statistic", user=user
+        )
+        counts = []
+        counts.append(("🏆 Total wins", await db_manager.get_ban_total_wins(user.id))) 
+        counts.append(("😔 Total losses", await db_manager.get_ban_total_losses(user.id))) 
+        counts.append(("📈 Highest win streak", await db_manager.get_highest_win_streak(user.id)))
+        counts.append(("📉 Highest loss streak", await db_manager.get_highest_loss_streak(user.id))) 
+        counts.append(("🏅 Current win streak", await db_manager.get_current_win_streak(user.id)))
+        counts.append(("😓 Current loss streak", await db_manager.get_current_loss_streak(user.id)))
+
+        for title, count in counts:
+
+            if len(count) != 0 and int(count[0][0]) != 0:
+                embed.add_field(
+                    name=title,
+                    value=f"```{count[0][0]}```",
+                    inline=True
+                )
+
+
+        return embed
+
+
+
 
 class CommandView(View):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot, is_leaderboard) -> None:
         super().__init__(timeout=60)
         self.bot = bot
+        self.is_leaderboard = is_leaderboard
         self.feature_selector = None
 
     chosen_command = None
@@ -339,7 +369,7 @@ class CommandView(View):
         }
         # self.children[0].disabled = True
         self.children[0].placeholder = formatted[select_item.values[0]]
-        command_select = CommandSelect(self.bot, select_item.values[0])
+        command_select = CommandSelect(self.bot, select_item.values[0], self.is_leaderboard)
 
         # remove previous selected feature selector if necessary
         if self.feature_selector is not None:
@@ -369,7 +399,10 @@ class CommandView(View):
 
 
 class CommandSelect(Select):
-    def __init__(self, bot, selected_cog):
+    def __init__(self, bot, selected_cog, is_leaderboard):
+
+        self.is_leaderboard = is_leaderboard
+
         commands = []
         for y in bot.tree.walk_commands():
             if y.extras.get('cog') == selected_cog:
@@ -385,12 +418,16 @@ class CommandSelect(Select):
         
         elif selected_cog == "stats":
             commands.insert(0, ("Bans", "bancount"))
-            commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
-            commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
-            commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
-            commands.append(("Ban Gamble - Highest Loss Streak", "highest_loss_streak"))
-            commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))
-            commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
+
+            if self.is_leaderboard:
+                commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
+                commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
+                commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
+                commands.append(("Ban Gamble - Highest Loss Streak", "highest_loss_streak"))
+                commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))
+                commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
+            else:
+                commands.append("Ban Gamble - Statistics", "ban_gamble_all")
 
         super().__init__(
             placeholder="Pick a feature", 
