@@ -328,7 +328,7 @@ class Stats(commands.Cog, name="stats"):
         
         for title, count in counts:
 
-            if len(count) != 0 and int(float(count[0][0])) != 0:
+            if len(count) != 0 and int(float(count[0][0])) != -1:
                 embed = embed.add_field(
                     name=title,
                     value=f"```{count[0][0]}```",
