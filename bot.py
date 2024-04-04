@@ -201,9 +201,9 @@ async def check_gif_unban():
     ok_list = []
     for user, t in bot.gif_prohibited:
 
-        # not longer than 1 hour ago
+        # not longer than 15 minutes ago
         time_diff = datetime.now() - t
-        if time_diff.total_seconds() < 3600:
+        if time_diff.total_seconds() < 900:
             ok_list.append((user, t))
     
     bot.gif_prohibited = ok_list

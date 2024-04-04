@@ -59,8 +59,8 @@ class Admin(commands.Cog, name="admin"):
 
 
 
-    @app_commands.command(name="gifban", description="Prevent a user from using gifs for 1 hour", extras={'cog': 'admin'})
-    @app_commands.checks.cooldown(rate=1, per=30, key=lambda i: (i.guild_id, i.user.id)) # 1 per 30 sec
+    @app_commands.command(name="gifban", description="Prevent a user from using gifs for 15 minutes", extras={'cog': 'admin'})
+    @app_commands.checks.cooldown(rate=1, per=1200, key=lambda i: (i.user.id))
     @checks.not_blacklisted()   
     @checks.not_in_dm()
     @app_commands.describe(user="Who to block")
