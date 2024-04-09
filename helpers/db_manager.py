@@ -1248,6 +1248,22 @@ async def get_ratio_leaderboard() -> list:
             
     except Exception as err:
         return [-1, err]
+    
+
+async def get_ratio_leaderboard_desc() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, round(total_wins*1./ NULLIF(total_losses,0), 2) as ratio FROM bangamble WHERE total_losses != 0 ORDER BY total_wins*1./NULLIF(total_losses,0) ASC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
 
 
 async def get_current_loss_streak_leaderboard() -> list:

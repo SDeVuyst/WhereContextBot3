@@ -58,6 +58,9 @@ class Stats(commands.Cog, name="stats"):
         elif view.chosen_command == "ban_gamble_ratio":
             leaderb = await db_manager.get_ratio_leaderboard()
 
+        elif view.chosen_command == "ban_gamble_ratio_desc":
+            leaderb = await db_manager.get_ratio_leaderboard_desc()
+
         elif view.chosen_command == "current_win_streak":
             leaderb = await db_manager.get_current_win_streak_leaderboard()
 
@@ -94,6 +97,9 @@ class Stats(commands.Cog, name="stats"):
 
         elif view.chosen_command == "ban_gamble_ratio":
             command = "Ban Gamble - Ratio"
+
+        elif view.chosen_command == "ban_gamble_ratio_desc":
+            command = "Ban Gamble - Ratio Losers"
 
         elif view.chosen_command == "current_win_streak":
             command = "Ban Gamble - Current Win Streak"
@@ -431,6 +437,7 @@ class CommandSelect(Select):
                 commands.append(("Ban Gamble - Current Win Streak", "current_win_streak"))
                 commands.append(("Ban Gamble - Current Loss Streak", "current_loss_streak"))
                 commands.append(("Ban Gamble - Ratio", "ban_gamble_ratio"))
+                commands.append(("Ban Gamble - Ratio Losers", "ban_gamble_ratio_desc"))
                 commands.append(("Ban Gamble - Highest Win Streak", "highest_win_streak"))
                 commands.append(("Ban Gamble - Highest Loss Streak", "highest_loss_streak"))
                 commands.append(("Ban Gamble - Total Wins", "ban_total_wins"))
