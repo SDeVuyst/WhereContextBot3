@@ -337,7 +337,7 @@ class General(commands.Cog, name="general"):
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Generate a concise, professional summary of the following conversation. Be specific about the subjects of conversation. Also include who took part in the conversation and what they said."},
+                {"role": "system", "content": "Generate a concise, professional summary of the following conversation. Be specific about the subjects of conversation. Also include who took part in the conversation and what they said. Your summary should be 50-100 words in length, but can be longer if needed."},
                 {"role": "user", "content": messages_str},
             ],
 
