@@ -162,6 +162,7 @@ async def on_ready() -> None:
         check_fortnite_player_peak.start()
         status_task.start()
         check_remindme.start()
+        check_gif_unban.start()
 
     except Exception as e:
         bot.logger.warning(e)
