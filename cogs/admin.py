@@ -414,6 +414,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.checks.cooldown(rate=1, per=2700, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
+    @checks.in_correct_server()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
         """Ban someone
 
@@ -483,6 +484,7 @@ class Admin(commands.Cog, name="admin"):
         extras={'cog': 'admin'}
     )
     @checks.not_blacklisted()
+    @checks.not_in_dm()
     @app_commands.describe(user="Which user")
     @app_commands.describe(nickname="What nickname")
     async def nickname(self, interaction, user: discord.User, nickname: app_commands.Range[str, 1, 32]) -> None:
