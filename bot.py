@@ -289,15 +289,18 @@ async def check_quote_send():
                 )
                 embed.set_author(name=data["author"])
                 
+                logger.info(f"sending quote: {data['quote']}")
+
                 # stuur embed 
-                channel = bot.get_channel(os.environ.get("PHILOSOPHY_CHANNEL"))
+                channel = bot.get_channel(int(os.environ.get("PHILOSOPHY_CHANNEL")))
                 await channel.send(embed=embed)
 
             else:
+                bot.quote_gestuurd  = False
                 logger.error("Error:", response.status_code, response.text)
 
-        except:
-            logger.error("Something went wrong! Try Again!")
+        except Exception as e:
+            logger.error(f"Something went wrong! Try Again! {e}")
         
     elif datetime.now().hour > 8:
         bot.quote_gestuurd = False
