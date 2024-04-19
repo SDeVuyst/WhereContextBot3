@@ -58,6 +58,8 @@ bot.unloaded = set()
 bot.status_manual = None
 bot.gif_prohibited = []
 
+bot.quote_gestuurd = False
+
 def save_ids_func(cmds):
     """Saves the ids of commands
 
@@ -163,6 +165,7 @@ async def on_ready() -> None:
         status_task.start()
         check_remindme.start()
         check_gif_unban.start()
+        check_quote_send.start()
 
     except Exception as e:
         bot.logger.warning(e)
@@ -268,6 +271,36 @@ async def check_fortnite_player_peak():
                     webhook = Webhook.from_url(webhook_url, session=session)
                     await webhook.send(embed=embed)
 
+
+@tasks.loop(seconds=60)
+async def check_quote_send():
+    if (datetime.now().hour == 10 and not bot.quote_gestuurd):
+        bot.quote_gestuurd = True
+
+        try:
+            categoryies = ['happiness', 'alone', 'anger', 'attitude', 'change', 'communication', 'courage', 'equality', 'friendship', 'inspirational', '']
+            api_url = 'https://api.api-ninjas.com/v1/quotes?category={}'.format(random.choice(categoryies))
+            response = requests.get(api_url, headers={'X-Api-Key': os.environ.get('API_NINJAS_KEY')})
+            if response.status_code == requests.codes.ok:
+                data = response.json()[0]
+                embed = embeds.DefaultEmbed(
+                    data['quote'], 
+                    f"💭 Category: {data['category']}"
+                )
+                embed.set_author(name=data["author"])
+                
+                # stuur embed 
+                channel = bot.get_channel(os.environ.get("PHILOSOPHY_CHANNEL"))
+                await channel.send(embed=embed)
+
+            else:
+                logger.error("Error:", response.status_code, response.text)
+
+        except:
+            logger.error("Something went wrong! Try Again!")
+        
+    elif datetime.now().hour > 10:
+        bot.quote_gestuurd = False
 
 
 @bot.event
