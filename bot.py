@@ -274,7 +274,7 @@ async def check_fortnite_player_peak():
 
 @tasks.loop(seconds=60)
 async def check_quote_send():
-    if (datetime.now().hour == 10 and not bot.quote_gestuurd):
+    if (datetime.now().hour == 8 and not bot.quote_gestuurd):
         bot.quote_gestuurd = True
 
         try:
@@ -299,7 +299,7 @@ async def check_quote_send():
         except:
             logger.error("Something went wrong! Try Again!")
         
-    elif datetime.now().hour > 10:
+    elif datetime.now().hour > 8:
         bot.quote_gestuurd = False
 
 
