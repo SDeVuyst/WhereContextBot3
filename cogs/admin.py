@@ -414,6 +414,7 @@ class Admin(commands.Cog, name="admin"):
     @app_commands.checks.cooldown(rate=1, per=2700, key=lambda i: (i.guild_id, i.user.id))
     @checks.not_in_dm()
     @checks.not_blacklisted()
+    @checks.in_audio_command_channel()
     @checks.in_correct_server()
     async def ban(self, interaction, user: discord.Member, reason: str) -> None:
         """Ban someone
