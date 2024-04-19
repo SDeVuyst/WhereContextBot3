@@ -51,7 +51,7 @@ def in_audio_command_channel() -> Callable[[T], T]:
             return True
         
         if interaction.channel.id not in [1114464141508345906, 727511733970665493]:
-            raise WrongChannel("Only able to play in #out-of-context-game or #music-bot")
+            raise WrongChannel("Only able to play in #wcb3-spam or #music-bot")
         return True
     
     return app_commands.check(predicate)
