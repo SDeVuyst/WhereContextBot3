@@ -278,7 +278,7 @@ async def check_quote_send():
         bot.quote_gestuurd = True
 
         try:
-            categoryies = ['happiness', 'alone', 'anger', 'attitude', 'change', 'communication', 'courage', 'equality', 'friendship', 'inspirational', '']
+            categoryies = ['happiness', 'alone', 'anger', 'change', 'courage', 'friendship', 'inspirational']
             api_url = 'https://api.api-ninjas.com/v1/quotes?category={}'.format(random.choice(categoryies))
             response = requests.get(api_url, headers={'X-Api-Key': os.environ.get('API_NINJAS_KEY')})
             if response.status_code == requests.codes.ok:
