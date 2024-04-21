@@ -285,7 +285,7 @@ async def check_quote_send():
                 data = response.json()[0]
                 embed = embeds.DefaultEmbed(
                     data['quote'], 
-                    f"💭 Category: {data['category']}"
+                    # f"💭 Category: {data['category']}"
                 )
                 embed.set_author(name=data["author"])
                 
