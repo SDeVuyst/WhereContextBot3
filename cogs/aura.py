@@ -87,7 +87,7 @@ class AuraView(discord.ui.View):
             )
             offset = (page-1) * L
 
-            events = db_manager.get_all_aura_events(self.user.id)
+            events = await db_manager.get_all_aura_events(self.user.id)
 
             # error
             if events[0] == -1:
