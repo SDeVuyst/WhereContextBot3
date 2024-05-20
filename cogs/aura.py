@@ -41,7 +41,7 @@ class Aura(commands.Cog, name="aura"):
             user=user
         )
 
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed, view=AuraView(self.bot, user))
 
 
     @app_commands.command(name="aura-event", description=f"Add an aura event to a person", extras={'cog': 'aura'})
@@ -66,7 +66,7 @@ class Aura(commands.Cog, name="aura"):
             f"There are {total} aura events saved."
         )
 
-        await interaction.followup.send(embed=embed, view=AuraView(self.bot, user))
+        await interaction.followup.send(embed=embed)
 
 
     
