@@ -69,3 +69,12 @@ CREATE TABLE IF NOT EXISTS bangamble (
   total_wins INTEGER DEFAULT 0,
   total_losses INTEGER DEFAULT 0
 );
+
+
+CREATE TABLE IF NOT EXISTS aura_event (
+  id SERIAL PRIMARY KEY,
+  user_id varchar(20) NOT NULL,
+  amount BIGINT NOT NULL DEFAULT 0
+  reason varchar(200)
+  date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+);

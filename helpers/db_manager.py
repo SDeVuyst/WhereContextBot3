@@ -1344,3 +1344,60 @@ async def get_ban_total_losses_leaderboard() -> list:
             
     except Exception as err:
         return [-1, err]
+    
+
+async def get_total_aura(user_id: int) -> int:
+
+    with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+        
+        try:
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT SUM(amount) FROM aura_event WHERE user_id=%s", (str(user_id),)
+                )
+                result = cursor.fetchone()
+                if len(result) > 1: return 0
+                return result[0]
+            
+        # Als er iets misgaat, geven we geen toegang tot de bot
+        except Exception as e:
+            print(e)
+            return 0
+        
+
+async def get_all_aura_events(user_id) -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT amount, reason, date FROM aura_event WHERE user_id=%s ORDER BY date", (str(user_id),)
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+
+
+async def add_aura_event(user_id: str, amount, description) -> int:
+
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute("INSERT INTO aura_event(user_id, amount, reason) VALUES (%s, %s, %s)", (str(user_id), amount, description))
+                con.commit()
+                cursor.execute("SELECT COUNT(*) FROM aura_event")
+                result = cursor.fetchone()
+                return result[0] if result is not None else 0
+            
+    except:
+        return -1
