@@ -46,6 +46,7 @@ class Aura(commands.Cog, name="aura"):
 
     @app_commands.command(name="aura-event", description=f"Add an aura event to a person", extras={'cog': 'aura'})
     @checks.not_blacklisted()
+@checks.is_owner()
     async def aura_event(self, interaction, amount: int, description: str, user: discord.User = None) -> None:
 
         await interaction.response.defer()
@@ -65,12 +66,12 @@ class Aura(commands.Cog, name="aura"):
             f"There are {total} aura events saved."
         )
 
-        await interaction.followup.send(embed=embed)
+        await interaction.followup.send(embed=embed, view=AuraView(self.bot, user))
 
 
     
 class AuraView(discord.ui.View):
-    def __init__(self, bot, embed, user):
+    def __init__(self, bot, user):
         self.bot = bot
         self.user = user
         super().__init__(timeout=500)
