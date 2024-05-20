@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS bangamble (
 CREATE TABLE IF NOT EXISTS aura_event (
   id SERIAL PRIMARY KEY,
   user_id varchar(20) NOT NULL,
-  amount BIGINT NOT NULL DEFAULT 0
-  reason varchar(200)
+  amount BIGINT NOT NULL DEFAULT 0,
+  reason varchar(200),
   date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
