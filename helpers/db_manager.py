@@ -1401,3 +1401,34 @@ async def add_aura_event(user_id: str, amount, description) -> int:
             
     except:
         return -1
+    
+async def get_aura_leaderboard() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, amount FROM aura_event ORDER BY amount DESC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]
+    
+
+async def get_aura_leaderboard_bottom() -> list:
+    try:
+        with psycopg2.connect(
+        host='wcb3_postgres', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+    ) as con:
+            
+            with con.cursor() as cursor:
+                cursor.execute(
+                    "SELECT user_id, amount FROM aura_event ORDER BY amount ASC LIMIT 5"
+                )
+                return cursor.fetchall()
+            
+    except Exception as err:
+        return [-1, err]

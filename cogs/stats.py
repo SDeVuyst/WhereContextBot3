@@ -79,6 +79,12 @@ class Stats(commands.Cog, name="stats"):
         elif view.chosen_command == "ban_total_losses":
             leaderb = await db_manager.get_ban_total_losses_leaderboard()
 
+        elif view.chosen_command == "aura_leaderboard_top":
+            leaderb = await db_manager.get_aura_leaderboard()
+        
+        elif view.chosen_command == "aura_leaderboard_bottom":
+            leaderb = await db_manager.get_aura_leaderboard_bottom()
+
         else:
             # krijg count bericht uit db
             leaderb = await db_manager.get_leaderboard(view.chosen_command)
@@ -121,6 +127,12 @@ class Stats(commands.Cog, name="stats"):
 
         elif view.chosen_command == "bancount":
             command = "Bans"
+
+        elif view.chosen_command == "aura_leaderboard_top":
+            command = "Total Aura (Top)"
+        
+        elif view.chosen_command == "aura_leaderboard_bottom":
+            command = "Total Aura (Bottom)"
 
         else:
             command = f'/{view.chosen_command}'
@@ -364,7 +376,8 @@ class CommandView(View):
             SelectOption(label="General", emoji="🤖", value="general"),
             SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
-            SelectOption(label="Admin", emoji="👨‍🔧", value="admin")
+            SelectOption(label="Admin", emoji="👨‍🔧", value="admin"),
+            SelectOption(label="Aura", emoji="💥", value="aura")
         ]     
     )
     async def select_cog(self, interaction: Interaction, select_item : Select):
@@ -379,7 +392,8 @@ class CommandView(View):
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
-            "admin": "👨‍🔧 Admin"
+            "admin": "👨‍🔧 Admin",
+            "aura": "💥 Aura"
         }
         # self.children[0].disabled = True
         self.children[0].placeholder = formatted[select_item.values[0]]
@@ -444,6 +458,12 @@ class CommandSelect(Select):
                 commands.append(("Ban Gamble - Total Losses", "ban_total_losses"))
             else:
                 commands.append(("Ban Gamble - Statistics", "ban_gamble_all"))
+
+        elif selected_cog == "aura":
+            if self.is_leaderboard:
+                commands.append(("Top Aura", "aura_leaderboard_top"))
+                commands.append(("Bottom Aura", "aura_leaderboard_bottom"))
+
 
         super().__init__(
             placeholder="Pick a feature", 
