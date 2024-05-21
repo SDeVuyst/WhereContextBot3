@@ -63,7 +63,7 @@ class Aura(commands.Cog, name="aura"):
         
         embed = embeds.OperationSucceededEmbed(
             f"💥 Aura event added!",
-            f"There are {total} aura events saved."
+            f"{'+' if amount > 0 else ''}{amount} • {description}"
         )
 
         await interaction.followup.send(embed=embed)
@@ -83,6 +83,7 @@ class AuraView(discord.ui.View):
             L = 5 # elements per page
             embed = embeds.DefaultEmbed(
                 f"💥 Aura Events of {self.user.display_name}",
+                " ",
                 user=self.user
             )
             offset = (page-1) * L
