@@ -63,7 +63,7 @@ class Aura(commands.Cog, name="aura"):
         
         embed = embeds.OperationSucceededEmbed(
             f"💥 Aura event added!",
-            f"{'+' if amount > 0 else ''}{amount} • {description}"
+            f"{user.mention}: {'+' if amount > 0 else ''}{amount} • {description}"
         )
 
         await interaction.followup.send(embed=embed)
