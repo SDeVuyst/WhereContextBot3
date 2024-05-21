@@ -95,9 +95,7 @@ class AuraView(discord.ui.View):
                 events = []
 
             for event in events[offset:offset+L]:
-                embed.description += f"""
-                    {'+' if event[0] > 0 else ''}{event[0]} • {event[1]}\n
-                """
+                embed.description += f"{'+' if event[0] > 0 else ''}{event[0]} • {event[1]}\n"
 
             n = pagination.Pagination.compute_total_pages(len(events), L)
             embed.set_footer(text=f"Page {page} from {n}")
