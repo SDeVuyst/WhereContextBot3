@@ -47,13 +47,9 @@ class Aura(commands.Cog, name="aura"):
     @app_commands.command(name="aura-event", description=f"Add an aura event to a person", extras={'cog': 'aura'})
     @checks.not_blacklisted()
     @checks.is_owner()
-    async def aura_event(self, interaction, amount: int, description: str, user: discord.User = None) -> None:
+    async def aura_event(self, interaction, amount: int, description: str, user: discord.User) -> None:
 
         await interaction.response.defer()
-
-        # geen gebruiker meegegeven, gaat over zichzelf
-        if user is None:
-            user = interaction.user
 
         total = await db_manager.add_aura_event(str(user.id), amount, description)
 
