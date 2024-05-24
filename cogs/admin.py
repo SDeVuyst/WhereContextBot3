@@ -772,6 +772,10 @@ class ConfigureView(discord.ui.View):
 
     @discord.ui.button(label="Set default nickname", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_nickname(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        if not ((interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))):
+            return interaction.response.send_message('nerd')
+        
         # send modal
         modal = AddNicknameModal(self)
         await interaction.response.send_modal(modal)
@@ -868,32 +872,6 @@ class ConfigureView(discord.ui.View):
             builder.async_set_all_poses_image(loop, self.user.id, message)
         )
 
-    async def interaction_check(self, interaction: discord.Interaction):
-        """Check that the user is the one who is clicking buttons
-k
-        Args:
-            interaction (discord.Interaction): Users Interaction
-
-        Returns:
-            bool
-        """
-        responses = [
-            f"<@{interaction.user.id}> shatap lil bro",
-            f"<@{interaction.user.id}> you are NOT him",
-            f"<@{interaction.user.id}> blud thinks he's funny",
-            f"<@{interaction.user.id}> imma touch you lil nigga",
-            f"<@{interaction.user.id}> it's on sight now",
-        ]
-
-        
-        # can only be triggered by the profile owner or an owner
-        is_possible = (interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))
-        
-        # send message if usr cannot interact with button
-        if not is_possible:
-            await interaction.response.send_message(random.choice(responses))
-        
-        return is_possible
     
 
 class AddNicknameModal(discord.ui.Modal, title='Set default nickname'):
