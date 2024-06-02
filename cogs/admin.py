@@ -487,7 +487,7 @@ class Admin(commands.Cog, name="admin"):
     @checks.not_in_dm()
     @app_commands.describe(user="Which user")
     @app_commands.describe(nickname="What nickname")
-    async def nickname(self, interaction, user: discord.User, nickname: app_commands.Range[str, 1, 32]) -> None:
+    async def nickname(self, interaction, user: discord.Member, nickname: app_commands.Range[str, 1, 32]) -> None:
         """Set the nickname of a user
 
         Args:
@@ -495,6 +495,16 @@ class Admin(commands.Cog, name="admin"):
             user (discord.User): Which user
             nickname (str): what nickname
         """
+
+        if user.id == interaction.user.id:
+            await db_manager.add_aura_event(str(user.id), -100, "eigen nickname aangepast :nerd:")
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
+                "blud tried to change own nickname",
+                "-100 aura",
+                "😭",
+                user=user
+            ))
+
         # edit nickname
         await user.edit(nick=nickname)
         
@@ -773,7 +783,7 @@ class ConfigureView(discord.ui.View):
     @discord.ui.button(label="Set default nickname", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_nickname(self, interaction: discord.Interaction, button: discord.ui.Button):
 
-        if not ((interaction.user.id == self.user.id) or str(interaction.user.id) in list(os.environ.get("OWNERS").split(","))):
+        if interaction.user.id == self.user.id:
             return interaction.response.send_message('nerd')
         
         # send modal
