@@ -1410,7 +1410,7 @@ async def get_aura_leaderboard() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, amount FROM aura_event ORDER BY amount DESC LIMIT 5"
+                    "SELECT user_id, SUM(amount) as total_amount FROM aura_event GROUP BY user_id ORDER BY total_amount DESC LIMIT 5"
                 )
                 return cursor.fetchall()
             
@@ -1426,7 +1426,7 @@ async def get_aura_leaderboard_bottom() -> list:
             
             with con.cursor() as cursor:
                 cursor.execute(
-                    "SELECT user_id, amount FROM aura_event ORDER BY amount ASC LIMIT 5"
+                    "SELECT user_id, SUM(amount) as total_amount FROM aura_event GROUP BY user_id ORDER BY total_amount ASC LIMIT 5"
                 )
                 return cursor.fetchall()
             
