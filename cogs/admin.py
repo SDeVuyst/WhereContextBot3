@@ -507,6 +507,9 @@ class Admin(commands.Cog, name="admin"):
 
         # edit nickname
         await user.edit(nick=nickname)
+
+        # set as default nickname
+        await db_manager.set_nickname(interaction.guild_id, user.id, nickname)
         
         # respond to interaction
         await interaction.response.send_message(embed=embeds.OperationSucceededEmbed(
@@ -778,31 +781,6 @@ class ConfigureView(discord.ui.View):
         )
 
         super().__init__(timeout=500)
-
-
-    @discord.ui.button(label="Set default nickname", emoji='📜', style=discord.ButtonStyle.blurple, disabled=False)
-    async def add_nickname(self, interaction: discord.Interaction, button: discord.ui.Button):
-
-        if interaction.user.id == self.user.id:
-            return interaction.response.send_message('nerd')
-        
-        # send modal
-        modal = AddNicknameModal(self)
-        await interaction.response.send_modal(modal)
-
-        # wait till modal finishes
-        await modal.wait()
-
-        # save the nickname
-        await db_manager.set_nickname(interaction.guild_id, self.user.id, self.nickname)
-
-        # set description to embed
-        self.embed.set_field_at(index=0, name="📛 Default Nickname", value=f"```{self.nickname}```", inline=False)
-
-        # edit config embed
-        msg = await interaction.original_response()
-        await msg.edit(embed=self.embed, view=self)
-
 
     @discord.ui.button(label="Set default roles", emoji='📝', style=discord.ButtonStyle.blurple, disabled=False)
     async def add_roles(self, interaction: discord.Interaction, button: discord.ui.Button):
