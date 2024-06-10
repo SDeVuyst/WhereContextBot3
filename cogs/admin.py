@@ -495,7 +495,12 @@ class Admin(commands.Cog, name="admin"):
             user (discord.User): Which user
             nickname (str): what nickname
         """
-
+        # cant ban a bot
+        if user.bot:
+            return await interaction.followup.send(embed=embeds.OperationFailedEmbed(
+                "You can't set the nickname of a bot!"
+            ))
+        
         if user.id == interaction.user.id:
             await db_manager.add_aura_event(str(user.id), -100, "eigen nickname aangepast :nerd:")
             return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
