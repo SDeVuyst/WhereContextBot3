@@ -497,7 +497,7 @@ class Admin(commands.Cog, name="admin"):
         """
         # cant ban a bot
         if user.bot:
-            return await interaction.followup.send(embed=embeds.OperationFailedEmbed(
+            return await interaction.response.send_message(embed=embeds.OperationFailedEmbed(
                 "You can't set the nickname of a bot!"
             ))
         
