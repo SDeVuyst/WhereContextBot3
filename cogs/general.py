@@ -51,7 +51,8 @@ class General(commands.Cog, name="general"):
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
-            "admin": "👨‍🔧 Admin"
+            "admin": "👨‍🔧 Admin",
+            "aura": "💥 Aura"
         }
 
         page_numbers = {}
