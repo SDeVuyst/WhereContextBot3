@@ -27,6 +27,17 @@ from datetime import datetime
 class Admin(commands.Cog, name="admin"):
     def __init__(self, bot):
         self.bot = bot
+        self.pin_contextmenu = app_commands.ContextMenu(
+            name='Pin Message',
+            callback=self.pin,
+        )
+        self.bot.tree.add_command(self.pin_contextmenu)
+        
+        self.unpin_contextmenu = app_commands.ContextMenu(
+            name='Unpin Message',
+            callback=self.unpin,
+        )
+        self.bot.tree.add_command(self.pin_contextmenu)
 
     conmand_cog_group = app_commands.Group(name="cog", description="Cog Group")
     blacklist_group = app_commands.Group(name="blacklist", description="Blacklist Group")
@@ -617,6 +628,33 @@ class Admin(commands.Cog, name="admin"):
             builder.async_set_all_podiums_image(loop, message, embed, user.id, [user.id, user.id, user.id], 100, False)
         )
 
+
+    @checks.not_blacklisted()
+    @checks.in_correct_server()
+    async def pin(self, interaction: discord.Interaction, message:discord.Message):
+        """
+        Pins a message
+
+        """
+        try:
+            await message.pin()
+            embed = embeds.OperationSucceededEmbed("Message pinned!", f"[Jump!]({message.jump_url})")
+        except discord.HTTPException:
+            embed = embeds.OperationFailedEmbed("Max pins reached!")
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    @checks.not_blacklisted()
+    @checks.in_correct_server()
+    async def unpin(self, interaction: discord.Interaction, message:discord.Message):
+        """
+        Unpins a message
+
+        """
+        await message.unpin()
+        embed = embeds.OperationSucceededEmbed("Message unpinned!", f"[Jump!]({message.jump_url})")
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 class BanView(discord.ui.View):
