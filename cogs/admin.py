@@ -37,7 +37,7 @@ class Admin(commands.Cog, name="admin"):
             name='Unpin Message',
             callback=self.unpin,
         )
-        self.bot.tree.add_command(self.pin_contextmenu)
+        self.bot.tree.add_command(self.unpin_contextmenu)
 
     conmand_cog_group = app_commands.Group(name="cog", description="Cog Group")
     blacklist_group = app_commands.Group(name="blacklist", description="Blacklist Group")
