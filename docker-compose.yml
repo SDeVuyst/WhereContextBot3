@@ -15,7 +15,7 @@ services:
 
   wcb3_postgres:
     container_name: wcb3_postgres_container
-    image: postgres:latest
+    image: postgres:16
     restart: always
     env_file: stack.env
 
@@ -43,6 +43,13 @@ services:
     depends_on:
       wcb3_postgres:
         condition: service_healthy
+
+  backup:
+    image: eeshugerman/postgres-backup-s3:16
+    env_file: stack.env
+    environment:
+      SCHEDULE: '@daily'
+      BACKUP_KEEP_DAYS: 7
 
 
 volumes:
