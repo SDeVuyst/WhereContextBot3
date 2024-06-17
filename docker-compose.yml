@@ -48,8 +48,8 @@ services:
     image: eeshugerman/postgres-backup-s3:16
     env_file: stack.env
     environment:
-      SCHEDULE: '@daily'
-      BACKUP_KEEP_DAYS: 7
+      SCHEDULE: '@hourly'
+      BACKUP_KEEP_DAYS: 3
 
 
 volumes:
