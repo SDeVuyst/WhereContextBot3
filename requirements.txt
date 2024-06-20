@@ -4,7 +4,7 @@ yt_dlp
 ffmpeg
 aiohttp>=3.7.4
 requests
-pytube
+pytube @ git+https://github.com/rgryta/pytube.git@main
 dateparser
 reactionmenu
 strprogressbar
