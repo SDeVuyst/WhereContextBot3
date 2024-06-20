@@ -372,7 +372,6 @@ class CommandView(View):
     @discord.ui.select(
         placeholder="Choose a subdivision",
         options = [
-            SelectOption(label="Audio", emoji="🎙️", value="audio"),
             SelectOption(label="General", emoji="🤖", value="general"),
             SelectOption(label="Statistics", emoji="📊", value="stats"),
             SelectOption(label="Out Of Context", emoji="📸", value="outofcontext"),
@@ -388,7 +387,6 @@ class CommandView(View):
             select_item (Select): Selected item
         """
         formatted = {
-            "audio": "🎙️ Audio",
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",

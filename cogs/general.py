@@ -47,7 +47,6 @@ class General(commands.Cog, name="general"):
 
         menu = ViewMenu(interaction, menu_type=ViewMenu.TypeEmbed)
         cog_to_title = {
-            "audio": "🎙️ Audio",
             "general": "🤖 General",
             "stats": "📊 Statistics",
             "outofcontext": "📸 Out Of Context",
