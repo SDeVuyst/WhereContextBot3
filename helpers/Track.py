@@ -56,8 +56,7 @@ class Track():
 
         # not a url, search on youtube
         else:
-            s = Search(input_str)
-            yt = s.results[0]
+            yt = custom_search(input_str)[0]
 
             self.url = yt.watch_url
             self.title = yt.title
@@ -67,3 +66,16 @@ class Track():
             self.track_type = TrackType.YOUTUBE
 
 
+
+
+
+# Custom function to handle adSlotRenderer
+def custom_search(query):
+    search_results = Search(query)
+    videos = []
+    for result in search_results.results:
+        if 'adSlotRenderer' in result:
+            continue
+        videos.append(result)
+
+    return videos
