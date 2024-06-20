@@ -1,16 +1,11 @@
 discord.py @ git+https://github.com/Rapptz/discord.py@master
 psycopg2
-yt_dlp
-ffmpeg
 aiohttp>=3.7.4
 requests
-pytube @ git+https://github.com/rgryta/pytube.git@main
 dateparser
 reactionmenu
 strprogressbar
-spotipy
 google-api-python-client
 pillow
 openai
 beautifulsoup4
-pynacl
