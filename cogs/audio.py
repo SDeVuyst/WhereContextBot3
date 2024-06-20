@@ -501,7 +501,7 @@ class Audio(commands.Cog, name="audio"):
 
         else:
             # wacht 1 seconde omdat url soms nog ingeladen moet worden in Track object
-            asyncio.sleep(0.5)
+            await asyncio.sleep(0.5)
             # speel de temp file af
             vc.play(discord.FFmpegPCMAudio(source=filename), after = lambda e: asyncio.run_coroutine_threadsafe(self.play_next(interaction), self.bot.loop))
 
