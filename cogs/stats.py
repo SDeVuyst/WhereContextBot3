@@ -186,11 +186,9 @@ class Stats(commands.Cog, name="stats"):
         description="See statistic about a fortnite creative map",
         extras={'cog': 'stats'}
     )
-    @app_commands.choices(map=[
+    @app_commands.choices(map=[discord.app_commands.Choice(name="ONE PIECE BOX PVP📦", value="8792-6389-3736"),
         discord.app_commands.Choice(name="Naruto Box PVP", value="3216-2522-9844"),
         discord.app_commands.Choice(name="📦STARWARS BOX PVP🔥", value="1630-9217-6519"),
-
-discord.app_commands.Choice(name="ONE PIECE BOX PVP📦", value="8792-6389-3736"),
     ])   
     @checks.not_blacklisted()
     async def fortnite(self, interaction, map: discord.app_commands.Choice[str]) -> None:
