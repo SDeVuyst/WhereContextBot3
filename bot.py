@@ -39,12 +39,15 @@ bot = AutoShardedBot(
 )
 
 FORTNITE_MAPS = {
+    "ONE PIECE BOX PVP📦": {
+        "mapcode": "8792-6389-3736",
+    },
     "Naruto Box PVP": {
         "mapcode": "3216-2522-9844",
     },
     "📦STARWARS BOX PVP🔥": {
         "mapcode": "1630-9217-6519",
-    }
+    },
 }
 
 WEBHOOK_URLS_FORTNITE = [
