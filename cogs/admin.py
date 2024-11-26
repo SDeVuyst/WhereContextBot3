@@ -795,7 +795,6 @@ class UnbanDropdown(discord.ui.Select):
         super().__init__(placeholder="Pick a user to unban", options=options, min_values=1, max_values=1)
 
 
-
     async def callback(self, interaction):
         guild = await self.bot.fetch_guild(int(os.environ.get("GUILD_ID")))
         user = await self.bot.fetch_user(int(self.values[0]))
@@ -1176,6 +1175,8 @@ class BanTypeView(discord.ui.View):
 
     @discord.ui.button(label="Rock Paper Scissors", style=discord.ButtonStyle.blurple, row=3, disabled=False, emoji='✂️')
     async def RPS_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer()
+        
         embed = discord.Embed(
             title="Rock-Paper-Scissors",
             description=f"{self.ban_starter.mention} challenges {self.user.mention} to a game of Rock-Paper-Scissors! (to the death)",
