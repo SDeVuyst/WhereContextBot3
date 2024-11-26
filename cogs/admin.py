@@ -1176,7 +1176,7 @@ class BanTypeView(discord.ui.View):
     @discord.ui.button(label="Rock Paper Scissors", style=discord.ButtonStyle.blurple, row=3, disabled=False, emoji='✂️')
     async def RPS_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer()
-        
+
         embed = discord.Embed(
             title="Rock-Paper-Scissors",
             description=f"{self.ban_starter.mention} challenges {self.user.mention} to a game of Rock-Paper-Scissors! (to the death)",
@@ -1416,7 +1416,7 @@ class RPSView(discord.ui.View):
         winner = self.get_winner(p1_choice, p2_choice)
         loser = self.player1 if winner != self.player1 else self.player2
         if winner == "draw":
-            result = "It's a draw! 🤝"
+            result = "It's a draw! 🤝\n Banning both lol"
         elif winner == self.player1:
             result = f"{self.player1.mention} wins! 🎉\n{self.player2.mention} is banned!"
         else:
@@ -1433,20 +1433,31 @@ class RPSView(discord.ui.View):
         )
         await interaction.response.edit_message(embed=embed, view=self)
 
-        # ban the user
-        await loser.ban(reason=f"Lost a Rock Paper Scissors game to {winner.mention}!", delete_message_days=0) 
-
-        # send ban message to loser
         banned_embed = embeds.DefaultEmbed(
             f"🔨 You have been banned from {interaction.guild.name}!", user=loser
         )
 
-        banned_embed.add_field(
-            name="💡 Reason",
-            value=f"```Lost a Rock Paper Scissors game to {winner.mention}!```",
-        )
+        if winner == "draw":
+            await self.player1.ban(reason=f"We do not draw in this hoe!", delete_message_days=0) 
+            await self.player2.ban(reason=f"We do not draw in this hoe!", delete_message_days=0) 
 
-        await loser.send(embed=banned_embed)
+            banned_embed.add_field(
+                name="💡 Reason",
+                value=f"```We do not draw in this hoe!```",
+            )
+            await self.player1.send(embed=banned_embed)
+            await self.player2.send(embed=banned_embed)
+
+        else:
+            # ban the user
+            await loser.ban(reason=f"Lost a Rock Paper Scissors game to {winner.mention}!", delete_message_days=0) 
+
+            banned_embed.add_field(
+                name="💡 Reason",
+                value=f"```Lost a Rock Paper Scissors game to {winner.mention}!```",
+            )
+
+            await loser.send(embed=banned_embed)
 
     def get_winner(self, p1, p2):
         """Determines the winner based on the game rules."""
