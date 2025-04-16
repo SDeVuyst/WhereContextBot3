@@ -135,7 +135,7 @@ bot.logger = logger
 def init_db():
     time.sleep(30)
     with psycopg2.connect(
-        host='192.168.86.200', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
+        host='192.168.128.2', dbname='pg_wcb3', user=os.environ.get('POSTGRES_USER'), password=os.environ.get('POSTGRES_PASSWORD')
     ) as con:
         
         with con.cursor() as cursor:
